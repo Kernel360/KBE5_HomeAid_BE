@@ -29,3 +29,33 @@ jobs:
 
       - name: Run tests
         run: ./gradlew test --no-daemon
+
+      - name: Notify success on Discord
+        if: success()
+        run: |
+          curl -H "Content-Type: application/json" \
+               -X POST \
+               -d '{
+                 "embeds": [{
+                   "title": "✅ CI 성공",
+                   "description": "**📦 Repository:** `${{ github.repository }}`\n**🌿 Branch:** `${{ github.ref_name }}`\n**🧪 Workflow:** `${{ github.workflow }}`\n**🎯 Event:** `${{ github.event_name }}`\n**👤 작성자:** `${{ github.actor }}`\n\n[🔗 GitHub Actions 로그 확인하기](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})\n\n${{ github.event_name == 'pull_request' && format('[🔍 PR 보기](https://github.com/{0}/pull/{1})', github.repository, github.event.pull_request.number) || '' }}",
+                   "color": 5763719
+                 }],
+                 "content": "<@&ROLE_ID> ✅ CI 통과: `${{ github.ref_name }}` 브랜치입니다!"
+               }' \
+               ${{ secrets.DISCORD_WEBHOOK }}
+
+      - name: Notify failure on Discord
+        if: failure()
+        run: |
+          curl -H "Content-Type: application/json" \
+               -X POST \
+               -d '{
+                 "embeds": [{
+                   "title": "❌ CI 실패",
+                   "description": "**📦 Repository:** `${{ github.repository }}`\n**🌿 Branch:** `${{ github.ref_name }}`\n**🧪 Workflow:** `${{ github.workflow }}`\n**🎯 Event:** `${{ github.event_name }}`\n**👤 작성자:** `${{ github.actor }}`\n\n[🔗 GitHub Actions 로그 확인하기](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})\n\n${{ github.event_name == 'pull_request' && format('[🔍 PR 보기](https://github.com/{0}/pull/{1})', github.repository, github.event.pull_request.number) || '' }}",
+                   "color": 16711680
+                 }],
+                 "content": "<@&ROLE_ID> ❗ CI 실패 발생: `${{ github.ref_name }}` 브랜치 확인해주세요!"
+               }' \
+               ${{ secrets.DISCORD_WEBHOOK }}

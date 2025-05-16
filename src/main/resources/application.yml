@@ -1,0 +1,24 @@
+spring:
+  application:
+    name: HomeAid
+
+  profiles:
+    active: local
+
+  datasource:
+    driver-class-name: ${DB_DRIVER}
+    url: jdbc:mysql://${DB_HOST}:${DB_PORT}/${DB_NAME}?serverTimezone=UTC&characterEncoding=UTF-8
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.MySQL8Dialect
+
+env:
+  secure-cookie: false
