@@ -10,6 +10,20 @@ jobs:
   build-and-test:
     runs-on: ubuntu-latest
 
+    services:
+      mysql:
+        image: mysql:latest
+        env:
+          MYSQL_DATABASE: homeaid_db
+          MYSQL_ROOT_PASSWORD: 1
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping --silent"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
+
     steps:
       - name: Checkout source code
         uses: actions/checkout@v3
@@ -28,14 +42,6 @@ jobs:
         run: ./gradlew build --no-daemon
 
       - name: Run tests
-        env:
-          DB_DRIVER: ${{ secrets.DB_DRIVER }}
-          DB_HOST: ${{ secrets.DB_HOST }}
-          DB_PORT: ${{ secrets.DB_PORT }}
-          DB_NAME: ${{ secrets.DB_NAME }}
-          DB_USERNAME: ${{ secrets.DB_USERNAME }}
-          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
-          SECURE_COOKIE: ${{ secrets.SECURE_COOKIE }}
         run: ./gradlew test --no-daemon
 
       - name: Notify success on Discord
@@ -49,7 +55,7 @@ jobs:
                    "description": "**📦 Repository:** `${{ github.repository }}`\n**🌿 Branch:** `${{ github.ref_name }}`\n**🧪 Workflow:** `${{ github.workflow }}`\n**🎯 Event:** `${{ github.event_name }}`\n**👤 작성자:** `${{ github.actor }}`\n\n[🔗 GitHub Actions 로그 확인하기](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})\n\n${{ github.event_name == 'pull_request' && format('[🔍 PR 보기](https://github.com/{0}/pull/{1})', github.repository, github.event.pull_request.number) || '' }}",
                    "color": 5763719
                  }],
-                 "content": "✅ CI 통과: `${{ github.ref_name }}` 브랜치입니다!"
+                 "content": "<@&ROLE_ID> ✅ CI 통과: `${{ github.ref_name }}` 브랜치입니다!"
                }' \
                ${{ secrets.DISCORD_WEBHOOK }}
 
@@ -64,6 +70,6 @@ jobs:
                    "description": "**📦 Repository:** `${{ github.repository }}`\n**🌿 Branch:** `${{ github.ref_name }}`\n**🧪 Workflow:** `${{ github.workflow }}`\n**🎯 Event:** `${{ github.event_name }}`\n**👤 작성자:** `${{ github.actor }}`\n\n[🔗 GitHub Actions 로그 확인하기](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})\n\n${{ github.event_name == 'pull_request' && format('[🔍 PR 보기](https://github.com/{0}/pull/{1})', github.repository, github.event.pull_request.number) || '' }}",
                    "color": 16711680
                  }],
-                 "content": "❗ CI 실패 발생: `${{ github.ref_name }}` 브랜치 확인해주세요!"
+                 "content": "<@&ROLE_ID> ❗ CI 실패 발생: `${{ github.ref_name }}` 브랜치 확인해주세요!"
                }' \
                ${{ secrets.DISCORD_WEBHOOK }}
