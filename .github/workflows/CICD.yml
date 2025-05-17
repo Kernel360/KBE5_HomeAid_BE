@@ -16,7 +16,7 @@ jobs:
         env:
           MYSQL_DATABASE: ${{ secrets.DB_NAME }}
           MYSQL_ROOT_PASSWORD: root
-          MYSQL_USER: ${{ secrets.DB_USERNAME }}
+          MYSQL_USER: homeaid_user
           MYSQL_PASSWORD: ${{ secrets.DB_PASSWORD }}
         ports:
           - 3306:3306
