@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor(staticName = "of")
-public class ApiResponse<T> {
+public class CommonApiResponse<T> {
 
   @Schema(description = "성공 여부", example = "true")
   private boolean success;
@@ -24,16 +24,16 @@ public class ApiResponse<T> {
   @Schema(description = "응답 메시지", example = "요청이 성공했습니다.", nullable = true)
   private String message;
 
-  public static <T> ApiResponse<T> success(T data) {
-    return ApiResponse.of(true, data, "SUCCESS", "요청이 성공했습니다.");
+  public static <T> CommonApiResponse<T> success(T data) {
+    return CommonApiResponse.of(true, data, "SUCCESS", "요청이 성공했습니다.");
   }
 
-  public static ApiResponse<Void> success() {
-    return ApiResponse.of(true, null, "SUCCESS", "요청이 성공했습니다.");
+  public static CommonApiResponse<Void> success() {
+    return CommonApiResponse.of(true, null, "SUCCESS", "요청이 성공했습니다.");
   }
 
-  public static ApiResponse<Void> fail(String code, String message) {
-    return ApiResponse.of(false, null, code, message);
+  public static CommonApiResponse<Void> fail(String code, String message) {
+    return CommonApiResponse.of(false, null, code, message);
   }
 
 
