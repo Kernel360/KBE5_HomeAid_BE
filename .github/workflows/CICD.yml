@@ -61,7 +61,7 @@ jobs:
         run: ./gradlew clean build
 
       - name: Notify success on Discord
-        if: success()
+        if: success() && github.repository == 'Kernel360/KBE5_HomeAid_BE'
         run: |
           curl -H "Content-Type: application/json" \
                -X POST \
@@ -76,7 +76,7 @@ jobs:
                ${{ secrets.DISCORD_WEBHOOK }}
 
       - name: Notify failure on Discord
-        if: failure()
+        if: failure() && github.repository == 'Kernel360/KBE5_HomeAid_BE'
         run: |
           curl -H "Content-Type: application/json" \
                -X POST \
