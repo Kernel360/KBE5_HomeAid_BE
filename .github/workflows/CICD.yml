@@ -5,6 +5,8 @@ on:
     branches: [ dev ]
   pull_request:
     branches: [ dev ]
+  pull_request_target:
+    branches: [ dev ]  # fork PR secrets 사용 가능
 
 jobs:
   build-and-test:
@@ -29,6 +31,14 @@ jobs:
     steps:
       - name: Checkout source code
         uses: actions/checkout@v3
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+          repository: ${{ github.event.pull_request.head.repo.full_name }}
+        if: github.event_name == 'pull_request_target'
+
+      - name: Checkout source code (for push/pull_request)
+        uses: actions/checkout@v3
+        if: github.event_name != 'pull_request_target'
 
       - name: Set up JDK 17 (corretto)
         uses: actions/setup-java@v3
