@@ -7,6 +7,7 @@ on:
     branches: [ dev ]
   pull_request_target:
     branches: [ dev ]  # fork PR secrets 사용 가능
+    types: [opened, synchronize, reopened]
 
 jobs:
   build-and-test:
