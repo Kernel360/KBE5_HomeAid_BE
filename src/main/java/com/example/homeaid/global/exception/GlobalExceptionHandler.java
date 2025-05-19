@@ -1,6 +1,6 @@
 package com.example.homeaid.global.exception;
 
-import com.example.homeaid.global.common.response.ApiResponse;
+import com.example.homeaid.global.common.response.CommonApiResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.ResponseEntity;
@@ -15,18 +15,18 @@ public class GlobalExceptionHandler {
 
 
   @ExceptionHandler(CustomException.class)
-  public ResponseEntity<ApiResponse<Void>> handleCustomException(CustomException e) {
+  public ResponseEntity<CommonApiResponse<Void>> handleCustomException(CustomException e) {
     log.warn("[CustomException] {} - {}", e.getErrorCode().getCode(), e.getMessage());
 
     return ResponseEntity.status(e.getErrorCode().getStatus())
-        .body(ApiResponse.fail(e.getErrorCode().getCode(), e.getErrorCode().getMessage()));
+        .body(CommonApiResponse.fail(e.getErrorCode().getCode(), e.getErrorCode().getMessage()));
   }
 
   /**
    * DTO 유효성 검증 실패
    */
   @ExceptionHandler(MethodArgumentNotValidException.class)
-  public ResponseEntity<ApiResponse<Void>> handleValidationException(MethodArgumentNotValidException e) {
+  public ResponseEntity<CommonApiResponse<Void>> handleValidationException(MethodArgumentNotValidException e) {
     String message = e.getBindingResult().getFieldErrors().stream()
         .findFirst()
         .map(DefaultMessageSourceResolvable::getDefaultMessage)
@@ -35,18 +35,18 @@ public class GlobalExceptionHandler {
     log.warn("[ValidationException] {}", message);
 
     return ResponseEntity.badRequest()
-        .body(ApiResponse.fail("VALIDATION_ERROR", message));
+        .body(CommonApiResponse.fail("VALIDATION_ERROR", message));
   }
 
   /**
    * 요청 JSON 파싱 실패
    */
   @ExceptionHandler(HttpMessageNotReadableException.class)
-  public ResponseEntity<ApiResponse<Void>> handleParsingException(HttpMessageNotReadableException e) {
+  public ResponseEntity<CommonApiResponse<Void>> handleParsingException(HttpMessageNotReadableException e) {
     log.warn("[HttpMessageNotReadableException] {}", e.getMessage());
 
     return ResponseEntity.badRequest()
-        .body(ApiResponse.fail("INVALID_JSON", "요청 형식이 잘못되었습니다."));
+        .body(CommonApiResponse.fail("INVALID_JSON", "요청 형식이 잘못되었습니다."));
   }
 
 
