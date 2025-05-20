@@ -1,23 +1,25 @@
 package com.example.homeaid.manager.entity;
 
 import com.example.homeaid.global.common.entity.User;
+import com.example.homeaid.global.common.entity.enumerate.GenderType;
+import com.example.homeaid.global.common.entity.enumerate.UserRole;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import lombok.AllArgsConstructor;
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 
 @Getter
-@AllArgsConstructor
-@NoArgsConstructor
-@Builder
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 @Table(name = "manager")
 public class Manager extends User {
@@ -28,13 +30,26 @@ public class Manager extends User {
 
   private String profileImage;
 
+  @Setter
   private String documentUrl;
 
-  private boolean verified = false;
+  private Boolean verified = false;
 
   @OneToMany(mappedBy = "manager", cascade = CascadeType.ALL, orphanRemoval = true)
   private List<ManagerAvailability> availabilityList = new ArrayList<>();
 
   private LocalDateTime verifiedAt;
 
+  @Builder
+  public Manager(String email, String password, String name, String phone, LocalDate birth, GenderType gender, String career, String experience, String profileImage) {
+    super(email, password, name, phone, birth, gender, UserRole.MANAGER);
+    this.career = career;
+    this.experience = experience;
+    this.profileImage = profileImage;
+  }
+
+  public void approve() {
+    this.verified = true;
+    this.verifiedAt = LocalDateTime.now();
+  }
 }

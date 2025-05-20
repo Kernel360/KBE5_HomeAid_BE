@@ -9,16 +9,14 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import lombok.AllArgsConstructor;
+import java.time.LocalTime;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Getter
-@AllArgsConstructor
 @NoArgsConstructor
-@Builder
 @Entity
 @Table(name = "manager_availability")
 public class ManagerAvailability {
@@ -27,14 +25,25 @@ public class ManagerAvailability {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
+  @Setter
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "manager_id")
   private Manager manager;
 
   private LocalDate availableDate;
 
-  private LocalDateTime availableTime;
+  private LocalTime startTime;
+  private LocalTime endTime;
 
   private String region;
+
+  @Builder
+  public ManagerAvailability(LocalDate availableDate, LocalTime startTime, LocalTime endTime,
+      String region) {
+    this.availableDate = availableDate;
+    this.startTime = startTime;
+    this.endTime = endTime;
+    this.region = region;
+  }
 
 }

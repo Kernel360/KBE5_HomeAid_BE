@@ -15,8 +15,6 @@ import jakarta.persistence.InheritanceType;
 import jakarta.persistence.Table;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
@@ -25,9 +23,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 
 @Getter
-@AllArgsConstructor
 @NoArgsConstructor
-@Builder
 @Entity
 @Table(name = "user")
 @Inheritance(strategy = InheritanceType.JOINED)
@@ -41,10 +37,13 @@ public class User {
   @Column(unique = true, nullable = false)
   private String email;
 
+  @Column(nullable = false)
   private String password;
 
+  @Column(nullable = false)
   private String name;
 
+  @Column(nullable = false)
   private String phone;
 
   private LocalDate birth;
@@ -61,5 +60,15 @@ public class User {
 
   @LastModifiedDate
   private LocalDateTime updatedAt;
+
+  public User(String email, String password, String name, String phone, LocalDate birth, GenderType gender, UserRole role) {
+    this.email = email;
+    this.password = password;
+    this.name = name;
+    this.phone = phone;
+    this.birth = birth;
+    this.gender = gender;
+    this.role = role;
+  }
 
 }

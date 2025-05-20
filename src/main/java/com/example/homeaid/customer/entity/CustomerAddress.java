@@ -8,15 +8,14 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Getter
-@AllArgsConstructor
-@NoArgsConstructor
-@Builder
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 @Table(name = "customer_address")
 public class CustomerAddress {
@@ -25,6 +24,7 @@ public class CustomerAddress {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
+  @Setter
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "customer_id")
   private Customer customer;
@@ -32,4 +32,10 @@ public class CustomerAddress {
   private String address;
 
   private String addressDetail;
+
+  @Builder
+  public CustomerAddress(String address, String addressDetail) {
+    this.address = address;
+    this.addressDetail = addressDetail;
+  }
 }
