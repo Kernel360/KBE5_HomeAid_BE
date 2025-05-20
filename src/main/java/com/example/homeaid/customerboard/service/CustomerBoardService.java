@@ -11,7 +11,7 @@ public interface CustomerBoardService {
 
     CustomerBoard createBoard(CustomerBoard customerBoard);
 
-    CustomerBoard updateBoard(Long id, UpdateBoardRequestDto updateBoardRequestDto);
+    CustomerBoard updateBoard(Long id, CustomerBoard customerBoard);
 
     CustomerBoard getBoard(Long id);
 

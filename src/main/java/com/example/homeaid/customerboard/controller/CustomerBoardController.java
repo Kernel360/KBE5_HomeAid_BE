@@ -4,6 +4,7 @@ import com.example.homeaid.customerboard.dto.request.CreateBoardRequestDto;
 import com.example.homeaid.customerboard.dto.request.UpdateBoardRequestDto;
 import com.example.homeaid.customerboard.dto.response.CreateBoardResponseDto;
 import com.example.homeaid.customerboard.dto.response.UpdateBoardResponseDto;
+import com.example.homeaid.customerboard.entity.CustomerBoard;
 import com.example.homeaid.customerboard.service.CustomerBoardServiceImpl;
 import com.example.homeaid.global.common.response.CommonApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -38,8 +39,6 @@ public class CustomerBoardController {
   @PostMapping("")
   @Operation(summary = "[수요자] 게시판 글 작성", responses = {
       @ApiResponse(responseCode = "201", description = "성공",
-          content = @Content(schema = @Schema(implementation = CommonApiResponse.class))),
-      @ApiResponse(responseCode = "400", description = "필수 필드 누락 및 잘못된 값 입력",
           content = @Content(schema = @Schema(implementation = CommonApiResponse.class)))
   })
   public ResponseEntity<CommonApiResponse<CreateBoardResponseDto>> createBoard(
@@ -55,8 +54,6 @@ public class CustomerBoardController {
   @Operation(summary = "[수요자] 게시판 글 수정", responses = {
       @ApiResponse(responseCode = "200", description = "성공",
           content = @Content(schema = @Schema(implementation = UpdateBoardResponseDto.class))),
-      @ApiResponse(responseCode = "400", description = "필수 필드 누락 및 잘못된 값 입력",
-          content = @Content(schema = @Schema(implementation = UpdateBoardResponseDto.class))),
       @ApiResponse(responseCode = "404", description = "해당 게시글 없음",
           content = @Content(schema = @Schema(implementation = UpdateBoardResponseDto.class)))
   })
@@ -64,10 +61,12 @@ public class CustomerBoardController {
       @PathVariable Long id,
       @RequestBody @Valid UpdateBoardRequestDto updateBoardRequestDto
   ) {
-    return ResponseEntity.status(HttpStatus.OK).body(CommonApiResponse.success(
-        UpdateBoardResponseDto.toDto(
-            boardService.updateBoard(id, updateBoardRequestDto))
-    ));
+    CustomerBoard updatedBoard = boardService.updateBoard(
+        id, UpdateBoardRequestDto.toEntity(updateBoardRequestDto)
+    );
+    return ResponseEntity.status(HttpStatus.OK).body(
+        CommonApiResponse.success(UpdateBoardResponseDto.toDto(updatedBoard))
+    );
   }
 
   @DeleteMapping("/{id}")
@@ -101,8 +100,6 @@ public class CustomerBoardController {
   @GetMapping("")
   @Operation(summary = "[수요자] 게시글 전체 조회 및 검색", responses = {
       @ApiResponse(responseCode = "200", description = "성공",
-          content = @Content(schema = @Schema(implementation = CommonApiResponse.class))),
-      @ApiResponse(responseCode = "404", description = "조회된 게시글 없음",
           content = @Content(schema = @Schema(implementation = CommonApiResponse.class)))
   })
   public ResponseEntity<CommonApiResponse<Page<CreateBoardResponseDto>>> searchBoard(
@@ -116,9 +113,6 @@ public class CustomerBoardController {
         Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();
 
     Pageable pageable = PageRequest.of(page, size, sort);
-
-    Page<CreateBoardResponseDto> results = boardService.searchBoard(
-        keyword, pageable);
 
     return ResponseEntity.ok(CommonApiResponse.success(boardService.searchBoard(
         keyword, pageable)));
