@@ -1,6 +1,5 @@
-package com.example.homeaid.global.domain;
+package com.example.homeaid.global.domain.Entity;
 
-import com.example.homeaid.customer.entity.Customer;
 import jakarta.persistence.*;
 import lombok.*;
 import java.time.LocalDateTime;
@@ -17,10 +16,10 @@ public class User {
     @Id
     private Long id;
 
-    @Column(nullable = false, unique = true, length = 255)
+    @Column(nullable = false, unique = true)
     private String email;
 
-    @Column(nullable = false, length = 255)
+    @Column(nullable = false)
     private String password;
 
     @Column(nullable = false, length = 100)
@@ -36,8 +35,6 @@ public class User {
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
-    private Customer customer;
 
     public enum Role {
         CUSTOMER, MANAGER, ADMIN

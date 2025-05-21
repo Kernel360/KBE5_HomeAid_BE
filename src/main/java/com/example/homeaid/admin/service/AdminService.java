@@ -1,8 +1,8 @@
 package com.example.homeaid.admin.service;
 
-import com.example.homeaid.admin.repository.AdminRepository;
-import com.example.homeaid.customer.entity.Customer;
-import com.example.homeaid.customer.entity.repository.CustomerRepository;
+import com.example.homeaid.global.domain.Entity.User;
+import com.example.homeaid.global.domain.Entity.User.Role;
+import com.example.homeaid.global.domain.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -14,15 +14,12 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class AdminService {
 
-    private final AdminRepository adminRepository;
-    private final CustomerRepository customerRepository;
+    private final UserRepository userRepository;
 
 
-    public Page<Customer> findAllCustomer(Pageable pageable) {
-
-        return customerRepository.findAll(pageable);
+    public Page<User> findAllUser(Role role, Pageable pageable) {
+        return userRepository.findByRole(role, pageable);
     }
-
 
 
 }
