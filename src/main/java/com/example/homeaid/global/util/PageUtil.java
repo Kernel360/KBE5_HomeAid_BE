@@ -5,15 +5,15 @@ import org.springframework.data.domain.Page;
 public class PageUtil {
 
     /**
-     * Page<Dto>객체를 파라미터로 받아
-     * Dto객체와 Page의 paging하는 요소로 구성
      * @param page
-     * @return
-     * @param <T>
+     * Page의 메서드 map()을 사용하여 Page<Dto>로 변환 합니다
+     *      map의 인자 : fromEntity(Entity entity)
+     * Page<Dto>로 변환한 객체를 파라미터로 받습니다
+     * @return Dto(page.getContent) 와 paging 요소로 구성
      */
-    public static <T> PageResponse<T> from(Page<T> page) {
+    public static <T> ResponsePagingDto<T> from(Page<T> page) {
 
-        return new PageResponse<>(
+        return new ResponsePagingDto<>(
             page.getContent(),
             page.getNumber(),
             page.getTotalPages(),

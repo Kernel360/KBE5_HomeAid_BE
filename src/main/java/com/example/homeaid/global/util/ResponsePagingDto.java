@@ -8,7 +8,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @AllArgsConstructor
-public class PageResponse<T> {
+public class ResponsePagingDto<T> {
     private List<T> content;
     private int currentPage;
     private int totalPages;
