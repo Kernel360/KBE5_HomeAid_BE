@@ -1,12 +1,15 @@
 package com.example.homeaid.customerboard.entity;
 
 
-import com.example.homeaid.customerboard.dto.request.UpdateBoardRequestDto;
+import com.example.homeaid.adminreply.entity.AdminReply;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
@@ -27,6 +30,7 @@ public class CustomerBoard {
     private Long id;
 
     // 작성자
+    private Long userId;
 
     @Column(nullable = false, length = 255)
     private String title;
@@ -34,12 +38,11 @@ public class CustomerBoard {
     @Column(nullable = false, columnDefinition = "TEXT")
     private String content;
 
-    // 작성일
     private LocalDateTime createdAt;
-
-    // 수정일
     private LocalDateTime modifiedAt;
 
+//    @OneToOne(mappedBy = "customer_board", cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
+//    private AdminReply adminReply;
 
     public void updateBoard(String title, String content) {
         if (title != null) this.title = title;
