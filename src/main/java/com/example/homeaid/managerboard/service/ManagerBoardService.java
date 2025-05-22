@@ -1,6 +1,5 @@
 package com.example.homeaid.managerboard.service;
 
-import com.example.homeaid.managerboard.dto.request.ManagerBoardUpdateRequestDto;
 import com.example.homeaid.managerboard.entity.ManagerBoard;
 
 public interface ManagerBoardService {
@@ -9,7 +8,7 @@ public interface ManagerBoardService {
 
   ManagerBoard getManagerBoard(Long id);
 
-  ManagerBoard updateManagerBoard(Long id, ManagerBoardUpdateRequestDto managerBoardUpdateRequestDto);
+  ManagerBoard updateManagerBoard(Long id, ManagerBoard managerBoard);
 
   void deleteManagerBoard(Long id);
 

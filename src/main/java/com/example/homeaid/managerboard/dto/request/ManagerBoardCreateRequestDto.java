@@ -11,13 +11,13 @@ public class ManagerBoardCreateRequestDto {
   private String content;
   private Boolean isPublic;
 
-  public static ManagerBoard toEntity(ManagerBoardCreateRequestDto managerBoardCreateRequestDto) {
+  public ManagerBoard toEntity(Long managerId) {
     return ManagerBoard.builder()
-        .title(managerBoardCreateRequestDto.getTitle())
-        .content(managerBoardCreateRequestDto.getContent())
-        .isPublic(managerBoardCreateRequestDto.getIsPublic())
+        .title(this.title)
+        .content(this.content)
+        .isPublic(this.isPublic)
         .createdAt(LocalDateTime.now())
-        .managerId(1L) // 수정필수
+        .managerId(managerId)
         .build();
   }
 }

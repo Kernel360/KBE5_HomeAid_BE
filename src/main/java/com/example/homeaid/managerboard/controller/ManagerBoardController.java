@@ -4,6 +4,7 @@ import com.example.homeaid.global.common.response.CommonApiResponse;
 import com.example.homeaid.managerboard.dto.request.ManagerBoardCreateRequestDto;
 import com.example.homeaid.managerboard.dto.request.ManagerBoardUpdateRequestDto;
 import com.example.homeaid.managerboard.dto.response.ManagerBoardResponseDto;
+import com.example.homeaid.managerboard.entity.ManagerBoard;
 import com.example.homeaid.managerboard.service.ManagerBoardServiceImpl;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -30,10 +31,12 @@ public class ManagerBoardController {
   public ResponseEntity<CommonApiResponse<ManagerBoardResponseDto>> createManagerBoard(
       ManagerBoardCreateRequestDto managerBoardCreateRequestDto) {
 
+    // DTO → Entity 변환
+    ManagerBoard entity = managerBoardCreateRequestDto.toEntity(1L); // TODO: 로그인된 managerId로 수정
+    // 저장 후 Entity 반환 → DTO로 변환
+    ManagerBoard saved = managerBoardService.createManagerBoard(entity);
     return ResponseEntity.status(HttpStatus.CREATED).body(CommonApiResponse.success(
-        ManagerBoardResponseDto.toDto(
-            managerBoardService.createManagerBoard(ManagerBoardCreateRequestDto.toEntity(managerBoardCreateRequestDto))
-        )
+        ManagerBoardResponseDto.from(saved)
     ));
   }
 
@@ -46,24 +49,21 @@ public class ManagerBoardController {
       @PathVariable Long id
   ) {
     return ResponseEntity.ok(
-        CommonApiResponse.success(ManagerBoardResponseDto.toDto(managerBoardService.getManagerBoard(id)))
+        CommonApiResponse.success(ManagerBoardResponseDto.from(managerBoardService.getManagerBoard(id)))
     );
   }
 
   @PutMapping("/{id}")
-  @Operation(summary = "매니저 게시글 수정", responses = {
-      @ApiResponse(responseCode = "200", description = "수정 성공",
-          content = @Content(schema = @Schema(implementation = CommonApiResponse.class)))
-  })
   public ResponseEntity<CommonApiResponse<ManagerBoardResponseDto>> updateManagerBoard(
       @PathVariable Long id,
-      @RequestBody ManagerBoardUpdateRequestDto managerBoardUpdateRequestDto
-  ) {
-    return ResponseEntity.ok(CommonApiResponse.success(
-        ManagerBoardResponseDto.toDto(
-            managerBoardService.updateManagerBoard(id, managerBoardUpdateRequestDto)
-        )
-    ));
+      @RequestBody ManagerBoardUpdateRequestDto dto) {
+
+    // DTO → Entity 변환
+    ManagerBoard entity = dto.toEntity();
+
+    // 수정 후 Entity 반환 → DTO 변환
+    ManagerBoard updated = managerBoardService.updateManagerBoard(id, entity);
+    return ResponseEntity.ok(CommonApiResponse.success(ManagerBoardResponseDto.from(updated)));
   }
 
   @DeleteMapping("/{id}")

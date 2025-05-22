@@ -1,6 +1,8 @@
 package com.example.homeaid.managerboard.entity;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -10,6 +12,8 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @Entity
 @Getter
@@ -17,6 +21,7 @@ import lombok.NoArgsConstructor;
 @Table(name = "manager_board")
 @NoArgsConstructor
 @AllArgsConstructor
+@EntityListeners(AuditingEntityListener.class)
 public class ManagerBoard {
 
   @Id
@@ -27,6 +32,9 @@ public class ManagerBoard {
   private String content;
 
   private Boolean isPublic; // 공개여부
+
+  @CreatedDate
+  @Column(updatable = false)
   private LocalDateTime createdAt;
 
   private Long managerId;

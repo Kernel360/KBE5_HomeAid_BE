@@ -19,7 +19,7 @@ public class ManagerBoardResponseDto {
   private String createdAt;
   private Long managerId;
 
-  public static ManagerBoardResponseDto toDto(ManagerBoard managerBoard) {
+  public static ManagerBoardResponseDto from(ManagerBoard managerBoard) {
     return ManagerBoardResponseDto.builder()
         .id(managerBoard.getId())
         .title(managerBoard.getTitle())
