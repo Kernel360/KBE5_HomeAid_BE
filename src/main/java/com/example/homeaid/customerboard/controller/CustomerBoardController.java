@@ -121,3 +121,4 @@ public class CustomerBoardController {
     return ResponseEntity.ok(CommonApiResponse.success(boardService.searchBoard(
         keyword, pageable)));
   }
+}
