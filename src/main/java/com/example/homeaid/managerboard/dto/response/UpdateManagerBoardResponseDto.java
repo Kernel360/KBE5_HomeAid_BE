@@ -10,23 +10,18 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class ManagerBoardResponseDto {
+public class UpdateManagerBoardResponseDto {
 
   private Long id;
   private String title;
   private String content;
-  private Boolean isPublic;
-  private String createdAt;
-  private Long managerId;
 
-  public static ManagerBoardResponseDto from(ManagerBoard managerBoard) {
-    return ManagerBoardResponseDto.builder()
+  public static UpdateManagerBoardResponseDto toDto(ManagerBoard managerBoard) {
+    return UpdateManagerBoardResponseDto.builder()
         .id(managerBoard.getId())
         .title(managerBoard.getTitle())
         .content(managerBoard.getContent())
-        .isPublic(managerBoard.getIsPublic())
-        .createdAt(managerBoard.getCreatedAt() != null ? managerBoard.getCreatedAt().toString() : null)
-        .managerId(managerBoard.getManagerId())
         .build();
   }
+
 }

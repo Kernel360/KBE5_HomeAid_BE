@@ -1,23 +1,28 @@
 package com.example.homeaid.managerboard.dto.request;
 
 import com.example.homeaid.managerboard.entity.ManagerBoard;
-import java.time.LocalDateTime;
+import jakarta.validation.constraints.NotBlank;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Getter
-public class ManagerBoardCreateRequestDto {
+@NoArgsConstructor
+@AllArgsConstructor
+public class CreateManagerBoardRequestDto {
 
+  @NotBlank(message = "제목을 작성해주세요")
   private String title;
+
+  @NotBlank(message = "내용을 작성해주세요")
   private String content;
   private Boolean isPublic;
 
-  public ManagerBoard toEntity(Long managerId) {
+  public ManagerBoard toEntity() {
     return ManagerBoard.builder()
         .title(this.title)
         .content(this.content)
         .isPublic(this.isPublic)
-        .createdAt(LocalDateTime.now())
-        .managerId(managerId)
         .build();
   }
 }
