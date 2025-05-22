@@ -12,6 +12,10 @@ on:
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
+    if: |
+      (github.event_name == 'pull_request_target' && github.event.pull_request.head.repo.full_name != github.repository) ||
+      (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository) ||
+      github.event_name == 'push'
     
     services:
       mysql:
@@ -30,16 +34,16 @@ jobs:
           --health-retries=3
 
     steps:
-      - name: Checkout source code
+      - name: Checkout PR code (fork PR only)
+        if: github.event_name == 'pull_request_target'
         uses: actions/checkout@v3
         with:
           ref: ${{ github.event.pull_request.head.ref }}
           repository: ${{ github.event.pull_request.head.repo.full_name }}
-        if: github.event_name == 'pull_request_target'
 
-      - name: Checkout source code (for push/pull_request)
-        uses: actions/checkout@v3
+      - name: Checkout code (for push or internal pull_request)
         if: github.event_name != 'pull_request_target'
+        uses: actions/checkout@v3
 
       - name: Set up JDK 17 (corretto)
         uses: actions/setup-java@v3
@@ -62,7 +66,7 @@ jobs:
         run: ./gradlew clean build
 
       - name: Notify success on Discord
-        if: success() && github.repository == 'Kernel360/KBE5_HomeAid_BE'
+        if: success()
         run: |
           curl -H "Content-Type: application/json" \
                -X POST \
@@ -77,7 +81,7 @@ jobs:
                ${{ secrets.DISCORD_WEBHOOK }}
 
       - name: Notify failure on Discord
-        if: failure() && github.repository == 'Kernel360/KBE5_HomeAid_BE'
+        if: failure()
         run: |
           curl -H "Content-Type: application/json" \
                -X POST \
