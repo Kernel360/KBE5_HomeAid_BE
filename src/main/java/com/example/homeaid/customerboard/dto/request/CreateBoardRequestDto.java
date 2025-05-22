@@ -16,7 +16,6 @@ public class CreateBoardRequestDto {
     private String title;
 
     @NotBlank(message = "내용을 작성해 주세요")
-    private String content;
 
     public static CustomerBoard toEntity(CreateBoardRequestDto createBoardRequestDto) {
         return CustomerBoard.builder()

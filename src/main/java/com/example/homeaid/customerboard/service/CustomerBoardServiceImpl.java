@@ -1,14 +1,10 @@
 package com.example.homeaid.customerboard.service;
 
-import com.example.homeaid.customerboard.dto.request.UpdateBoardRequestDto;
-import com.example.homeaid.customerboard.dto.response.CreateBoardResponseDto;
 import com.example.homeaid.customerboard.entity.CustomerBoard;
 import com.example.homeaid.customerboard.repository.CustomerBoardRepository;
 import com.example.homeaid.global.exception.CustomException;
 import com.example.homeaid.global.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @Service

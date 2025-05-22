@@ -1,6 +1,5 @@
 package com.example.homeaid.customerboard.service;
 
-
 import com.example.homeaid.customerboard.dto.request.UpdateBoardRequestDto;
 import com.example.homeaid.customerboard.dto.response.UpdateBoardResponseDto;
 import com.example.homeaid.customerboard.entity.CustomerBoard;

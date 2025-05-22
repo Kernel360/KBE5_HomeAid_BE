@@ -6,6 +6,9 @@ import com.example.homeaid.customerboard.dto.response.CreateBoardResponseDto;
 import com.example.homeaid.customerboard.dto.response.UpdateBoardResponseDto;
 import com.example.homeaid.customerboard.entity.CustomerBoard;
 import com.example.homeaid.customerboard.service.CustomerBoardServiceImpl;
+import com.example.homeaid.customerboard.dto.response.CreateBoardResponseDto;
+import com.example.homeaid.customerboard.entity.CustomerBoard;
+import com.example.homeaid.customerboard.service.CustomerBoardServiceImpl;
 import com.example.homeaid.global.common.response.CommonApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -17,6 +20,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -117,6 +121,3 @@ public class CustomerBoardController {
     return ResponseEntity.ok(CommonApiResponse.success(boardService.searchBoard(
         keyword, pageable)));
   }
-
-
-}

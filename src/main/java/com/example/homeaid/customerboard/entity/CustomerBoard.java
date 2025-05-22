@@ -1,6 +1,5 @@
 package com.example.homeaid.customerboard.entity;
 
-
 import com.example.homeaid.adminreply.entity.AdminReply;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -28,7 +27,6 @@ public class CustomerBoard {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     // 작성자
     private Long userId;
 

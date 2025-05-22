@@ -5,10 +5,17 @@ on:
     branches: [ dev ]
   pull_request:
     branches: [ dev ]
+  pull_request_target:
+    branches: [ dev ]  # fork PR secrets 사용 가능
+    types: [opened, synchronize, reopened]
 
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
+    if: |
+      (github.event_name == 'pull_request_target' && github.event.pull_request.head.repo.full_name != github.repository) ||
+      (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository) ||
+      github.event_name == 'push'
     
     services:
       mysql:
@@ -27,7 +34,15 @@ jobs:
           --health-retries=3
 
     steps:
-      - name: Checkout source code
+      - name: Checkout PR code (fork PR only)
+        if: github.event_name == 'pull_request_target'
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+          repository: ${{ github.event.pull_request.head.repo.full_name }}
+
+      - name: Checkout code (for push or internal pull_request)
+        if: github.event_name != 'pull_request_target'
         uses: actions/checkout@v3
 
       - name: Set up JDK 17 (corretto)
