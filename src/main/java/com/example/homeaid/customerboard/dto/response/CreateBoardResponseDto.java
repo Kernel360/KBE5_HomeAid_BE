@@ -1,23 +1,30 @@
 package com.example.homeaid.customerboard.dto.response;
 
 import com.example.homeaid.customerboard.entity.CustomerBoard;
+import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-@Builder
 @Getter
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class CreateBoardResponseDto {
 
+    private Long id;
     private String title;
     private String content;
+    private LocalDateTime createdAt;
 
     public static CreateBoardResponseDto toDto(CustomerBoard customerBoard) {
-        return CreateBoardResponseDto.builder().title(customerBoard.getTitle())
-            .content(customerBoard.getContent()).build();
+        return CreateBoardResponseDto.builder()
+            .id(customerBoard.getId())
+            .title(customerBoard.getTitle())
+            .content(customerBoard.getContent())
+            .createdAt(customerBoard.getCreatedAt())
+            .build();
     }
 
 }
