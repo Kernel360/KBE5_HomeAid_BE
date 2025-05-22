@@ -1,5 +1,6 @@
 package com.example.homeaid.adminreply.service;
 
+import com.example.homeaid.adminreply.dto.Request.AdminReplyRequestDto;
 import com.example.homeaid.adminreply.entity.AdminReply;
 import com.example.homeaid.adminreply.entity.PostType;
 import com.example.homeaid.adminreply.repository.AdminReplyRepository;
@@ -42,19 +43,19 @@ public class AdminReplyServiceImpl implements AdminReplyService {
       default -> throw new CustomException(ErrorCode.INVALID_REQUEST);
     }
 
-    adminReply.createBoard(postType,postId, 1L); // adminId 수정 필요
+    adminReply.createReply(postType,postId, 1L); // adminId 수정 필요
     return adminReplyRepository.save(adminReply);
   }
 
   @Override
   @Transactional
-  public AdminReply updateReply(PostType postType, Long postId, AdminReply adminReply) {
-    AdminReply existingReply = adminReplyRepository
+  public AdminReply updateReply(PostType postType, Long postId, String content) {
+    AdminReply reply = adminReplyRepository
         .findByPostTypeAndPostId(postType, postId)
         .orElseThrow(() -> new CustomException(ErrorCode.RESOURCE_NOT_FOUND));
 
-    existingReply.updateContent(adminReply.getContent()); // 아래 entity에 메서드 추가 필요
-    return existingReply;
+    reply.updateReply(content);
+    return reply;
   }
 
 

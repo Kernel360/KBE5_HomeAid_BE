@@ -56,20 +56,20 @@ public class AdminReplyController {
   @PutMapping("/{postType}/id/{postId}")
   @Operation(summary = "[관리자] 답변 수정", responses = {
       @ApiResponse(responseCode = "200", description = "성공",
-          content = @Content(schema = @Schema(implementation = CommonApiResponse.class))),
+          content = @Content(schema = @Schema(implementation = UpdateBoardResponseDto.class))),
       @ApiResponse(responseCode = "404", description = "해당 게시글 없음",
-          content = @Content(schema = @Schema(implementation = CommonApiResponse.class)))
+          content = @Content(schema = @Schema(implementation = UpdateBoardResponseDto.class)))
   })
   public ResponseEntity<CommonApiResponse<AdminReplyResponseDto>> updateReply(
       @PathVariable(name = "postType") PostType postType,
       @PathVariable(name = "postId") Long postId,
       @RequestBody @Valid AdminReplyRequestDto adminReplyRequestDto
   ) {
-    AdminReply updatedReply = adminReplyService.updateReply(
-        postType, postId, AdminReplyRequestDto.toEntity(adminReplyRequestDto));
+    AdminReply createdReply = adminReplyService.updateReply(
+        postType, postId, adminReplyRequestDto.getContent());
 
-    return ResponseEntity.ok(CommonApiResponse.success(
-        AdminReplyResponseDto.toDto(updatedReply)));
+    return ResponseEntity.status(HttpStatus.CREATED).body(CommonApiResponse.success(
+        AdminReplyResponseDto.toDto(createdReply)));
   }
 
 

@@ -7,8 +7,6 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.PrePersist;
-import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
 import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
@@ -48,12 +46,7 @@ public class AdminReply {
   private LocalDateTime updateAt;
 
 
-  @PreUpdate
-  public void preUpdate() {
-    this.updateAt = LocalDateTime.now();
-  }
-
-  public void createBoard(PostType postType, Long postId, Long adminId) {
+  public void createReply(PostType postType, Long postId, Long adminId) {
     if (postType != null) this.postType = postType;
     if (postId != null) this.postId = postId;
     this.adminId = adminId;
@@ -61,7 +54,7 @@ public class AdminReply {
     this.updateAt = LocalDateTime.now();
   }
 
-  public void updateContent(String content) {
+  public void updateReply(String content) {
     if (content != null) {
       this.content = content;
       this.updateAt = LocalDateTime.now();
