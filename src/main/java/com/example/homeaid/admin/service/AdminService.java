@@ -1,8 +1,8 @@
 package com.example.homeaid.admin.service;
 
-import com.example.homeaid.customer.entity.Customer;
+import com.example.homeaid.customer.customer.entity.Customer;
 import com.example.homeaid.customer.repository.CustomerRepository;
-import com.example.homeaid.manager.entity.Manager;
+import com.example.homeaid.manager.manager.entity.Manager;
 import com.example.homeaid.manager.repository.ManagerRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

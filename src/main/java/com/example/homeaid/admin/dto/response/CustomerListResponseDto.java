@@ -1,6 +1,6 @@
 package com.example.homeaid.admin.dto.response;
 
-import com.example.homeaid.customer.entity.Customer;
+import com.example.homeaid.customer.customer.entity.Customer;
 import com.example.homeaid.global.util.DateTimeUtil;
 import lombok.Builder;
 import lombok.Getter;

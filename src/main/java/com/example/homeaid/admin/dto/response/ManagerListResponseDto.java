@@ -1,7 +1,7 @@
 package com.example.homeaid.admin.dto.response;
 
 import com.example.homeaid.global.util.DateTimeUtil;
-import com.example.homeaid.manager.entity.Manager;
+import com.example.homeaid.manager.manager.entity.Manager;
 import lombok.Builder;
 import lombok.Getter;
 

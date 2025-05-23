@@ -3,7 +3,7 @@ package com.example.homeaid.admin.controller;
 import com.example.homeaid.admin.dto.response.CustomerListResponseDto;
 import com.example.homeaid.admin.dto.response.ManagerListResponseDto;
 import com.example.homeaid.admin.service.AdminService;
-import com.example.homeaid.customer.entity.Customer;
+import com.example.homeaid.customer.customer.entity.Customer;
 import com.example.homeaid.global.common.response.CommonApiResponse;
 import com.example.homeaid.global.util.PageUtil;
 import com.example.homeaid.global.util.ResponsePagingDto;
