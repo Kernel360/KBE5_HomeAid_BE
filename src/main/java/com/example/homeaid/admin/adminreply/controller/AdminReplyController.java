@@ -7,7 +7,10 @@ import com.example.homeaid.admin.adminreply.entity.PostType;
 import com.example.homeaid.admin.adminreply.service.AdminReplyService;
 import com.example.homeaid.customer.customerboard.dto.response.UpdateBoardResponseDto;
 import com.example.homeaid.global.common.response.CommonApiResponse;
+import com.example.homeaid.manager.managerboard.dto.request.ManagerBoardWithRepliesDto;
+import com.example.homeaid.manager.managerboard.service.ManagerBoardService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -16,6 +19,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -35,6 +39,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class AdminReplyController {
 
   private final AdminReplyService adminReplyService;
+  private final ManagerBoardService managerBoardService;
 
   @PostMapping("/{postType}/id/{postId}")
   @Operation(summary = "[관리자] 답변 작성", responses = {
@@ -72,21 +77,18 @@ public class AdminReplyController {
         AdminReplyResponseDto.toDto(createdReply)));
   }
 
-
-
-@DeleteMapping("/replies/{replyId}")
-@Operation(summary = "[관리자] 답변 삭제", responses = {
-    @ApiResponse(responseCode = "200", description = "성공",
-        content = @Content(schema = @Schema(implementation = CommonApiResponse.class))),
-    @ApiResponse(responseCode = "404", description = "해당 게시글 없음",
-        content = @Content(schema = @Schema(implementation = CommonApiResponse.class)))
-})
-public ResponseEntity<CommonApiResponse<Void>> deleteAnswer(
-    @PathVariable(name = "replyId") Long replyId
-) {
-  adminReplyService.deleteReply(replyId);
-  return ResponseEntity.ok(CommonApiResponse.success());
-}
-
+  @DeleteMapping("/replies/{replyId}")
+  @Operation(summary = "[관리자] 답변 삭제", responses = {
+      @ApiResponse(responseCode = "200", description = "성공",
+          content = @Content(schema = @Schema(implementation = CommonApiResponse.class))),
+      @ApiResponse(responseCode = "404", description = "해당 게시글 없음",
+          content = @Content(schema = @Schema(implementation = CommonApiResponse.class)))
+  })
+  public ResponseEntity<CommonApiResponse<Void>> deleteAnswer(
+      @PathVariable(name = "replyId") Long replyId
+  ) {
+    adminReplyService.deleteReply(replyId);
+    return ResponseEntity.ok(CommonApiResponse.success());
+  }
 
 }

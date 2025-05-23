@@ -1,11 +1,16 @@
 package com.example.homeaid.admin.adminreply.service;
 
+import com.example.homeaid.admin.adminreply.dto.Request.AdminReplyDto;
 import com.example.homeaid.admin.adminreply.entity.AdminReply;
 import com.example.homeaid.admin.adminreply.entity.PostType;
 import com.example.homeaid.admin.adminreply.repository.AdminReplyRepository;
 import com.example.homeaid.customer.customerboard.repository.CustomerBoardRepository;
 import com.example.homeaid.global.exception.CustomException;
 import com.example.homeaid.global.exception.ErrorCode;
+import com.example.homeaid.manager.managerboard.dto.request.ManagerBoardWithRepliesDto;
+import com.example.homeaid.manager.managerboard.entity.ManagerBoard;
+import com.example.homeaid.manager.managerboard.repository.ManagerBoardRepository;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,7 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class AdminReplyServiceImpl implements AdminReplyService {
 
   private final AdminReplyRepository adminReplyRepository;
-//  private final ManagerBoardRepository managerBoardRepository;
+  private final ManagerBoardRepository managerBoardRepository;
   private final CustomerBoardRepository customerBoardRepository;
 
   @Override
@@ -29,11 +34,11 @@ public class AdminReplyServiceImpl implements AdminReplyService {
 
     // 2. 해당 게시글 존재 여부 확인
     switch (postType) {
-//      case MANAGER -> {
-//        if (!managerQnaRepository.existsById(postId)) {
-//          throw new CustomException(ErrorCode.RESOURCE_NOT_FOUND);
-//        }
-//      }
+      case MANAGER -> {
+        if (!managerBoardRepository.existsById(postId)) {
+          throw new CustomException(ErrorCode.RESOURCE_NOT_FOUND);
+        }
+      }
       case CUSTOMER -> {
         if (!customerBoardRepository.existsById(postId)) {
           throw new CustomException(ErrorCode.RESOURCE_NOT_FOUND);
@@ -57,7 +62,6 @@ public class AdminReplyServiceImpl implements AdminReplyService {
     return reply;
   }
 
-
   @Override
   public void deleteReply(Long replyId) {
     adminReplyRepository.findById(replyId).orElseThrow(() -> new CustomException(
@@ -66,8 +70,4 @@ public class AdminReplyServiceImpl implements AdminReplyService {
 
     adminReplyRepository.deleteById(replyId);
   }
-
 }
-
-
-
