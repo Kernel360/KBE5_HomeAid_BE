@@ -1,7 +1,11 @@
 package com.example.homeaid.manager.managerboard.controller;
 
+import com.example.homeaid.admin.adminreply.dto.Request.AdminReplyDto;
+import com.example.homeaid.admin.adminreply.entity.AdminReply;
+import com.example.homeaid.admin.adminreply.entity.PostType;
 import com.example.homeaid.global.common.response.CommonApiResponse;
 import com.example.homeaid.manager.managerboard.dto.request.CreateManagerBoardRequestDto;
+import com.example.homeaid.manager.managerboard.dto.request.ManagerBoardWithRepliesDto;
 import com.example.homeaid.manager.managerboard.dto.request.UpdateManagerBoardRequestDto;
 import com.example.homeaid.manager.managerboard.dto.response.CreateManagerBoardResponseDto;
 import com.example.homeaid.manager.managerboard.dto.response.UpdateManagerBoardResponseDto;
@@ -13,7 +17,10 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;
+import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -74,5 +81,18 @@ public class ManagerBoardController {
   public ResponseEntity<CommonApiResponse<Void>> deleteManagerBoard(@PathVariable(name = "id") @Parameter(name = "id") Long id) {
     managerBoardService.deleteManagerBoard(id);
     return ResponseEntity.ok(CommonApiResponse.success());
+  }
+
+  @GetMapping("/{id}/with-replies")
+  @Operation(summary = "답글 포함 매니저 게시글 조회", responses = {
+      @ApiResponse(responseCode = "200", description = "조회 성공",
+          content = @Content(schema = @Schema(implementation = CommonApiResponse.class)))
+  })
+  public ResponseEntity<CommonApiResponse<ManagerBoardWithRepliesDto>> getManagerBoardWithReplies(
+      @PathVariable(name = "id") @Parameter(name = "id") Long id
+  ) {
+    return ResponseEntity.ok(
+        CommonApiResponse.success(managerBoardService.getBoardWithReplies(id))
+    );
   }
 }
