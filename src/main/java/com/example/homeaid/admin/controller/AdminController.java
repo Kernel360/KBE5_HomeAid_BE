@@ -1,6 +1,7 @@
 package com.example.homeaid.admin.controller;
 
 import com.example.homeaid.admin.dto.response.CustomerListResponseDto;
+import com.example.homeaid.admin.dto.response.ManagerListResponseDto;
 import com.example.homeaid.admin.service.AdminService;
 import com.example.homeaid.customer.entity.Customer;
 import com.example.homeaid.global.common.response.CommonApiResponse;
@@ -30,7 +31,7 @@ public class AdminController {
 
     private final AdminService adminService;
 
-    @Operation(summary = "[관리자] 고객 정보 조회", responses = {
+    @Operation(summary = "고객 정보 조회", responses = {
         @ApiResponse(responseCode = "200", description = "유저 조회 성공",
             content = @Content(schema = @Schema(implementation = CustomerListResponseDto.class)))
     })
@@ -46,6 +47,18 @@ public class AdminController {
             customerListResponseDto);
 
         return ResponseEntity.ok(CommonApiResponse.success(customerPagingDto));
+    }
+
+    @GetMapping("/managers")
+    public ResponseEntity<CommonApiResponse<ResponsePagingDto<ManagerListResponseDto>>> getManagerList(
+        @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
+    ) {
+        Page<ManagerListResponseDto> managerListDto = adminService.getManagersBy(pageable)
+            .map(ManagerListResponseDto::fromEntity);
+        ResponsePagingDto<ManagerListResponseDto> managerListPagingDto = PageUtil.from(
+            managerListDto);
+
+        return ResponseEntity.ok(CommonApiResponse.success(managerListPagingDto));
     }
 
 }
