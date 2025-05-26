@@ -7,7 +7,7 @@ import lombok.Getter;
 
 @Getter
 @Builder
-public class CustomerListResponseDto {
+public class CustomerViewResponseDto {
 
     private Long id;
     private String email;
@@ -15,8 +15,8 @@ public class CustomerListResponseDto {
     private String phone;
     private String createdAt;
 
-    public static CustomerListResponseDto fromEntity(Customer customer) {
-        return CustomerListResponseDto.builder()
+    public static CustomerViewResponseDto fromEntity(Customer customer) {
+        return CustomerViewResponseDto.builder()
             .id(customer.getId())
             .email(customer.getEmail())
             .name(customer.getName())
