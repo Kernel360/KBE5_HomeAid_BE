@@ -1,4 +1,4 @@
-rootProject.name = "homeaid-service"
+rootProject.name = "homeaid"
 include("app")
 include("user")
 include("payment")
