@@ -14,5 +14,6 @@ dependencies {
     implementation(project(":user"))
     implementation(project(":worklog"))
     implementation("org.springframework.boot:spring-boot-starter-web")
+    implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     runtimeOnly("com.h2database:h2")
 }
