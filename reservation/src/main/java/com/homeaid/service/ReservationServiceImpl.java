@@ -3,7 +3,7 @@ package com.homeaid.service;
 
 import com.homeaid.domain.Reservation;
 import com.homeaid.domain.ReservationItem;
-import com.homeaid.domain.ReservationStatus;
+import com.homeaid.domain.enumerate.ReservationStatus;
 import com.homeaid.exception.CustomException;
 import com.homeaid.exception.ReservationErrorCode;
 import com.homeaid.repository.ReservationRepository;
@@ -38,6 +38,7 @@ public class ReservationServiceImpl implements ReservationService {
   }
 
   @Override
+  @Transactional
   public Reservation updateReservation(Long id, Reservation newReservation,
       Long serviceSubOptionId) {
     Reservation originReservation = reservationRepository.findById(id)
@@ -61,6 +62,7 @@ public class ReservationServiceImpl implements ReservationService {
 
 
   @Override
+  @Transactional
   public void deleteReservation(Long id) {
     Reservation reservation = reservationRepository.findById(id)
         .orElseThrow(() -> new CustomException(ReservationErrorCode.RESERVATION_NOT_FOUND));
