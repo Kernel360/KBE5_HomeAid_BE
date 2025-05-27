@@ -1,0 +1,11 @@
+rootProject.name = "homeaid-service"
+include("app")
+include("user")
+include("payment")
+include("matching")
+include("reservation")
+include("board")
+include("worklog")
+include("global")
+include("admin")
+include("domain-core")
