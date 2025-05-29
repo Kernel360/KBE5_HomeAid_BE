@@ -3,10 +3,7 @@ package com.homeaid.dto.response;
 
 import com.homeaid.domain.Reservation;
 import com.homeaid.domain.enumerate.ReservationStatus;
-<<<<<<< HEAD
-=======
 import io.swagger.v3.oas.annotations.media.Schema;
->>>>>>> da50824f3ef72c6625c6e214bc5ab59ac077d530
 import lombok.Builder;
 import lombok.Getter;
 
