@@ -2,8 +2,9 @@ package com.homeaid.domain;
 
 
 
-import static com.homeaid.domain.ReservationStatus.REQUESTED;
+import static com.homeaid.domain.enumerate.ReservationStatus.REQUESTED;
 
+import com.homeaid.domain.enumerate.ReservationStatus;
 import com.homeaid.serviceoption.domain.ServiceSubOption;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -48,6 +49,8 @@ public class Reservation {
   private ReservationStatus status = REQUESTED;
 
   private Long customerId;
+
+  private Long managerId = null;
 
   @OneToOne(mappedBy = "reservation", cascade = CascadeType.ALL)
   private ReservationItem item;
