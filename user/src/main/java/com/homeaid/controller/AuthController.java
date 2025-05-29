@@ -1,9 +1,8 @@
-package com.example.homeaid.global.auth.controller;
+package com.homeaid.controller;
 
-import com.example.homeaid.global.auth.dto.request.CustomerSignUpRequestDto;
-import com.example.homeaid.global.auth.dto.request.ManagerSignUpRequestDto;
-import com.example.homeaid.global.auth.service.AuthService;
-import com.example.homeaid.manager.repository.ManagerRepository;
+import com.homeaid.dto.request.CustomerSignUpRequestDto;
+import com.homeaid.dto.request.ManagerSignUpRequestDto;
+import com.homeaid.service.AuthService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

@@ -1,15 +1,18 @@
-package com.example.homeaid.global.auth.dto.request;
+package com.homeaid.dto.request;
 
-import com.example.homeaid.global.common.entity.enumerate.GenderType;
-import com.example.homeaid.global.common.entity.enumerate.UserRole;
-import com.example.homeaid.manager.manager.entity.Manager;
-import jakarta.validation.constraints.*;
+import com.homeaid.domain.Manager;
+import com.homeaid.domain.enumerate.GenderType;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Past;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
+import java.time.LocalDate;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import java.time.LocalDate;
 
 @Getter
 @NoArgsConstructor

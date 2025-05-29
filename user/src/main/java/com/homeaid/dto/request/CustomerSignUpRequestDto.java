@@ -1,6 +1,6 @@
-package com.example.homeaid.global.auth.dto.request;
+package com.homeaid.dto.request;
 
-import com.example.homeaid.global.common.entity.enumerate.GenderType;
+import com.homeaid.domain.enumerate.GenderType;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;

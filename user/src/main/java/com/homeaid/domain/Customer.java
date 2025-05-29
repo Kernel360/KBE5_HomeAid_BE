@@ -34,4 +34,37 @@ public class Customer extends User {
       LocalDate birth, GenderType gender, UserRole role) {
     super(email, password, name, phone, birth, gender, role);
   }
+
+  // 단일 주소 입력(회원가입)
+  @Builder(builderMethodName = "addSingleAddress")
+  public Customer(String email, String password, String name, String phone,
+      LocalDate birth, GenderType gender, CustomerAddress address) {
+
+    super(email, password, name, phone, birth, gender, UserRole.CUSTOMER);
+
+    if (address != null) {
+      this.addressList.add(address);
+    }
+  }
+
+  public void removeAddress(CustomerAddress address) {
+    if (address != null) {
+      addressList.remove(address);
+      address.setCustomer(null);
+    }
+  }
+
+
+  // 복수 주소 입력
+  @Builder(builderMethodName = "addMultipleAddresses")
+  public Customer(String email, String password, String name, String phone,
+      LocalDate birth, GenderType gender, List<CustomerAddress> addresses) {
+
+    super(email, password, name, phone, birth, gender, UserRole.CUSTOMER);
+
+    if (addresses != null && !addresses.isEmpty()) {
+      this.addressList.addAll(addresses);
+    }
+  }
+
 }

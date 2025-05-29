@@ -1,14 +1,13 @@
-package com.example.homeaid.global.auth.service;
+package com.homeaid.service;
 
-import com.example.homeaid.customer.customer.entity.Customer;
-import com.example.homeaid.customer.customer.entity.CustomerAddress;
-import com.example.homeaid.global.auth.dto.request.CustomerSignUpRequestDto;
-import com.example.homeaid.global.auth.dto.request.ManagerSignUpRequestDto;
-import com.example.homeaid.global.auth.repository.UserRepository;
-import com.example.homeaid.manager.manager.entity.Manager;
+import com.homeaid.domain.Customer;
+import com.homeaid.domain.CustomerAddress;
+import com.homeaid.domain.Manager;
+import com.homeaid.dto.request.CustomerSignUpRequestDto;
+import com.homeaid.dto.request.ManagerSignUpRequestDto;
+import com.homeaid.repository.UserRepository;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -16,7 +15,7 @@ import org.springframework.stereotype.Service;
 public class AuthServiceImpl implements AuthService{
 
     private final UserRepository userRepository;
-    private final BCryptPasswordEncoder passwordEncoder;
+//    private final BCryptPasswordEncoder passwordEncoder;
 
     public void registerManager(@Valid ManagerSignUpRequestDto managerDto) {
 
@@ -26,7 +25,8 @@ public class AuthServiceImpl implements AuthService{
 
         Manager manager = Manager.builder()
             .email(managerDto.getEmail())
-            .password(passwordEncoder.encode(managerDto.getPassword()))
+            .password(managerDto.getPassword())
+//            .password(passwordEncoder.encode(managerDto.getPassword()))
             .name(managerDto.getName())
             .phone(managerDto.getPhone())
             .birth(managerDto.getBirth())
@@ -52,7 +52,8 @@ public class AuthServiceImpl implements AuthService{
 
         Customer customer = Customer.addSingleAddress()
             .email(customerDto.getEmail())
-            .password(passwordEncoder.encode(customerDto.getPassword()))
+            .password(customerDto.getPassword())
+//            .password(passwordEncoder.encode(customerDto.getPassword()))
             .name(customerDto.getName())
             .phone(customerDto.getPhone())
             .birth(customerDto.getBirth())
