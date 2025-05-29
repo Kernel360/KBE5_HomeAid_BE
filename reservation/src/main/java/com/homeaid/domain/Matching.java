@@ -54,6 +54,9 @@ public class Matching {
   @Column(columnDefinition = "TEXT")
   private String managerMemo;
 
+  @Column(columnDefinition = "TEXT")
+  private String customerMemo;
+
   @CreatedDate
   @Column(updatable = false)
   private LocalDateTime createdDate;
@@ -95,6 +98,7 @@ public class Matching {
   public void rejectByCustomer(String memo) {
     this.customerStatus = MatchingStatus.REJECTED;
     this.status = MatchingStatus.REJECTED;
+    this.customerMemo = memo;
   }
 
   public boolean isCompleted() {

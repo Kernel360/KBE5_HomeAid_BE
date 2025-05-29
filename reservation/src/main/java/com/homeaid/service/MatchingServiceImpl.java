@@ -1,9 +1,12 @@
 package com.homeaid.service;
 
+
+
 import com.homeaid.domain.Manager;
 import com.homeaid.domain.Matching;
 import com.homeaid.domain.Reservation;
-import com.homeaid.dto.request.MatchingManagerResponseDto.Action;
+import com.homeaid.dto.request.MatchingCustomerResponseDto.CustomerAction;
+import com.homeaid.dto.request.MatchingManagerResponseDto.ManagerAction;
 import com.homeaid.exception.CustomException;
 import com.homeaid.exception.MatchingErrorCode;
 import com.homeaid.exception.ReservationErrorCode;
@@ -14,7 +17,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class AdminMatchingServiceImpl implements AdminMatchingService {
+public class MatchingServiceImpl implements MatchingService {
 
   //  private final ManagerRepository managerRepository;
   private final ReservationRepository reservationRepository;
@@ -37,8 +40,9 @@ public class AdminMatchingServiceImpl implements AdminMatchingService {
     return matchingRepository.save(matching).getId();
   }
 
+
   @Override
-  public void respondToMatching(Long matchingId, Action action, String memo) {
+  public void respondToMatchingAsManager(Long matchingId, ManagerAction action, String memo) {
     Matching matching = matchingRepository.findById(matchingId)
         .orElseThrow(() -> new CustomException(MatchingErrorCode.MATCHING_NOT_FOUND));
 
@@ -52,6 +56,22 @@ public class AdminMatchingServiceImpl implements AdminMatchingService {
       }
     }
 
+  }
+
+  @Override
+  public void respondToMatchingAsCustomer(Long matchingId,
+      CustomerAction action, String memo) {
+    Matching matching = matchingRepository.findById(matchingId)
+        .orElseThrow(() -> new CustomException(MatchingErrorCode.MATCHING_NOT_FOUND));
+
+    switch (action) {
+      case CONFIRM -> {
+        matching.confirmByCustomer();
+        Reservation reservation = matching.getReservation();
+        reservation.confirmMatching(matchingId);
+      }
+      case REJECT -> matching.rejectByCustomer(memo);
+    }
   }
 
   private int calculateNextMatchingRound(Long reservationId) {

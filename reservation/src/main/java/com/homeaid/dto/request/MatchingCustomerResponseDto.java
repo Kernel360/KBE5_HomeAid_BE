@@ -4,15 +4,16 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 
 @Getter
-public class MatchingManagerResponseDto {
+public class MatchingCustomerResponseDto {
 
   @NotNull
-  private ManagerAction action;
+  private CustomerAction action;
 
   private String memo;
 
-  public enum ManagerAction {
-    ACCEPT,
+  public enum CustomerAction {
+    CONFIRM,
     REJECT
   }
+
 }

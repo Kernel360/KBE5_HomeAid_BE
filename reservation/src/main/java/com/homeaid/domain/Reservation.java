@@ -87,4 +87,8 @@ public class Reservation {
   public void softDelete() {
     this.deletedDate = LocalDateTime.now();
   }
+
+  public void confirmMatching(Long matchingId) {
+    finalMatchingId = matchingId;
+  }
 }
