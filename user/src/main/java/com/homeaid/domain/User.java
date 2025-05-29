@@ -72,4 +72,16 @@ public class User {
     this.role = role;
   }
 
+  public User(String email, UserRole role) {
+    this.email = email;
+    this.password = "temp";
+    this.role = role;
+  }
+
+  public User(String email, UserRole role, String encodedPassword) {
+    this.email = email;
+    this.password = encodedPassword;
+    this.role = role;
+  }
+
 }
