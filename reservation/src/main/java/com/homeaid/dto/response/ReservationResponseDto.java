@@ -2,7 +2,7 @@ package com.homeaid.dto.response;
 
 
 import com.homeaid.domain.Reservation;
-import com.homeaid.domain.ReservationStatus;
+import com.homeaid.domain.enumerate.ReservationStatus;
 import lombok.Builder;
 import lombok.Getter;
 

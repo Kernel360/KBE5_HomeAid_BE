@@ -4,7 +4,7 @@ package com.homeaid.service;
 
 import com.homeaid.domain.Reservation;
 import com.homeaid.domain.ReservationItem;
-import com.homeaid.domain.ReservationStatus;
+import com.homeaid.domain.enumerate.ReservationStatus;
 import com.homeaid.repository.ReservationRepository;
 import com.homeaid.serviceoption.domain.ServiceSubOption;
 import com.homeaid.serviceoption.repository.ServiceSubOptionRepository;
