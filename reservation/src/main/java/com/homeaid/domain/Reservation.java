@@ -86,4 +86,8 @@ public class Reservation {
   public void softDelete() {
     this.deletedDate = LocalDateTime.now();
   }
+
+  public void setStatus(ReservationStatus status) {
+    this.status = status;
+  }
 }
