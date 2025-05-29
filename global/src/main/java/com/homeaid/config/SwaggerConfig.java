@@ -27,4 +27,12 @@ public class SwaggerConfig {
         .pathsToMatch("/api/v1/customer/reservations/**")
         .build();
   }
+
+  @Bean
+  public GroupedOpenApi serviceOptionAPI() {
+    return GroupedOpenApi.builder()
+        .group("serviceOption")
+        .pathsToMatch("/api/v1/admin/service-option/**")
+        .build();
+  }
 }
