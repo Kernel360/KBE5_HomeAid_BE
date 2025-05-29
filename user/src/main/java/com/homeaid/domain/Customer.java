@@ -24,17 +24,6 @@ public class Customer extends User {
   @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL, orphanRemoval = true)
   private List<CustomerAddress> addressList = new ArrayList<>();
 
-  public void addAddress(CustomerAddress address) {
-    addressList.add(address);
-    address.setCustomer(this);
-  }
-
-  @Builder
-  public Customer(String email, String password, String name, String phone,
-      LocalDate birth, GenderType gender, UserRole role) {
-    super(email, password, name, phone, birth, gender, role);
-  }
-
   // 단일 주소 입력(회원가입)
   @Builder(builderMethodName = "addSingleAddress")
   public Customer(String email, String password, String name, String phone,
@@ -44,13 +33,6 @@ public class Customer extends User {
 
     if (address != null) {
       this.addressList.add(address);
-    }
-  }
-
-  public void removeAddress(CustomerAddress address) {
-    if (address != null) {
-      addressList.remove(address);
-      address.setCustomer(null);
     }
   }
 
@@ -64,6 +46,20 @@ public class Customer extends User {
 
     if (addresses != null && !addresses.isEmpty()) {
       this.addressList.addAll(addresses);
+    }
+  }
+
+
+  public void addAddress(CustomerAddress address) {
+    addressList.add(address);
+    address.setCustomer(this);
+  }
+
+
+  public void removeAddress(CustomerAddress address) {
+    if (address != null) {
+      addressList.remove(address);
+      address.setCustomer(null);
     }
   }
 
