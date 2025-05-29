@@ -23,7 +23,7 @@ public class PaymentResponseDto {
   private PaymentStatus status;
   private LocalDateTime paidAt;
 
-  public static PaymentResponseDto toEntity(Payment payment) {
+  public static PaymentResponseDto toDto(Payment payment) {
     return PaymentResponseDto.builder()
         .id(payment.getId())
         .reservationId(payment.getReservation().getId())

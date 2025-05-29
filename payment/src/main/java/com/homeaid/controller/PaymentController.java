@@ -10,10 +10,13 @@ import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
+@RestController
 @RequestMapping("/api/v1/payments")
 @RequiredArgsConstructor
 public class PaymentController {
@@ -27,7 +30,7 @@ public class PaymentController {
   })
   public ResponseEntity<PaymentResponseDto> pay(@Valid @RequestBody PaymentRequestDto requestDto) {
     PaymentResponseDto response = paymentService.pay(requestDto);
-    return ResponseEntity.ok(response);
+    return ResponseEntity.status(HttpStatus.CREATED).body(response);
   }
 
 }
