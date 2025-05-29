@@ -1,5 +1,7 @@
 package com.homeaid.dto.request;
 
+import com.homeaid.domain.Customer;
+import com.homeaid.domain.CustomerAddress;
 import com.homeaid.domain.enumerate.GenderType;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -53,5 +55,23 @@ public class CustomerSignUpRequestDto {
 
   @NotBlank(message = "상세 주소는 필수 입력값입니다.")
   private String addressDetail;
+
+
+  // TODO Security 추가 시 파라미터 주석 해제
+  public static Customer toEntity(
+      CustomerSignUpRequestDto customerSignUpRequestDto /*, String encodedPassword*/) {
+    return Customer.addSingleAddress()
+        .email(customerSignUpRequestDto.getEmail())
+        .password(customerSignUpRequestDto.getPassword()) // encodedPassword로 수정 필요
+        .name(customerSignUpRequestDto.getName())
+        .phone(customerSignUpRequestDto.getPhone())
+        .birth(customerSignUpRequestDto.getBirth())
+        .gender(customerSignUpRequestDto.getGender())
+        .address(CustomerAddress.builder()
+            .address(customerSignUpRequestDto.getAddress())
+            .addressDetail(customerSignUpRequestDto.getAddressDetail())
+            .build())
+        .build();
+  }
 
 }

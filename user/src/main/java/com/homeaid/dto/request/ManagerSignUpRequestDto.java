@@ -53,16 +53,18 @@ public class ManagerSignUpRequestDto {
 
     private String experience;
 
-    public Manager toEntity(String encodedPassword) {
+    // TODO Security 추가 시 파라미터 주석 해제
+    public static Manager toEntity(
+        ManagerSignUpRequestDto managerSignUpRequestDto/*, String encodedPassword*/) {
         return Manager.builder()
-            .email(email)
-            .password(encodedPassword)
-            .name(name)
-            .phone(phone)
-            .birth(birth)
-            .gender(gender)
-            .career(career)
-            .experience(experience)
+            .email(managerSignUpRequestDto.getEmail())
+            .password(managerSignUpRequestDto.password) // encodedPassword로 수정 필요
+            .name(managerSignUpRequestDto.getName())
+            .phone(managerSignUpRequestDto.getPhone())
+            .birth(managerSignUpRequestDto.getBirth())
+            .gender(managerSignUpRequestDto.getGender())
+            .career(managerSignUpRequestDto.getCareer())
+            .experience(managerSignUpRequestDto.getExperience())
             .build();
     }
 }
