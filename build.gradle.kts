@@ -21,9 +21,6 @@ allprojects {
 		mavenCentral()
 	}
 
-	dependencies {
-		runtimeOnly("com.h2database:h2")
-	}
 
 }
 
@@ -36,6 +33,7 @@ dependencies {
 	implementation(project(":worklog"))
 	implementation(project(":global"))
 	implementation(project(":admin"))
+	implementation(project(":review"))
 	implementation(project(":common-domain"))
 }
 
@@ -44,6 +42,7 @@ subprojects {
 		implementation("org.springframework.boot:spring-boot-starter")
 		compileOnly("org.projectlombok:lombok")
 		annotationProcessor("org.projectlombok:lombok")
+		testImplementation("com.h2database:h2")
 		testImplementation("org.springframework.boot:spring-boot-starter-test")
 		testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 	}
