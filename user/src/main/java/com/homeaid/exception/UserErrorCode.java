@@ -36,3 +36,4 @@ public enum UserErrorCode implements BaseErrorCode {
   private final String code;
   private final String message;
 }
+
