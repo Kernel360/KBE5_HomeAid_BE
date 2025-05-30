@@ -43,4 +43,12 @@ public class SwaggerConfig {
         .pathsToMatch("/api/v1/user/**")
         .build();
   }
+
+  @Bean
+  public GroupedOpenApi worklogAPI() {
+    return GroupedOpenApi.builder()
+            .group("worklog")
+            .pathsToMatch("/api/v1/manager/work-log/**")
+            .build();
+  }
 }
