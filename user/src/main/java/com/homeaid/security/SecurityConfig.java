@@ -17,51 +17,64 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-    private final CustomUserDetailsService customUserDetailsService;
-    private final JwtUtil jwtUtil;
+  private final CustomUserDetailsService customUserDetailsService;
+  private final JwtUtil jwtUtil;
 
-    @Bean
-    SecurityFilterChain securityFilterChain(HttpSecurity http, AuthenticationManager authManager) throws Exception {
-        SignInAuthenticationFilter filter = new SignInAuthenticationFilter(authManager, jwtUtil);
-        filter.setFilterProcessesUrl("/api/v1/user/auth/signin");
+  @Bean
+  SecurityFilterChain securityFilterChain(HttpSecurity http, AuthenticationManager authManager)
+      throws Exception {
+    SignInAuthenticationFilter filter = new SignInAuthenticationFilter(authManager, jwtUtil);
+    filter.setFilterProcessesUrl("/api/v1/user/auth/signin");
 
-        http
-                .csrf((auth) -> auth.disable())
-                .formLogin((auth) -> auth.disable())
-                .cors((auth)-> auth.disable())
-                .httpBasic((auth) -> auth.disable())
-                .sessionManagement((session)-> session
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+    http
+        .csrf((auth) -> auth.disable())
+        .formLogin((auth) -> auth.disable())
+        .cors((auth) -> auth.disable())
+        .httpBasic((auth) -> auth.disable())
+        .sessionManagement((session) -> session
+            .sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
-        http
-                .authorizeHttpRequests((auth) -> auth
-                        .requestMatchers("/api/v1/user/auth/signup/**", "/api/v1/user/auth/signin").permitAll()
-                        .requestMatchers("/api/v1/admin").hasRole("ADMIN")
-                        .requestMatchers("/api/v1/customer").hasRole("CUSTOMER")
-                        .requestMatchers("/api/v1/manager").hasRole("MANAGER")
-                        .anyRequest().authenticated()
-                );
+    http
+        .authorizeHttpRequests((auth) -> auth
+            .requestMatchers("/api/v1/user/auth/signup/**").permitAll()
+            .requestMatchers(
+                "/swagger-ui/**",
+                "/v3/api-docs/**",
+                "/swagger-resources/**",
+                "/swagger-resources",
+                "/configuration/ui",
+                "/configuration/security",
+                "/webjars/**"
+            ).permitAll()
 
-        // JwtAuthenticationFilter 추가
-        http
-                .addFilterBefore(new JwtFilter(jwtUtil, customUserDetailsService), UsernamePasswordAuthenticationFilter.class);
+            .requestMatchers("/api/v1/admin").hasRole("ADMIN")
+            .requestMatchers("/api/v1/customer").hasRole("CUSTOMER")
+            .requestMatchers("/api/v1/manager").hasRole("MANAGER")
+            .anyRequest().authenticated()
+        );
 
-        // LoginFilter 추가
-        http
-                .addFilterAt(filter, UsernamePasswordAuthenticationFilter.class);
+    // JwtAuthenticationFilter 추가
+    http
+        .addFilterBefore(new JwtFilter(jwtUtil, customUserDetailsService),
+            UsernamePasswordAuthenticationFilter.class);
 
-        return http.build();
+    // LoginFilter 추가
+    http
+        .addFilterAt(filter, UsernamePasswordAuthenticationFilter.class);
 
-    }
+    return http.build();
 
-    @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
-        return configuration.getAuthenticationManager();
-    }
+  }
 
-    @Bean
-    BCryptPasswordEncoder bCryptPasswordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
+  @Bean
+  public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration)
+      throws Exception {
+    return configuration.getAuthenticationManager();
+  }
 
-    }
+  @Bean
+  BCryptPasswordEncoder bCryptPasswordEncoder() {
+    return new BCryptPasswordEncoder();
+  }
+
+}
