@@ -1,6 +1,6 @@
 package com.homeaid.dto.response;
 
-import com.homeaid.domain.User;
+import com.homeaid.domain.Manager;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -18,12 +18,12 @@ public class MatchingRecommendationResponseDto {
   @Schema(description = "매니저 이름", example = "김매니저")
   private String managerName;
 
-  public static MatchingRecommendationResponseDto toDto(User manager) {
+  public static MatchingRecommendationResponseDto toDto(Manager manager) {
     return MatchingRecommendationResponseDto.builder().managerId(manager.getId())
         .managerName(manager.getName()).build();
   }
 
-  public static List<MatchingRecommendationResponseDto> toDto(List<User> managerList) {
+  public static List<MatchingRecommendationResponseDto> toDto(List<Manager> managerList) {
     return managerList.stream().map(MatchingRecommendationResponseDto::toDto)
         .collect(Collectors.toList());
   }

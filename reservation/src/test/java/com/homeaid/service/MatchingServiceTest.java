@@ -14,14 +14,13 @@ import static org.mockito.Mockito.verify;
 import com.homeaid.domain.Manager;
 import com.homeaid.domain.Matching;
 import com.homeaid.domain.Reservation;
-import com.homeaid.domain.User;
 import com.homeaid.domain.enumerate.GenderType;
 import com.homeaid.domain.enumerate.Weekday;
 import com.homeaid.dto.request.MatchingManagerResponseDto.ManagerAction;
 import com.homeaid.exception.CustomException;
+import com.homeaid.repository.ManagerRepository;
 import com.homeaid.repository.MatchingRepository;
 import com.homeaid.repository.ReservationRepository;
-import com.homeaid.repository.UserRepository;
 import com.homeaid.serviceoption.domain.ServiceOption;
 import com.homeaid.serviceoption.domain.ServiceSubOption;
 import java.time.LocalDate;
@@ -50,7 +49,7 @@ class MatchingServiceTest {
   private ReservationRepository reservationRepository;
 
   @Mock
-  private UserRepository userRepository;
+  private ManagerRepository managerRepository;
 
   @Mock
   private MatchingRepository matchingRepository;
@@ -84,7 +83,7 @@ class MatchingServiceTest {
 
     Matching matching = Matching.builder().build();
 
-    given(userRepository.findById(managerId)).willReturn(Optional.of(manager));
+    given(managerRepository.findById(managerId)).willReturn(Optional.of(manager));
     given(reservationRepository.findById(reservationId)).willReturn(Optional.of(reservation));
     given(matchingRepository.save(any(Matching.class)))
         .willAnswer(invocation -> {
@@ -131,7 +130,7 @@ class MatchingServiceTest {
 
     reservation.addItem(subOption);
 
-    List<User> managerList = List.of(
+    List<Manager> managerList = List.of(
         new Manager(
             "manager1@example.com",
             "encoded-password1",
@@ -170,11 +169,11 @@ class MatchingServiceTest {
 
     given(reservationRepository.findById(reservationId))
         .willReturn(Optional.of(reservation));
-    given(userRepository.findMatchingManagers(eq(Weekday.TUESDAY), any(), any(), eq("청소")))
+    given(managerRepository.findMatchingManagers(eq(Weekday.TUESDAY), any(), any(), eq("청소")))
         .willReturn(managerList);
 
     // when
-    List<User> result = matchingService.recommendManagers(reservationId);
+    List<Manager> result = matchingService.recommendManagers(reservationId);
 
     // then
     assertThat(result).hasSize(3);

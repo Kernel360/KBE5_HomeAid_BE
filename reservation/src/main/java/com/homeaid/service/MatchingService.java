@@ -1,5 +1,6 @@
 package com.homeaid.service;
 
+import com.homeaid.domain.Manager;
 import com.homeaid.domain.Matching;
 import com.homeaid.domain.User;
 import com.homeaid.dto.request.MatchingCustomerResponseDto.CustomerAction;
@@ -15,5 +16,5 @@ public interface MatchingService {
 
   void respondToMatchingAsCustomer(Long matchingId, CustomerAction action, String memo);
 
-  List<User> recommendManagers(Long reservationId);
+  List<Manager> recommendManagers(Long reservationId);
 }
