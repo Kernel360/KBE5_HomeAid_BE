@@ -37,6 +37,14 @@ public class SwaggerConfig {
   }
 
   @Bean
+  public GroupedOpenApi authAPI() {
+    return GroupedOpenApi.builder()
+        .group("User")
+        .pathsToMatch("/api/v1/user/**")
+        .build();
+  }
+
+  @Bean
   public GroupedOpenApi worklogAPI() {
     return GroupedOpenApi.builder()
             .group("worklog")
