@@ -36,10 +36,10 @@ public class WorkLogController {
     }
 
     @PatchMapping
-    @Operation(summary = "체크인 요청", description = "매니저의 예약건에 대한 체크인 요청")
+    @Operation(summary = "체크아웃 요청", description = "매니저의 예약건에 대한 체크아웃 요청")
     @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "체크인 성공"),
-            @ApiResponse(responseCode = "400", description = "이미 체크인 한 예약건"),
+            @ApiResponse(responseCode = "200", description = "체크아웃 성공"),
+            @ApiResponse(responseCode = "404", description = "존재하지 않는 예약 건"),
             @ApiResponse(responseCode = "403", description = "예약 위치 범위 밖의 잘못된 요청")
     })
     public ResponseEntity<CommonApiResponse<Void>> updateWorkLogForCheckOut(@RequestBody @Valid CheckOutRequestDto checkOutRequestDto) {
