@@ -15,7 +15,6 @@ import com.homeaid.exception.UserErrorCode;
 import com.homeaid.repository.MatchingRepository;
 import com.homeaid.repository.ReservationRepository;
 import com.homeaid.repository.UserRepository;
-import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
