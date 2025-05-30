@@ -48,6 +48,10 @@ public class Reservation {
   @Column(nullable = false)
   private ReservationStatus status = REQUESTED;
 
+  private Double latitude;
+
+  private Double longitude;
+
   private Long customerId;
 
   private Long managerId = null;

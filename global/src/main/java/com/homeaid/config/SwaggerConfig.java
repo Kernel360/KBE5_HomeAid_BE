@@ -40,7 +40,7 @@ public class SwaggerConfig {
   public GroupedOpenApi worklogAPI() {
     return GroupedOpenApi.builder()
             .group("worklog")
-            .pathsToMatch("/api/v1/work-log/**")
+            .pathsToMatch("/api/v1/manager/work-log/**")
             .build();
   }
 }

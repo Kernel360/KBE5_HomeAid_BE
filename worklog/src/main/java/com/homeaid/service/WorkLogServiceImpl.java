@@ -3,12 +3,13 @@ package com.homeaid.service;
 import com.homeaid.domain.Reservation;
 import com.homeaid.domain.WorkLog;
 import com.homeaid.exception.CustomException;
+import com.homeaid.exception.ReservationErrorCode;
 import com.homeaid.exception.WorkLogErrorCode;
 import com.homeaid.repository.ReservationRepository;
 import com.homeaid.repository.WorkLogRepository;
+import com.homeaid.util.GeoUtils;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.geo.Point;
 import org.springframework.stereotype.Service;
 
 @RequiredArgsConstructor
@@ -16,33 +17,35 @@ import org.springframework.stereotype.Service;
 public class WorkLogServiceImpl implements WorkLogService {
     private final WorkLogRepository workLogRepository;
     private final ReservationRepository reservationRepository;
+    private final static int CHECK_RANGE_DISTANCE_METER = 500; //500미터
 
     @Transactional
     @Override
-    public WorkLog createWorkLog(WorkLog workLog, Long reservationId, Point point) {
-        if (!validateWorkLog(reservationId, point)) {
-            throw new CustomException(WorkLogErrorCode.OUT_OF_RANGE);
-        }
+    public WorkLog createWorkLog(WorkLog workLog, Long reservationId, Double latitude, Double longitude) {
         Reservation reservation = reservationRepository.findById(reservationId).orElseThrow(()
-                -> new CustomException(WorkLogErrorCode.RESERVATION_NOT_FOUND));
+                -> new CustomException(ReservationErrorCode.RESERVATION_NOT_FOUND));
 
-        // 기존 작업기록이 있으면 삭제 , 이 방식이 합리적인가?
-        workLogRepository.findByReservationId(reservationId)
-                .ifPresent(existWorkLog -> {
-                    workLogRepository.delete(existWorkLog);
-                    workLogRepository.flush();
-                });
+        if (workLogRepository.existsWorkLogByManagerId(workLog.getManagerId())) {
+            throw new CustomException(WorkLogErrorCode.ALREADY_COMPLETED_CHECKIN);
+        }
+
+        if (!isValidDistance(reservationId, latitude, longitude)) {
+            throw new CustomException(WorkLogErrorCode.OUT_OF_WORK_RANGE);
+        }
         workLog.assignReservation(reservation);
 
         return workLogRepository.save(workLog);
     }
 
-    private boolean validateWorkLog(Long reservationId, Point point) {
-        boolean result = true;
-        // Todo : 임시
-        //예약id로 예약의 위도 경도 값과
-        //요청 체크인 체크아웃의 위도 경도 값을 검증하는 로직
-        return result;
+    /**
+     * @param reservationId 예약 위치 조회할 id
+     * @return 예약 위치와 체크인 위치의 차이가 CHECK_RANGE_DISTANCE_METER 범위 안에 있으면 true
+     */
+    private boolean isValidDistance(Long reservationId, Double latitude, Double longitude) {
+        Reservation reservation = reservationRepository.findById(reservationId).orElseThrow(() -> new CustomException(ReservationErrorCode.RESERVATION_NOT_FOUND));
+        double calResult = GeoUtils.calculateDistanceInMeters(reservation.getLatitude(), reservation.getLongitude(), latitude, longitude);
+
+        return calResult < CHECK_RANGE_DISTANCE_METER;
     }
 
 

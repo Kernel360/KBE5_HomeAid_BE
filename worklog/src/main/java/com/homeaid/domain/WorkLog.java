@@ -7,7 +7,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
@@ -26,7 +25,6 @@ public class WorkLog {
     @Column(updatable = false)
     private LocalDateTime checkInTime;
 
-    @LastModifiedDate
     private LocalDateTime checkOutTime;
 
     @Enumerated(EnumType.STRING)
