@@ -4,8 +4,10 @@ import com.homeaid.common.response.CommonApiResponse;
 import com.homeaid.dto.request.CreateMatchingRequestDto;
 import com.homeaid.dto.request.MatchingCustomerResponseDto;
 import com.homeaid.dto.request.MatchingManagerResponseDto;
+import com.homeaid.dto.response.MatchingRecommendationResponseDto;
 import com.homeaid.service.MatchingService;
 import jakarta.validation.Valid;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -33,24 +35,38 @@ public class MatchingController {
         .body(CommonApiResponse.success(matchingId));
   }
 
-  @PatchMapping("/{matchingId}")
+  @PatchMapping("/{matchingId}/to-customer")
   public ResponseEntity<CommonApiResponse<Void>> respondToMatching(
       @PathVariable(name = "matchingId") Long matchingId,
       @RequestBody @Valid MatchingManagerResponseDto requestDto
   ) {
-      matchingService.respondToMatchingAsManager(matchingId, requestDto.getAction(), requestDto.getMemo());
+    matchingService.respondToMatchingAsManager(matchingId, requestDto.getAction(),
+        requestDto.getMemo());
 
     return ResponseEntity.ok().body(CommonApiResponse.success());
   }
 
-  @PatchMapping("/{matchingId}")
+  @PatchMapping("/{matchingId}/to-manager")
   public ResponseEntity<CommonApiResponse<Void>> respondToMatching(
       @PathVariable(name = "matchingId") Long matchingId,
       @RequestBody @Valid MatchingCustomerResponseDto requestDto
   ) {
-    matchingService.respondToMatchingAsCustomer(matchingId, requestDto.getAction(), requestDto.getMemo());
+    matchingService.respondToMatchingAsCustomer(matchingId, requestDto.getAction(),
+        requestDto.getMemo());
 
     return ResponseEntity.ok().body(CommonApiResponse.success());
+  }
+
+  @PostMapping("/{reservationId}/recommendations")
+  public ResponseEntity<CommonApiResponse<List<MatchingRecommendationResponseDto>>> recommendManagers(
+      @PathVariable Long reservationId
+  ) {
+
+    // Todo: 추후 거리 순, 리뷰 순 등의 정렬 기준 추가
+
+    return ResponseEntity.ok().body(CommonApiResponse.success(
+        MatchingRecommendationResponseDto.toDto(
+            matchingService.recommendManagers(reservationId))));
   }
 
 }

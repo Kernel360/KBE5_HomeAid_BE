@@ -1,7 +1,6 @@
 package com.homeaid.dto.request;
 
 import com.homeaid.domain.Matching;
-import com.homeaid.domain.Reservation;
 import com.homeaid.domain.enumerate.MatchingStatus;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;

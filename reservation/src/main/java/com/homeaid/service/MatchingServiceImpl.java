@@ -4,6 +4,8 @@ package com.homeaid.service;
 import com.homeaid.domain.Manager;
 import com.homeaid.domain.Matching;
 import com.homeaid.domain.Reservation;
+import com.homeaid.domain.User;
+import com.homeaid.domain.enumerate.Weekday;
 import com.homeaid.dto.request.MatchingCustomerResponseDto.CustomerAction;
 import com.homeaid.dto.request.MatchingManagerResponseDto.ManagerAction;
 import com.homeaid.exception.CustomException;
@@ -13,6 +15,9 @@ import com.homeaid.exception.UserErrorCode;
 import com.homeaid.repository.MatchingRepository;
 import com.homeaid.repository.ReservationRepository;
 import com.homeaid.repository.UserRepository;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -28,8 +33,9 @@ public class MatchingServiceImpl implements MatchingService {
   public Long createMatching(Long managerId, Long reservationId,
       Matching matching) {
 
-    Manager manager = (Manager) userRepository.findById(managerId).orElseThrow(() -> new CustomException(
-        UserErrorCode.MANAGER_NOT_FOUND));
+    Manager manager = (Manager) userRepository.findById(managerId)
+        .orElseThrow(() -> new CustomException(
+            UserErrorCode.MANAGER_NOT_FOUND));
 
     Reservation reservation = reservationRepository.findById(reservationId)
         .orElseThrow(() -> new CustomException(
@@ -51,7 +57,7 @@ public class MatchingServiceImpl implements MatchingService {
       case ACCEPT -> matching.acceptByManager();
       case REJECT -> {
         if (memo == null || memo.isBlank()) {
-         throw new CustomException(MatchingErrorCode.MEMO_REQUIRED_FOR_REJECTION);
+          throw new CustomException(MatchingErrorCode.MEMO_REQUIRED_FOR_REJECTION);
         }
         matching.rejectByManager(memo);
       }
@@ -78,6 +84,24 @@ public class MatchingServiceImpl implements MatchingService {
         matching.rejectByCustomer(memo);
       }
     }
+  }
+
+  @Override
+  public List<User> recommendManagers(Long reservationId) {
+    Reservation reservation = reservationRepository.findById(reservationId)
+        .orElseThrow(() -> new CustomException(ReservationErrorCode.RESERVATION_NOT_FOUND));
+
+    Weekday reservationWeekday = Weekday.from(reservation.getRequestedDate());
+
+    LocalTime startTime = reservation.getRequestedTime();
+    Integer durationMinutes = reservation.getItem().getDuration();
+    LocalTime endTime = startTime.plusMinutes(durationMinutes);
+
+    String subOptionName = reservation.getItem().getSubOptionName();
+
+    // Todo: 매니저 통계 테이블 만든 후에 조회된 매니저의 리뷰 수, 별점 등도 같이 조회
+    return userRepository.findMatchingManagers(reservationWeekday, startTime, endTime, subOptionName);
+
   }
 
   private int calculateNextMatchingRound(Long reservationId) {

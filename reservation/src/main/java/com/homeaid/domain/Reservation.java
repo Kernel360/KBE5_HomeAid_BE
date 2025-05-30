@@ -50,6 +50,10 @@ public class Reservation {
 
   private Long finalMatchingId;
 
+  private Double latitude;
+
+  private Double longitude;
+
   @Column(columnDefinition = "TEXT")
   private String customerMemo;
 
