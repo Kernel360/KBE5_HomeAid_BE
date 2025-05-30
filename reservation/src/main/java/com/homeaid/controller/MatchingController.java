@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/v1/admin/matchings")
 @RequiredArgsConstructor
-public class AdminMatchingController {
+public class MatchingController {
 
   private final MatchingService matchingService;
 

@@ -1,7 +1,6 @@
 package com.homeaid.service;
 
 import com.homeaid.domain.Matching;
-import com.homeaid.dto.request.MatchingCustomerResponseDto;
 import com.homeaid.dto.request.MatchingCustomerResponseDto.CustomerAction;
 import com.homeaid.dto.request.MatchingManagerResponseDto.ManagerAction;
 

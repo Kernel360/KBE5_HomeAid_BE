@@ -1,7 +1,6 @@
 package com.homeaid.service;
 
 
-
 import com.homeaid.domain.Manager;
 import com.homeaid.domain.Matching;
 import com.homeaid.domain.Reservation;
@@ -10,8 +9,10 @@ import com.homeaid.dto.request.MatchingManagerResponseDto.ManagerAction;
 import com.homeaid.exception.CustomException;
 import com.homeaid.exception.MatchingErrorCode;
 import com.homeaid.exception.ReservationErrorCode;
+import com.homeaid.exception.UserErrorCode;
 import com.homeaid.repository.MatchingRepository;
 import com.homeaid.repository.ReservationRepository;
+import com.homeaid.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -19,7 +20,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class MatchingServiceImpl implements MatchingService {
 
-  //  private final ManagerRepository managerRepository;
+  private final UserRepository userRepository;
   private final ReservationRepository reservationRepository;
   private final MatchingRepository matchingRepository;
 
@@ -27,14 +28,14 @@ public class MatchingServiceImpl implements MatchingService {
   public Long createMatching(Long managerId, Long reservationId,
       Matching matching) {
 
-    // Todo: 매니저 조회
+    Manager manager = (Manager) userRepository.findById(managerId).orElseThrow(() -> new CustomException(
+        UserErrorCode.MANAGER_NOT_FOUND));
 
     Reservation reservation = reservationRepository.findById(reservationId)
         .orElseThrow(() -> new CustomException(
             ReservationErrorCode.RESERVATION_NOT_FOUND));
 
-    // Todo: 매니저 수정
-    matching.setReservationAndManagerAndMatchingRound(reservation, Manager.builder().build(),
+    matching.setReservationAndManagerAndMatchingRound(reservation, manager,
         calculateNextMatchingRound(reservationId));
 
     return matchingRepository.save(matching).getId();
@@ -70,7 +71,12 @@ public class MatchingServiceImpl implements MatchingService {
         Reservation reservation = matching.getReservation();
         reservation.confirmMatching(matchingId);
       }
-      case REJECT -> matching.rejectByCustomer(memo);
+      case REJECT -> {
+        if (memo == null || memo.isBlank()) {
+          throw new CustomException(MatchingErrorCode.MEMO_REQUIRED_FOR_REJECTION);
+        }
+        matching.rejectByCustomer(memo);
+      }
     }
   }
 
