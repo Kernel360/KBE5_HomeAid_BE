@@ -62,12 +62,11 @@ public class ManagerSignUpRequestDto {
     @Schema(description = "경험", example = "노인 케어와 위생 관리에 자신 있습니다.")
     private String experience;
 
-    // TODO Security 추가 시 파라미터 주석 해제
     public static Manager toEntity(
-        ManagerSignUpRequestDto managerSignUpRequestDto/*, String encodedPassword*/) {
+        ManagerSignUpRequestDto managerSignUpRequestDto, String encodedPassword) {
         return Manager.builder()
             .email(managerSignUpRequestDto.getEmail())
-            .password(managerSignUpRequestDto.password) // encodedPassword로 수정 필요
+            .password(encodedPassword)
             .name(managerSignUpRequestDto.getName())
             .phone(managerSignUpRequestDto.getPhone())
             .birth(managerSignUpRequestDto.getBirth())

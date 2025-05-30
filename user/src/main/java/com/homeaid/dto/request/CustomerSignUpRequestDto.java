@@ -66,12 +66,11 @@ public class CustomerSignUpRequestDto {
   @NotBlank(message = "상세 주소는 필수 입력값입니다.")
   private String addressDetail;
 
-  // TODO Security 추가 시 파라미터 주석 해제
   public static Customer toEntity(
-      CustomerSignUpRequestDto customerSignUpRequestDto /*, String encodedPassword*/) {
+      CustomerSignUpRequestDto customerSignUpRequestDto , String encodedPassword) {
     return Customer.addSingleAddress()
         .email(customerSignUpRequestDto.getEmail())
-        .password(customerSignUpRequestDto.getPassword()) // encodedPassword로 수정 필요
+        .password(encodedPassword)
         .name(customerSignUpRequestDto.getName())
         .phone(customerSignUpRequestDto.getPhone())
         .birth(customerSignUpRequestDto.getBirth())
