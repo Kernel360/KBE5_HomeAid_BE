@@ -35,4 +35,12 @@ public class SwaggerConfig {
         .pathsToMatch("/api/v1/admin/service-option/**")
         .build();
   }
+
+  @Bean
+  public GroupedOpenApi matchingAPI() {
+    return GroupedOpenApi.builder()
+        .group("matchings")
+        .pathsToMatch("/api/v1/admin/matchings/**")
+        .build();
+  }
 }
