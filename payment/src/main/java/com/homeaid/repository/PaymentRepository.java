@@ -13,6 +13,5 @@ public interface PaymentRepository extends JpaRepository<Payment, Long> {
   // payment 에서 reservation - managerId 를 타고 결제일 paidAt 로 필터링
   List<Payment> findAllByReservation_ManagerIdAndPaidAtBetween(Long managerId, LocalDateTime start, LocalDateTime end);
 
-  boolean existsByReservationIdAndStatus(Long reservationId, PaymentStatus status);
 
 }
