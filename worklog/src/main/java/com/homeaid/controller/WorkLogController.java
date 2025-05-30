@@ -3,6 +3,7 @@ package com.homeaid.controller;
 import com.homeaid.common.response.CommonApiResponse;
 import com.homeaid.domain.WorkLog;
 import com.homeaid.dto.request.CheckInRequestDto;
+import com.homeaid.dto.request.CheckOutRequestDto;
 import com.homeaid.dto.response.CheckInResponseDto;
 import com.homeaid.service.WorkLogService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -12,10 +13,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/manager/work-log")
@@ -35,6 +33,19 @@ public class WorkLogController {
                 checkInRequestDto.getReservationId(), checkInRequestDto.getLat(), checkInRequestDto.getLng());
 
         return ResponseEntity.status(HttpStatus.CREATED).body(CommonApiResponse.success(CheckInResponseDto.toDto(workLog)));
+    }
+
+    @PatchMapping
+    @Operation(summary = "체크인 요청", description = "매니저의 예약건에 대한 체크인 요청")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "체크인 성공"),
+            @ApiResponse(responseCode = "400", description = "이미 체크인 한 예약건"),
+            @ApiResponse(responseCode = "403", description = "예약 위치 범위 밖의 잘못된 요청")
+    })
+    public ResponseEntity<CommonApiResponse<Void>> updateWorkLogForCheckOut(@RequestBody @Valid CheckOutRequestDto checkOutRequestDto) {
+        workLogService.updateWorkLogForCheckOut(CheckOutRequestDto.toEntity(checkOutRequestDto), checkOutRequestDto.getWorkLogId(), checkOutRequestDto.getLat(), checkOutRequestDto.getLng());
+
+        return ResponseEntity.ok(CommonApiResponse.success());
     }
 
 }

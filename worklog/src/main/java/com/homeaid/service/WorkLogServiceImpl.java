@@ -37,15 +37,31 @@ public class WorkLogServiceImpl implements WorkLogService {
         return workLogRepository.save(workLog);
     }
 
+    @Transactional
+    @Override
+    public WorkLog updateWorkLogForCheckOut(WorkLog requestWorkLog, Long workLogId, Double latitude, Double longitude) {
+        //Todo requestWorkLog.getManagerId()와 workLogId로 조회한 매니저 아이디 같은지 검증
+        WorkLog workLog = workLogRepository.findById(workLogId).orElseThrow(() ->
+              new CustomException(WorkLogErrorCode.WORKLOG_NOT_FOUND)
+        );
+
+        if (!isValidDistance(workLog.getReservation().getId(), latitude, longitude)) {
+            throw new CustomException(WorkLogErrorCode.OUT_OF_WORK_RANGE);
+        }
+        workLog.updateCheckOutTime(requestWorkLog);
+
+        return workLog;
+    }
+
     /**
      * @param reservationId 예약 위치 조회할 id
      * @return 예약 위치와 체크인 위치의 차이가 CHECK_RANGE_DISTANCE_METER 범위 안에 있으면 true
      */
     private boolean isValidDistance(Long reservationId, Double latitude, Double longitude) {
         Reservation reservation = reservationRepository.findById(reservationId).orElseThrow(() -> new CustomException(ReservationErrorCode.RESERVATION_NOT_FOUND));
-        double calResult = GeoUtils.calculateDistanceInMeters(reservation.getLatitude(), reservation.getLongitude(), latitude, longitude);
+        double calculatedDistance = GeoUtils.calculateDistanceInMeters(reservation.getLatitude(), reservation.getLongitude(), latitude, longitude);
 
-        return calResult < CHECK_RANGE_DISTANCE_METER;
+        return calculatedDistance < CHECK_RANGE_DISTANCE_METER;
     }
 
 

@@ -46,7 +46,8 @@ public class WorkLog {
     }
 
     public void updateCheckOutTime(WorkLog workLog) {
-        this.checkInTime = workLog.getCheckOutTime();
+        this.checkOutTime = LocalDateTime.now();
+        this.workType = workLog.getWorkType();
     }
 
     public void assignReservation(Reservation reservation) {
