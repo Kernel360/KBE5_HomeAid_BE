@@ -18,7 +18,7 @@ public class PaymentResponseDto {
 
   private Long id;
   private Long reservationId;
-  private BigDecimal amount;
+  private Integer amount;
   private PaymentMethod paymentMethod;
   private PaymentStatus status;
   private LocalDateTime paidAt;
