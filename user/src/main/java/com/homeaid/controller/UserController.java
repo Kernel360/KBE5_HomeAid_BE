@@ -17,6 +17,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -29,6 +30,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class UserController {
 
   private final UserService userService;
+    private final BCryptPasswordEncoder passwordEncoder;
 
   @PostMapping("/auth/signup/manager")
   @Operation(summary = "매니저 회원가입", description = "매니저 사용자 정보를 입력받아 회원가입을 처리합니다.")
@@ -43,8 +45,10 @@ public class UserController {
   public ResponseEntity<CommonApiResponse<UserSignUpResponseDto>> signUpManager(
       @RequestBody @Valid ManagerSignUpRequestDto managerSignUpRequestDto
   ) {
+
+    String password = passwordEncoder.encode(managerSignUpRequestDto.getPassword());
     Manager manager = userService.signUpManager(
-        ManagerSignUpRequestDto.toEntity(managerSignUpRequestDto) // 비밀번호 추가 수정 필요
+        ManagerSignUpRequestDto.toEntity(managerSignUpRequestDto, password) // 비밀번호 추가 수정 필요
     );
     return ResponseEntity.status(HttpStatus.CREATED)
         .body(CommonApiResponse.success(UserSignUpResponseDto.toManagerDto(manager)));
@@ -63,8 +67,11 @@ public class UserController {
   public ResponseEntity<CommonApiResponse<UserSignUpResponseDto>> signUpCustomer(
       @RequestBody @Valid CustomerSignUpRequestDto customerSignUpRequestDto
   ) {
+
+    String password = passwordEncoder.encode(customerSignUpRequestDto.getPassword());
+
     Customer customer = userService.signUpCustomer(
-        CustomerSignUpRequestDto.toEntity(customerSignUpRequestDto) // 비밀번호 추가 수정 필요
+        CustomerSignUpRequestDto.toEntity(customerSignUpRequestDto, password) // 비밀번호 추가 수정 필요
     );
     return ResponseEntity.status(HttpStatus.CREATED)
         .body(CommonApiResponse.success(UserSignUpResponseDto.toCustomerDto(customer)));

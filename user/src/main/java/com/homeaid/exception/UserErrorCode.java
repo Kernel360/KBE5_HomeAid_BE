@@ -8,6 +8,10 @@ import org.springframework.http.HttpStatus;
 @RequiredArgsConstructor
 public enum UserErrorCode implements BaseErrorCode {
 
+  // 401 UNAUTHORIZED
+  USER_NOT_AUTHENTICATED(HttpStatus.UNAUTHORIZED, "USER_NOT_AUTHENTICATED", "인증되지 않은 사용자입니다."),
+
+
   // 409 CONFLICT
   USER_ALREADY_EXISTS(HttpStatus.CONFLICT, "USER_ALREADY_EXISTS", "이미 가입된 회원입니다.");
 
