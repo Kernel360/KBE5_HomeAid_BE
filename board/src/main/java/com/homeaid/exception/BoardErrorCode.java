@@ -23,7 +23,8 @@ public enum BoardErrorCode implements BaseErrorCode {
       "답변이 완료된 게시글은 수정할 수 없습니다."),
 
   // 404 NOT_FOUND
-  BOARD_NOT_FOUND(HttpStatus.NOT_FOUND, "BOARD_NOT_FOUND", "문의글이 존재하지 않습니다."),
+  BOARD_NOT_FOUND(HttpStatus.NOT_FOUND, "BOARD_NOT_FOUND", "게시글이 존재하지 않습니다."),
+  BOARD_USER_NOT_FOUND(HttpStatus.NOT_FOUND, "BOARD_USER_NOT_FOUND", "게시글 작성자를 찾을 수 없습니다."),
 
   // 500 INTERNAL_SERVER_ERROR
   BOARD_SAVE_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "BOARD_SAVE_FAILED", "게시글 저장에 실패했습니다."),
