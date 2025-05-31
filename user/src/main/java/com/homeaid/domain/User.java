@@ -62,7 +62,8 @@ public class User {
   @LastModifiedDate
   private LocalDateTime updatedAt;
 
-  public User(String email, String password, String name, String phone, LocalDate birth, GenderType gender, UserRole role) {
+  public User(String email, String password, String name, String phone, LocalDate birth,
+      GenderType gender, UserRole role) {
     this.email = email;
     this.password = password;
     this.name = name;
@@ -72,7 +73,8 @@ public class User {
     this.role = role;
   }
 
-  public User(String email, UserRole role) {
+  public User(Long userId, String email, UserRole role) {
+    this.id = userId;
     this.email = email;
     this.password = "temp";
     this.role = role;

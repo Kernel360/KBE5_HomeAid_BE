@@ -1,7 +1,7 @@
 package com.homeaid.dto.request;
 
 
-import com.homeaid.domain.CustomerBoard;
+import com.homeaid.domain.UserBoard;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 
@@ -14,10 +14,10 @@ public class UpdateBoardRequestDto {
   @NotBlank(message = "내용을 작성해 주세요")
   private String content;
 
-  public static CustomerBoard toEntity(UpdateBoardRequestDto dto) {
-    return CustomerBoard.builder()
-        .title(dto.getTitle())
-        .content(dto.getContent())
+  public static UserBoard toEntity(UpdateBoardRequestDto updateBoardRequestDto) {
+    return UserBoard.builder()
+        .title(updateBoardRequestDto.getTitle())
+        .content(updateBoardRequestDto.getContent())
         .build();
   }
 
