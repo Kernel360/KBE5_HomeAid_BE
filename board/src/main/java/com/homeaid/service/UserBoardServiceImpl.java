@@ -117,7 +117,7 @@ public class UserBoardServiceImpl implements UserBoardService {
   }
 
   private boolean validateUserAccess(UserBoard board, Long userId, UserRole role) {
-    if (!board.getUserId().equals(userId) && role == board.getRole()) {
+    if (!board.getUserId().equals(userId) || role != board.getRole()) {
       throw new CustomException(BoardErrorCode.BOARD_ACCESS_UNAUTHORIZED);
     }
     return true;
