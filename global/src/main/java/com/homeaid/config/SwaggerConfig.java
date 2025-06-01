@@ -82,6 +82,7 @@ public class SwaggerConfig {
             .group("worklog")
             .pathsToMatch("/api/v1/manager/work-logs/**")
             .build();
+  }
     
   @Bean
     
