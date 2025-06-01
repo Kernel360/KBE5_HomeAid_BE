@@ -3,7 +3,6 @@ package com.homeaid.dto.response;
 import com.homeaid.domain.Payment;
 import com.homeaid.domain.PaymentMethod;
 import com.homeaid.domain.PaymentStatus;
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
