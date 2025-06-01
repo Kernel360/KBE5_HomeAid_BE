@@ -1,7 +1,5 @@
 package com.homeaid.domain;
 
-
-
 import static com.homeaid.domain.enumerate.ReservationStatus.REQUESTED;
 
 import com.homeaid.domain.enumerate.ReservationStatus;
@@ -54,7 +52,14 @@ public class Reservation {
 
   private Long customerId;
 
-  private Long managerId = null;
+  private Long finalMatchingId;
+
+  private Double latitude;
+
+  private Double longitude;
+
+  @Column(columnDefinition = "TEXT")
+  private String customerMemo;
 
   @OneToOne(mappedBy = "reservation", cascade = CascadeType.ALL)
   private ReservationItem item;
@@ -91,7 +96,12 @@ public class Reservation {
     this.deletedDate = LocalDateTime.now();
   }
 
+
   public void updateStatusCompleted() {
     this.status = ReservationStatus.COMPLETED;
+
+  public void confirmMatching(Long matchingId) {
+    finalMatchingId = matchingId;
+
   }
 }
