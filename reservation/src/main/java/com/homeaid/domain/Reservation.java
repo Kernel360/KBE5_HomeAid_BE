@@ -99,7 +99,8 @@ public class Reservation {
 
   public void updateStatusCompleted() {
     this.status = ReservationStatus.COMPLETED;
-
+  }
+  
   public void confirmMatching(Long matchingId) {
     finalMatchingId = matchingId;
 
