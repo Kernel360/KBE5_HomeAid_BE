@@ -46,6 +46,10 @@ public class Reservation {
   @Column(nullable = false)
   private ReservationStatus status = REQUESTED;
 
+  private Double latitude;
+
+  private Double longitude;
+
   private Long customerId;
 
   private Long finalMatchingId;
@@ -92,7 +96,13 @@ public class Reservation {
     this.deletedDate = LocalDateTime.now();
   }
 
+
+  public void updateStatusCompleted() {
+    this.status = ReservationStatus.COMPLETED;
+  }
+  
   public void confirmMatching(Long matchingId) {
     finalMatchingId = matchingId;
+
   }
 }

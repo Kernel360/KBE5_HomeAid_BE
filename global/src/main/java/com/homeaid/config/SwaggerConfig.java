@@ -76,11 +76,22 @@ public class SwaggerConfig {
   }
 
   @Bean
+
+  public GroupedOpenApi worklogAPI() {
+    return GroupedOpenApi.builder()
+            .group("worklog")
+            .pathsToMatch("/api/v1/manager/work-logs/**")
+            .build();
+  }
+    
+  @Bean
+    
   public GroupedOpenApi boardAPI() {
     return GroupedOpenApi.builder()
         .group("Boards")
         .displayName("💬 1:1 문의글")
         .pathsToMatch("/api/v1/board/**")
         .build();
+
   }
 }
