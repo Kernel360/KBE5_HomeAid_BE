@@ -64,13 +64,29 @@ public class User {
   private LocalDateTime updatedAt;
 
 
-  public User(String email, String password, String name, String phone, LocalDate birth, GenderType gender, UserRole role) {
+
+  public User(String email, String password, String name, String phone, LocalDate birth,
+      GenderType gender, UserRole role) {
+
     this.email = email;
     this.password = password;
     this.name = name;
     this.phone = phone;
     this.birth = birth;
     this.gender = gender;
+    this.role = role;
+  }
+
+  public User(Long userId, String email, UserRole role) {
+    this.id = userId;
+    this.email = email;
+    this.password = "temp";
+    this.role = role;
+  }
+
+  public User(String email, UserRole role, String encodedPassword) {
+    this.email = email;
+    this.password = encodedPassword;
     this.role = role;
   }
 
