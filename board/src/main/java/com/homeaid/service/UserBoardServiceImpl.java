@@ -3,10 +3,13 @@ package com.homeaid.service;
 
 import com.homeaid.domain.UserBoard;
 import com.homeaid.domain.enumerate.UserRole;
+import com.homeaid.dto.response.PagedResponseDto;
 import com.homeaid.dto.response.UserBoardListResponseDto;
 import com.homeaid.exception.BoardErrorCode;
 import com.homeaid.exception.CustomException;
 import com.homeaid.repository.UserBoardRepository;
+import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -87,22 +90,30 @@ public class UserBoardServiceImpl implements UserBoardService {
 
   @Override
   @Transactional(readOnly = true)
-  public Page<UserBoardListResponseDto> searchBoard(String keyword, Pageable pageable, Long userId,
+  public PagedResponseDto<UserBoardListResponseDto> searchBoard(String keyword, Pageable pageable, Long userId,
       UserRole role) {
-
     try {
       Page<UserBoard> boardPage;
 
       if (keyword == null || keyword.trim().isEmpty()) {
         boardPage = userBoardRepository.findByUserId(userId, pageable);
       } else {
-        boardPage = userBoardRepository.findByUserIdAndTitleContainingOrUserIdAndContentContaining(
-            userId, keyword, userId, keyword, pageable
-        );
+        boardPage = userBoardRepository.findByUserIdAndKeyword(userId,
+            keyword, pageable);
       }
 
-      return boardPage.map(UserBoardListResponseDto::toDto);
+      List<UserBoardListResponseDto> content = boardPage.getContent()
+          .stream()
+          .map(UserBoardListResponseDto::toDto)
+          .collect(Collectors.toList());
 
+      return PagedResponseDto.of(
+          content,
+          boardPage.getNumber(),
+          boardPage.getTotalPages(),
+          (int) boardPage.getTotalElements(),
+          boardPage.getSize()
+      );
     } catch (CustomException e) {
       throw e;
     } catch (Exception e) {

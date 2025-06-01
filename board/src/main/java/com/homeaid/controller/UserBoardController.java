@@ -5,6 +5,7 @@ import com.homeaid.domain.UserBoard;
 import com.homeaid.domain.enumerate.UserRole;
 import com.homeaid.dto.request.CreateBoardRequestDto;
 import com.homeaid.dto.request.UpdateBoardRequestDto;
+import com.homeaid.dto.response.PagedResponseDto;
 import com.homeaid.dto.response.UserBoardListResponseDto;
 import com.homeaid.dto.response.UserBoardResponseDto;
 import com.homeaid.security.CustomUserDetails;
@@ -60,7 +61,6 @@ public class UserBoardController {
       @AuthenticationPrincipal CustomUserDetails customUserDetails
   ) {
     Long userId = customUserDetails.getUserId();
-    System.out.println(userId);
     UserRole role = customUserDetails.getUserRole();
     UserBoard board = CreateBoardRequestDto.toEntity(userId, role, createRequestDto);
 
@@ -154,7 +154,7 @@ public class UserBoardController {
       @ApiResponse(responseCode = "401", description = "인증되지 않은 사용자",
           content = @Content(schema = @Schema(implementation = CommonApiResponse.class)))
   })
-  public ResponseEntity<CommonApiResponse<Page<UserBoardListResponseDto>>> searchBoard(
+  public ResponseEntity<CommonApiResponse<PagedResponseDto<UserBoardListResponseDto>>> searchBoard(
       @Parameter(description = "검색 키워드", example = "문의")
       @RequestParam(name = "keyword", required = false) String keyword,
       @Parameter(description = "페이지 번호 (0부터 시작)", example = "0")

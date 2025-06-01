@@ -57,10 +57,6 @@ public class JwtFilter extends OncePerRequestFilter {
       Long userId = jwtUtil.getUserIdFromToken(token);
       String email = jwtUtil.getEmailFromToken(token);
       String role = jwtUtil.getRoleFromToken(token);
-      System.out.println("JWT에서 추출한 값들:");
-      System.out.println("userId: " + userId);
-      System.out.println("email: " + email);
-      System.out.println("role: " + role);
 
       // 실제 DB 조회 없이 임시 User 객체 생성
       User user = new User(userId, email,
