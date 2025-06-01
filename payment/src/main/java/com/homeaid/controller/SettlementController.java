@@ -1,5 +1,6 @@
 package com.homeaid.controller;
 
+import com.homeaid.common.response.CommonApiResponse;
 import com.homeaid.domain.Settlement;
 import com.homeaid.dto.request.SettlementRequestDto;
 import com.homeaid.dto.response.SettlementResponseDto;
@@ -31,6 +32,8 @@ public class SettlementController {
   @Operation(summary = "정산 ", responses = {
       @ApiResponse(responseCode = "201", description = "정산",
           content = @Content(schema = @Schema(implementation = SettlementResponseDto.class))),
+      @ApiResponse(responseCode = "404", description = "정산 실패",
+          content = @Content(schema = @Schema(implementation = CommonApiResponse.class)))
   })
   public ResponseEntity<SettlementResponseDto> calcAndSaveForManager(
       @Valid @RequestBody SettlementRequestDto dto

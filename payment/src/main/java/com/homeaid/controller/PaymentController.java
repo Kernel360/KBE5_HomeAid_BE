@@ -1,5 +1,6 @@
 package com.homeaid.controller;
 
+import com.homeaid.common.response.CommonApiResponse;
 import com.homeaid.dto.request.PaymentRequestDto;
 import com.homeaid.dto.response.PaymentResponseDto;
 import com.homeaid.service.PaymentService;
@@ -27,6 +28,8 @@ public class PaymentController {
   @Operation(summary = "결제 성공", responses = {
       @ApiResponse(responseCode = "201", description = "결제 성공",
           content = @Content(schema = @Schema(implementation = PaymentResponseDto.class))),
+      @ApiResponse(responseCode = "404", description = "결제 실패",
+          content = @Content(schema = @Schema(implementation = CommonApiResponse.class)))
   })
   public ResponseEntity<PaymentResponseDto> pay(@Valid @RequestBody PaymentRequestDto requestDto) {
     PaymentResponseDto response = paymentService.pay(requestDto);
