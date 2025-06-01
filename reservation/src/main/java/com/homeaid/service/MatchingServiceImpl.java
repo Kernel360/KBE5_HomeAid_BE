@@ -18,6 +18,7 @@ import java.time.LocalTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -28,6 +29,7 @@ public class MatchingServiceImpl implements MatchingService {
   private final MatchingRepository matchingRepository;
 
   @Override
+  @Transactional
   public Long createMatching(Long managerId, Long reservationId,
       Matching matching) {
 
@@ -47,6 +49,7 @@ public class MatchingServiceImpl implements MatchingService {
 
 
   @Override
+  @Transactional
   public void respondToMatchingAsManager(Long matchingId, ManagerAction action, String memo) {
     Matching matching = matchingRepository.findById(matchingId)
         .orElseThrow(() -> new CustomException(MatchingErrorCode.MATCHING_NOT_FOUND));
@@ -64,6 +67,7 @@ public class MatchingServiceImpl implements MatchingService {
   }
 
   @Override
+  @Transactional
   public void respondToMatchingAsCustomer(Long matchingId,
       CustomerAction action, String memo) {
     Matching matching = matchingRepository.findById(matchingId)
@@ -85,6 +89,7 @@ public class MatchingServiceImpl implements MatchingService {
   }
 
   @Override
+  @Transactional(readOnly = true)
   public List<Manager> recommendManagers(Long reservationId) {
     Reservation reservation = reservationRepository.findById(reservationId)
         .orElseThrow(() -> new CustomException(ReservationErrorCode.RESERVATION_NOT_FOUND));
