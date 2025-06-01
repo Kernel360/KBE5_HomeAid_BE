@@ -40,6 +40,7 @@ public class WorkLogController {
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "체크아웃 성공"),
             @ApiResponse(responseCode = "404", description = "존재하지 않는 예약 건"),
+            @ApiResponse(responseCode = "403", description = "체크인의 매니저와 체크아웃 매니저가 다를 때"),
             @ApiResponse(responseCode = "403", description = "예약 위치 범위 밖의 잘못된 요청")
     })
     public ResponseEntity<CommonApiResponse<Void>> updateWorkLogForCheckOut(@RequestBody @Valid CheckOutRequestDto checkOutRequestDto) {

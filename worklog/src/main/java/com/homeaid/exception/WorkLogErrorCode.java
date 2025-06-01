@@ -14,6 +14,8 @@ public enum WorkLogErrorCode implements BaseErrorCode {
     ALREADY_COMPLETED_CHECKIN(HttpStatus.BAD_REQUEST, "ALREADY_COMPLETED_WORKLOG", "이미 완료된 체크인입니다."),
     ALREADY_COMPLETED_CHECKOUT(HttpStatus.BAD_REQUEST, "ALREADY_COMPLETED_WORKLOG", "이미 완료된 체크아웃입니다."),
 
+    // 403 FORBIDDEN
+    CHECKOUT_MANAGER_MISMATCH(HttpStatus.FORBIDDEN, "INVALID_WORKLOG_WORKER", "체크인한 매니저와 체크아웃을 시도한 매니저가 일치하지 않습니다."),
     OUT_OF_WORK_RANGE(HttpStatus.FORBIDDEN, "OUT_OF_WORK_RANGE", "현재 위치가 허용된 작업 범위를 벗어났습니다."),
 
     // 404 NOT FOUND

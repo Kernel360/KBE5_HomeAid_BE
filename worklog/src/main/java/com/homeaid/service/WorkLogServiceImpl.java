@@ -41,10 +41,11 @@ public class WorkLogServiceImpl implements WorkLogService {
     @Transactional
     @Override
     public WorkLog updateWorkLogForCheckOut(WorkLog requestWorkLog, Long workLogId, Double latitude, Double longitude) {
-        //Todo requestWorkLog.getManagerId()와 workLogId로 조회한 매니저 아이디 같은지 검증
         WorkLog workLog = workLogRepository.findById(workLogId).orElseThrow(() ->
               new CustomException(WorkLogErrorCode.WORKLOG_NOT_FOUND)
         );
+
+        isValidManager(workLog.getId(), requestWorkLog.getManagerId());
 
         if (!isValidDistance(workLog.getReservation().getId(), latitude, longitude)) {
             throw new CustomException(WorkLogErrorCode.OUT_OF_WORK_RANGE);
@@ -63,6 +64,15 @@ public class WorkLogServiceImpl implements WorkLogService {
         double calculatedDistance = GeoUtils.calculateDistanceInMeters(reservation.getLatitude(), reservation.getLongitude(), latitude, longitude);
 
         return calculatedDistance < CHECK_RANGE_DISTANCE_METER;
+    }
+
+    public void isValidManager(Long workLogId, Long requestManagerId) {
+        WorkLog workLog = workLogRepository.findById(workLogId)
+                .orElseThrow(() -> new CustomException(WorkLogErrorCode.WORKLOG_NOT_FOUND));
+
+        if (!workLog.getManagerId().equals(requestManagerId)) {
+            throw new CustomException(WorkLogErrorCode.CHECKOUT_MANAGER_MISMATCH);
+        }
     }
 
 
