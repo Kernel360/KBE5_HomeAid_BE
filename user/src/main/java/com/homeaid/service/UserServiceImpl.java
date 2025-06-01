@@ -14,7 +14,6 @@ import org.springframework.stereotype.Service;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
-//    private final BCryptPasswordEncoder passwordEncoder;
 
     public Manager signUpManager(@Valid Manager manager) {
 
