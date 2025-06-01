@@ -40,8 +40,8 @@ public class WorkLogServiceImpl implements WorkLogService {
 
     @Transactional
     @Override
-    public WorkLog updateWorkLogForCheckOut(WorkLog requestWorkLog, Long workLogId, Double latitude, Double longitude) {
-        WorkLog workLog = workLogRepository.findById(workLogId).orElseThrow(() ->
+    public WorkLog updateWorkLogForCheckOut(WorkLog requestWorkLog, Long requestWorkLogId, Double latitude, Double longitude) {
+        WorkLog workLog = workLogRepository.findById(requestWorkLogId).orElseThrow(() ->
               new CustomException(WorkLogErrorCode.WORKLOG_NOT_FOUND)
         );
 
@@ -51,6 +51,8 @@ public class WorkLogServiceImpl implements WorkLogService {
             throw new CustomException(WorkLogErrorCode.OUT_OF_WORK_RANGE);
         }
         workLog.updateCheckOutTime(requestWorkLog);
+
+        updateReservationStatusCompleted(workLog.getReservation());
 
         return workLog;
     }
@@ -73,6 +75,10 @@ public class WorkLogServiceImpl implements WorkLogService {
         if (!workLog.getManagerId().equals(requestManagerId)) {
             throw new CustomException(WorkLogErrorCode.CHECKOUT_MANAGER_MISMATCH);
         }
+    }
+
+    public void updateReservationStatusCompleted(Reservation reservation) {
+        reservation.updateStatusCompleted();
     }
 
 

@@ -90,4 +90,8 @@ public class Reservation {
   public void softDelete() {
     this.deletedDate = LocalDateTime.now();
   }
+
+  public void updateStatusCompleted() {
+    this.status = ReservationStatus.COMPLETED;
+  }
 }
