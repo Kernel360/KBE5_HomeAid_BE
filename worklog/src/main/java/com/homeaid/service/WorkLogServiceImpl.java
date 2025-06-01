@@ -22,10 +22,11 @@ public class WorkLogServiceImpl implements WorkLogService {
     @Transactional
     @Override
     public WorkLog createWorkLog(WorkLog workLog, Long reservationId, Double latitude, Double longitude) {
+        //요청 한 예약건이 존재하는 예약건인지 검증
         Reservation reservation = reservationRepository.findById(reservationId).orElseThrow(()
                 -> new CustomException(ReservationErrorCode.RESERVATION_NOT_FOUND));
-
-        if (workLogRepository.existsWorkLogByManagerId(workLog.getManagerId())) {
+        //존재한 예약건에 대해 요청한 매니저 아이디가 체크인을 한적이있는지 검증
+        if (workLogRepository.existsWorkLogByManagerIdAndReservationId(workLog.getManagerId(), reservationId)) {
             throw new CustomException(WorkLogErrorCode.ALREADY_COMPLETED_CHECKIN);
         }
 
