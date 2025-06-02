@@ -3,20 +3,14 @@ package com.homeaid.dto.request;
 
 import com.homeaid.domain.Review;
 import com.homeaid.domain.enumerate.UserRole;
-import jakarta.validation.constraints.Size;
 import lombok.Getter;
-
 
 @Getter
 public class CustomerReviewRequestDto {
 
     private Long targetId;
 
-    private UserRole writerRole;
-
-
-    @Size(min = 1, max = 5)
-    private int rating;
+    private Integer rating;
 
     private String comment;
 
@@ -30,6 +24,7 @@ public class CustomerReviewRequestDto {
                 .writerRole(userRole)
                 .comment(customerReviewRequestDto.comment)
                 .rating(customerReviewRequestDto.rating)
+                .reservationId(customerReviewRequestDto.reservationId)
                 .build();
     }
 }

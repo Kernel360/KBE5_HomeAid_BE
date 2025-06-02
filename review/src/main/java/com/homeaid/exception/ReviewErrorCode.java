@@ -14,6 +14,10 @@ public enum ReviewErrorCode implements BaseErrorCode {
 
     // 403 FORBIDDEN
     UNAUTHORIZED_REVIEW_ACCESS(HttpStatus.FORBIDDEN, "UNAUTHORIZED_REVIEW_ACCESS", "리뷰에 대한 권한이 없습니다."),
+    UNAUTHORIZED_REVIEW_TARGET(HttpStatus.FORBIDDEN, "UNAUTHORIZED_REVIEW_TARGET", "예약건에 대한 리뷰 대상이 유효하지 않습니다."),
+
+    // 404 NOTFOUND
+    REVIEW_NOT_FOUND(HttpStatus.NOT_FOUND, "REVIEW_NOT_FOUND", "해당 리뷰가 존재하지 않습니다."),
 
     // 409 CONFLICT
     REVIEW_NOT_ALLOWED(HttpStatus.CONFLICT, "REVIEW_NOT_ALLOWED", "작업이 완료되지 않아 리뷰를 작성할 수 없습니다."),
