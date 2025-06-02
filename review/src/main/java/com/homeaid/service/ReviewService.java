@@ -29,6 +29,7 @@ public class ReviewService {
         if (reservation.getStatus() != ReservationStatus.COMPLETED) {
             throw new CustomException(ReviewErrorCode.REVIEW_NOT_ALLOWED);
         }
+        //Todo 작성자 권한이 고객이면 매니저 찜 생성 추가
 
         return reviewRepository.save(requestReview);
     }

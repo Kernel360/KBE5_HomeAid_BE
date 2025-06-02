@@ -1,5 +1,6 @@
 package com.homeaid.domain;
 
+import com.homeaid.domain.enumerate.UserRole;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -28,17 +29,19 @@ public class Review {
 
     private String comment;
 
+    @Enumerated(EnumType.STRING)
+    private UserRole writerRole;
+
     @CreatedDate
     private LocalDateTime createdAt;
-
-    private Long managerId;
 
     private Long reservationId;
 
     @Builder
-    public Review(Long targetId, Long writerId, String comment, int rating, Long reservationId) {
+    public Review(Long targetId, Long writerId, UserRole writerRole, String comment, int rating, Long reservationId) {
         this.targetId = targetId;
         this.writerId = writerId;
+        this.writerRole = writerRole;
         this.comment = comment;
         this.rating = rating;
         this.reservationId = reservationId;

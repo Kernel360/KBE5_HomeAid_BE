@@ -1,9 +1,7 @@
 package com.homeaid.config;
 
-import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;
-import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
 import org.springdoc.core.models.GroupedOpenApi;
 import org.springframework.context.annotation.Bean;
@@ -93,5 +91,14 @@ public class SwaggerConfig {
         .pathsToMatch("/api/v1/board/**")
         .build();
 
+  }
+
+  @Bean
+  public GroupedOpenApi reviewAPI() {
+    return GroupedOpenApi.builder()
+            .group("reviews")
+            .displayName("리뷰")
+            .pathsToMatch("/api/v1/review/**")
+            .build();
   }
 }
