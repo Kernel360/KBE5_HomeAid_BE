@@ -45,7 +45,7 @@ public class CustomerRating {
     this.customer = customer;
   }
 
-  public void updateRating(Integer reviewCount, Double averageRating){
+  public void updateRating(int reviewCount, double averageRating){
     this.averageRating = averageRating;
     this.reviewCount = reviewCount;
   }

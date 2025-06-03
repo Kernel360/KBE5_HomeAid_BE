@@ -40,7 +40,7 @@ public class ManagerRating {
 
   public ManagerRating(Manager manager){
     this.managerId = manager.getId();
-    this.reviewCount = 0;
+    this.reviewCount = 0 ;
     this.averageRating = 0.0;
     this.manager = manager;
   }
