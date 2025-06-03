@@ -69,7 +69,7 @@ public class ReviewServiceImpl implements ReviewService {
             throw new CustomException(ReviewErrorCode.UNAUTHORIZED_REVIEW_ACCESS);
         }
 
-        reservationRepository.deleteById(reviewId);
+        reviewRepository.deleteById(reviewId);
     }
 
 
