@@ -39,7 +39,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/board")
+@RequestMapping("/api/v1/boards")
 @Tag(name = "1:1 문의글", description = "사용자와 관리자 간 1:1 문의글 API")
 @SecurityRequirement(name = "Bearer Authentication")
 public class UserBoardController {
