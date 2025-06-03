@@ -7,6 +7,7 @@ import com.homeaid.dto.request.CustomerReviewRequestDto;
 import com.homeaid.security.CustomUserDetails;
 import com.homeaid.service.ReviewService;
 import io.swagger.v3.oas.annotations.Operation;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -14,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/api/v1/review")
+@RequestMapping("/api/v1/reviews")
 public class ReviewController {
 
     private final ReviewService reviewService;
@@ -23,7 +24,7 @@ public class ReviewController {
     @PostMapping
     public ResponseEntity<CommonApiResponse<Long>> createReview(
             @AuthenticationPrincipal CustomUserDetails user,
-            @RequestBody CustomerReviewRequestDto customerReviewRequestDto) {
+            @RequestBody @Valid CustomerReviewRequestDto customerReviewRequestDto) {
 
         Review requestReview = CustomerReviewRequestDto.toEntity(customerReviewRequestDto, user.getUserRole(), user.getUserId());
 
