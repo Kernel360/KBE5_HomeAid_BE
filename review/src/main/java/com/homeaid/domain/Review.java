@@ -23,7 +23,7 @@ public class Review {
 
     private Long targetId;
 
-    private int rating;     //별점
+    private Integer rating;     //별점
 
     private String comment;
 

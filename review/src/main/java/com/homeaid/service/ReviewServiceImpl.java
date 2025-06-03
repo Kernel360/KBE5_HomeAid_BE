@@ -20,6 +20,7 @@ public class ReviewServiceImpl implements ReviewService {
     private final ReviewRepository reviewRepository;
     private final ReservationRepository reservationRepository;
     private final MatchingRepository matchingRepository;
+    private final UserRatingUpdateService userRatingUpdateService;
 
     @Transactional
     @Override
@@ -37,9 +38,12 @@ public class ReviewServiceImpl implements ReviewService {
             throw new CustomException(ReviewErrorCode.UNAUTHORIZED_REVIEW_TARGET);
         }
 
+        Review savedReview = reviewRepository.save(requestReview);
+        userRatingUpdateService.updateRating(requestReview.getTargetId(), requestReview.getWriterRole());
+
         //Todo 매니저 찜 기능
 
-        return reviewRepository.save(requestReview);
+        return savedReview;
     }
 
     @Transactional
@@ -58,7 +62,10 @@ public class ReviewServiceImpl implements ReviewService {
             throw new CustomException(ReviewErrorCode.UNAUTHORIZED_REVIEW_TARGET);
         }
 
-        return reviewRepository.save(requestReview);
+        Review savedReview = reviewRepository.save(requestReview);
+        userRatingUpdateService.updateRating(requestReview.getTargetId(), requestReview.getWriterRole());
+
+        return savedReview;
     }
 
     public void deleteReview(Long reviewId, Long userId) {
@@ -70,6 +77,7 @@ public class ReviewServiceImpl implements ReviewService {
         }
 
         reviewRepository.deleteById(reviewId);
+        userRatingUpdateService.updateRating(review.getTargetId(), review.getWriterRole());
     }
 
 
