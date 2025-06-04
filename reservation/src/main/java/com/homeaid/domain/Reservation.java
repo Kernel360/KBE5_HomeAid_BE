@@ -93,6 +93,7 @@ public class Reservation {
   }
 
 
+
   public void updateStatusCompleted() {
     this.status = ReservationStatus.COMPLETED;
   }
@@ -102,3 +103,4 @@ public class Reservation {
 
   }
 }
+

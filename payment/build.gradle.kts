@@ -13,6 +13,10 @@ tasks.named<Jar>("jar") {
 }
 
 dependencies {
+    implementation(project(":reservation"))
+    implementation(project(":common-domain"))
+    implementation(project(":global"))
+    implementation(project(":user"))
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.6")
