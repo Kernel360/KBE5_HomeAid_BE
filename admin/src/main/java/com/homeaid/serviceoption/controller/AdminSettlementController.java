@@ -1,6 +1,7 @@
 package com.homeaid.serviceoption.controller;
 
 import com.homeaid.service.SettlementService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import java.time.LocalDate;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -13,13 +14,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-//@RequestMapping("/api/admin/settlement")
-@RequestMapping("/api/admin")
+@RequestMapping("/api/v1/admin")
+@Tag(name = "AdminSettlement", description = "관리자 정산 API")
 public class AdminSettlementController {
   private final SettlementService settlementService;
 
   // 매니저별 정산 요청 API
-  @PostMapping("/manager")
+  @PostMapping("/settlement/manager")
   public ResponseEntity<Void> createManagerSettlement(
       @RequestParam Long managerId,
       @RequestParam @DateTimeFormat(iso = ISO.DATE) LocalDate weekStart,
