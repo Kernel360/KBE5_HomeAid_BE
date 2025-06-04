@@ -50,6 +50,8 @@ public class Reservation {
 
   private Long finalMatchingId;
 
+  private Long managerId;
+
   private Double latitude;
 
   private Double longitude;
