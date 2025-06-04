@@ -48,6 +48,8 @@ public class Reservation {
 
   private Long customerId;
 
+  private Long managerId;
+
   private Long finalMatchingId;
 
   private Double latitude;
