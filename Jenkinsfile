@@ -3,6 +3,12 @@ pipeline {
 
     environment {
         DISCORD_WEBHOOK = credentials('discord-webhook')
+        DB_DRIVER = 'mysql'
+        DB_HOST = 'mysql-ci'     // Docker Compose 서비스명 (같은 네트워크)
+        DB_PORT = '3306'
+        DB_NAME = 'homeaid_db'
+        DB_USERNAME = 'homeaid_user'
+        DB_PASSWORD = 'root'
     }
 
     tools {
@@ -13,38 +19,6 @@ pipeline {
         stage('Checkout') {
             steps {
                 checkout scm
-            }
-        }
-
-        stage('Build MySQL Service') {
-            steps {
-                script {
-                    // Docker로 MySQL 컨테이너 띄우기 (jenkins 서버에 Docker가 설치되어 있어야 함)
-                    sh '''
-                    docker run -d \
-                        --name mysql-ci \
-                        -e MYSQL_DATABASE=${DB_NAME} \
-                        -e MYSQL_ROOT_PASSWORD=root \
-                        -e MYSQL_USER=homeaid_user \
-                        -e MYSQL_PASSWORD=${DB_PASSWORD} \
-                        -p 3306:3306 \
-                        --health-cmd="mysqladmin ping -h localhost --silent" \
-                        --health-interval=10s \
-                        --health-timeout=5s \
-                        --health-retries=3 \
-                        mysql:latest
-
-                    # DB 준비 대기 (최대 60초)
-                    for i in {1..12}; do
-                        if docker exec mysql-ci mysqladmin ping -h localhost --silent; then
-                            echo "MySQL is ready!"
-                            break
-                        fi
-                        echo "Waiting for MySQL..."
-                        sleep 5
-                    done
-                    '''
-                }
             }
         }
 
