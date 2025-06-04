@@ -26,6 +26,7 @@ public class ReviewServiceImpl implements ReviewService {
   @Transactional
   @Override
   public Review createReviewByCustomer(Review requestReview) {
+
     Reservation validatedReservation = validateReview(requestReview);
 
     //예약건의 고객아이디와 요청 고객의 아이디 검증
@@ -41,8 +42,8 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     Review savedReview = reviewRepository.save(requestReview);
-    userRatingUpdateService.updateRating(requestReview.getTargetId(),
-        requestReview.getWriterRole());
+    userRatingUpdateService.updateRating(savedReview.getTargetId(),
+        savedReview.getWriterRole());
 
     //Todo 매니저 찜 기능
 

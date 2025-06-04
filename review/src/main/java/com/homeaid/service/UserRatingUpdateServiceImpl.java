@@ -10,6 +10,7 @@ import com.homeaid.repository.CustomerRepository;
 import com.homeaid.repository.ManagerRatingRepository;
 import com.homeaid.repository.ManagerRepository;
 import com.homeaid.repository.ReviewRepository;
+import java.util.Arrays;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,12 +28,10 @@ public class UserRatingUpdateServiceImpl implements UserRatingUpdateService {
   @Transactional
   @Override
   public void updateRating(Long targetId, UserRole writerRole) {
-    Object[] rating = reviewRepository.getReviewStatisticsByTargetId(targetId);
 
-    int count = ((Number) rating[0]).intValue();
-    double average = ((Number) rating[1]).doubleValue();
+    int count = reviewRepository.getReviewCountByTargetId(targetId);
+    double average = reviewRepository.getReviewRatingByTargetId(targetId);
 
-    // 작성자: CUSTOMER -> MANAGER update / 작성자: MANAGER -> CUSTOMER update
     if (writerRole == UserRole.CUSTOMER) {
       updateManagerRating(targetId, count, average);
     } else if (writerRole == UserRole.MANAGER) {
@@ -41,17 +40,15 @@ public class UserRatingUpdateServiceImpl implements UserRatingUpdateService {
   }
 
   private void updateManagerRating(Long managerId, int count, double average) {
-    Manager manager = managerRepository.getReferenceById(managerId);
     ManagerRating rating = managerRatingRepository.findById(managerId)
-        .orElseGet(() -> new ManagerRating(manager));
+        .orElseGet(() -> new ManagerRating(managerId));
     rating.updateRating(count, average);
     managerRatingRepository.save(rating);
   }
 
   private void updateCustomerRating(Long customerId, int count, double average) {
-    Customer customer = customerRepository.getReferenceById(customerId);
     CustomerRating rating = customerRatingRepository.findById(customerId)
-        .orElseGet(() -> new CustomerRating(customer));
+        .orElseGet(() -> new CustomerRating(customerId));
     rating.updateRating(count, average);
     customerRatingRepository.save(rating);
   }
