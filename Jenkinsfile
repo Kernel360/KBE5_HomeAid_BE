@@ -51,39 +51,41 @@ pipeline {
 
     post {
         success {
-            script {
-                def message = """{
-                    "embeds": [{
-                        "title": "✅ CI 성공",
-                        "description": "**📦 Repository:** `${env.JOB_NAME}`\\n**🌿 Branch:** `${env.BRANCH_NAME}`\\n**👤 Triggered by:** `${env.BUILD_USER}`\\n[🔗 Jenkins 로그 확인하기](${env.BUILD_URL})",
-                        "color": 5763719
-                    }],
-                    "content": "✅ CI 통과: `${env.BRANCH_NAME}` 브랜치입니다!"
-                }"""
-                sh """
-                curl -H "Content-Type: application/json" \
-                     -X POST \
-                     -d '${message}' \
-                     ${DISCORD_WEBHOOK}
-                """
+            wrap([$class: 'BuildUser']) {
+                script {
+                    def message = """{
+                        "embeds": [{
+                            "title": "✅ CI 성공",
+                            "description": "**📦 Repository:** `${env.JOB_NAME}`\\n**🌿 Branch:** `${env.BRANCH_NAME}`\\n**👤 Triggered by:** `${env.BUILD_USER}`\\n[🔗 Jenkins 로그 확인하기](${env.BUILD_URL})",
+                            "color": 5763719
+                        }],
+                        "content": "✅ CI 통과: `${env.BRANCH_NAME}` 브랜치입니다!"
+                    }"""
+                    sh """
+                    curl -H "Content-Type: application/json" \
+                         -X POST \
+                         -d '${message}' \
+                         ${DISCORD_WEBHOOK}
+                    """
+                }
             }
-        }
-        failure {
-            script {
-                def message = """{
-                    "embeds": [{
-                        "title": "❌ CI 실패",
-                        "description": "**📦 Repository:** `${env.JOB_NAME}`\\n**🌿 Branch:** `${env.BRANCH_NAME}`\\n**👤 Triggered by:** `${env.BUILD_USER}`\\n[🔗 Jenkins 로그 확인하기](${env.BUILD_URL})",
-                        "color": 16711680
-                    }],
-                    "content": "❗ CI 실패 발생: `${env.BRANCH_NAME}` 브랜치 확인해주세요!"
-                }"""
-                sh """
-                curl -H "Content-Type: application/json" \
-                     -X POST \
-                     -d '${message}' \
-                     ${DISCORD_WEBHOOK}
-                """
+            failure {
+                script {
+                    def message = """{
+                        "embeds": [{
+                            "title": "❌ CI 실패",
+                            "description": "**📦 Repository:** `${env.JOB_NAME}`\\n**🌿 Branch:** `${env.BRANCH_NAME}`\\n**👤 Triggered by:** `${env.BUILD_USER}`\\n[🔗 Jenkins 로그 확인하기](${env.BUILD_URL})",
+                            "color": 16711680
+                        }],
+                        "content": "❗ CI 실패 발생: `${env.BRANCH_NAME}` 브랜치 확인해주세요!"
+                    }"""
+                    sh """
+                    curl -H "Content-Type: application/json" \
+                         -X POST \
+                         -d '${message}' \
+                         ${DISCORD_WEBHOOK}
+                    """
+                }
             }
         }
     }
