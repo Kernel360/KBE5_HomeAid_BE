@@ -155,7 +155,7 @@ public class UserBoardController {
           content = @Content(schema = @Schema(implementation = CommonApiResponse.class)))
   })
   public ResponseEntity<CommonApiResponse<PagedResponseDto<UserBoardListResponseDto>>> searchBoard(
-      @Parameter(description = "검색 키워드", example = "문의")
+      @Parameter(description = "검색 키워드")
       @RequestParam(name = "keyword", required = false) String keyword,
       @Parameter(description = "페이지 번호 (0부터 시작)", example = "0")
       @RequestParam(name = "page", defaultValue = "0") int page,
