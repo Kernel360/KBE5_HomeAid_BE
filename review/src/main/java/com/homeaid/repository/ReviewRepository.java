@@ -12,9 +12,9 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface ReviewRepository extends JpaRepository<Review, Long> {
 
-  @Query("SELECT COUNT(r), AVG(r.rating) FROM Review r WHERE r.targetId = :targetId")
-  Object[] getReviewStatisticsByTargetId(@Param("targetId") Long targetId);
 
     Page<Review> findByWriterId(Long userId, Pageable pageable);
 
+    @Query("SELECT COUNT(r), AVG(r.rating) FROM Review r WHERE r.targetId = :targetId")
+    Object[] getReviewStatisticsByTargetId(@Param("targetId") Long targetId);
 }
