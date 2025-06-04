@@ -4,11 +4,11 @@ pipeline {
     environment {
         DISCORD_WEBHOOK = credentials('discord-webhook')
         DB_DRIVER = 'mysql'
-        DB_HOST = 'mysql-ci'
+        DB_HOST = 'homeaid-db.c98ykwkigxsn.ap-northeast-2.rds.amazonaws.com'
         DB_PORT = '3306'
         DB_NAME = 'homeaid_db'
-        DB_USERNAME = 'homeaid_user'
-        DB_PASSWORD = 'root'
+        DB_USERNAME = credentials('rds-db-credentials').username
+        DB_PASSWORD = credentials('rds-db-credentials').password
     }
 
     tools {
