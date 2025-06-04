@@ -4,7 +4,7 @@ import com.homeaid.common.response.CommonApiResponse;
 import com.homeaid.domain.Settlement;
 import com.homeaid.dto.request.SettlementRequestDto;
 import com.homeaid.dto.response.SettlementResponseDto;
-import com.homeaid.service.SettlementServiceImpl;
+import com.homeaid.service.SettlementService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -26,7 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class SettlementController {
 
-  private final SettlementServiceImpl settlementService;
+  private final SettlementService settlementService;
 
   @PostMapping("/manager/{managerId}")
   @Operation(summary = "정산 ", responses = {

@@ -22,9 +22,6 @@ spring:
         format_sql: true
         dialect: org.hibernate.dialect.MySQL8Dialect
 
-  jwt:
-    secret: ${JWT_SECRET}
-
 env:
   secure-cookie: false
 
@@ -32,14 +29,15 @@ springdoc:
   api-docs:
     groups:
       enabled: true
-  group-configs:
-    - group: reservations
-      packages-to-scan: com.homeaid.controller  # 실제 컨트롤러 패키지명!
+
   swagger-ui:
     path: /swagger-ui.html
     enabled: true
     groups-order: asc
     tags-sorter: alpha
     operations-sorter: alpha
+    # try it out 기능에 요청이 수행되는 소요시간을 표시
     display-request-duration: true
+    # 문서를 로드할때 기본적으로 API가 모두 접힌 상태로 설정
+    # list: 태그만 펼침, full: 모든 API 펼침
     doc-expansion: none
