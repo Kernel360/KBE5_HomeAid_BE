@@ -4,9 +4,11 @@ pipeline {
     environment {
         DISCORD_WEBHOOK = credentials('discord-webhook')
         DB_DRIVER = 'mysql'
-        DB_HOST = 'homeaid-db.c98ykwkigxsn.ap-northeast-2.rds.amazonaws.com'
+        DB_HOST = 'mysql-ci'
         DB_PORT = '3306'
         DB_NAME = 'homeaid_db'
+        DB_USERNAME = 'homeaid_user'
+        DB_PASSWORD = 'root'
     }
 
     tools {
@@ -34,11 +36,6 @@ pipeline {
         stage('Build and Test') {
             steps {
                 sh 'chmod +x ./gradlew'
-                withCredentials([usernamePassword(
-                    credentialsId: 'rds-db',
-                    usernameVariable: 'DB_USERNAME',
-                    passwordVariable: 'DB_PASSWORD'
-                )]) {
                 withEnv([
                     "DB_DRIVER=${DB_DRIVER}",
                     "DB_HOST=${DB_HOST}",
