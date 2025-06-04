@@ -16,4 +16,5 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
   Object[] getReviewStatisticsByTargetId(@Param("targetId") Long targetId);
 
     Page<Review> findByWriterId(Long userId, Pageable pageable);
+
 }
