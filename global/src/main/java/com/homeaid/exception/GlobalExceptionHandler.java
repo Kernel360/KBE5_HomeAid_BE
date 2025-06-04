@@ -9,6 +9,7 @@ import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import java.sql.SQLIntegrityConstraintViolationException;
 
 @Slf4j
 @RestControllerAdvice
@@ -48,6 +49,17 @@ public class GlobalExceptionHandler {
 
     return ResponseEntity.badRequest()
         .body(CommonApiResponse.fail("INVALID_JSON", "요청 형식이 잘못되었습니다."));
+  }
+
+  /**
+   *db 제약조건에 걸릴시
+   */
+  @ExceptionHandler(SQLIntegrityConstraintViolationException.class)
+  public ResponseEntity<CommonApiResponse<Void>> handleSQLIntegrityConstraintViolationException(SQLIntegrityConstraintViolationException e) {
+    log.warn("[SQLIntegrityConstraintViolationException] {}", e.getMessage());
+
+    return ResponseEntity.badRequest()
+            .body(CommonApiResponse.fail("duplicate value", "이미 처리된 요청 입니다"));
   }
 
 
