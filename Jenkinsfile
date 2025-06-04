@@ -77,11 +77,7 @@ pipeline {
             }
         }
         always {
-            // Clean up MySQL container
-            sh '''
-            docker stop mysql-ci || true
-            docker rm mysql-ci || true
-            '''
+
         }
     }
 }
