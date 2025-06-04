@@ -22,6 +22,16 @@ pipeline {
             }
         }
 
+        stage('Set Variables') {
+            steps {
+                wrap([$class: 'BuildUser']) {
+                    script {
+                        echo "Triggered by: ${env.BUILD_USER}"
+                    }
+                }
+            }
+        }
+
         stage('Build and Test') {
             steps {
                 sh 'chmod +x ./gradlew'
