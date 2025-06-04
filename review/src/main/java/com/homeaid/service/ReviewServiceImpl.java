@@ -19,60 +19,73 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 @Service
 public class ReviewServiceImpl implements ReviewService {
-    private final ReviewRepository reviewRepository;
-    private final ReservationRepository reservationRepository;
-    private final MatchingRepository matchingRepository;
 
-    @Transactional
-    @Override
-    public Review createReviewByCustomer(Review requestReview) {
-        Reservation validatedReservation = validateReview(requestReview);
+  private final ReviewRepository reviewRepository;
+  private final ReservationRepository reservationRepository;
+  private final MatchingRepository matchingRepository;
+  private final UserRatingUpdateService userRatingUpdateService;
 
-        //예약건의 고객아이디와 요청 고객의 아이디 검증
-        if (!validatedReservation.getCustomerId().equals(requestReview.getWriterId())) {
-            throw new CustomException(ReviewErrorCode.UNAUTHORIZED_REVIEW_ACCESS);
-        }
+  @Transactional
+  @Override
+  public Review createReviewByCustomer(Review requestReview) {
+    Reservation validatedReservation = validateReview(requestReview);
 
-        //타켓 매니저 와 예약 건의 매니저 검증
-        Long reservationManagerId = getFinalMatchingOfManagerId(validatedReservation.getFinalMatchingId());
-        if (!reservationManagerId.equals(requestReview.getTargetId())) {
-            throw new CustomException(ReviewErrorCode.UNAUTHORIZED_REVIEW_TARGET);
-        }
-
-        //Todo 매니저 찜 기능
-
-        return reviewRepository.save(requestReview);
+    //예약건의 고객아이디와 요청 고객의 아이디 검증
+    if (!validatedReservation.getCustomerId().equals(requestReview.getWriterId())) {
+      throw new CustomException(ReviewErrorCode.UNAUTHORIZED_REVIEW_ACCESS);
     }
 
-    @Transactional
-    @Override
-    public Review createReviewByManager(Review requestReview) {
-        Reservation validatedReservation = validateReview(requestReview);
-
-        //예약 건의 매니저와 와 요청자의 매니저 아이디 검증
-        Long reservationManagerId = getFinalMatchingOfManagerId(validatedReservation.getFinalMatchingId());
-        if (!reservationManagerId.equals(requestReview.getWriterId())) {
-            throw new CustomException(ReviewErrorCode.UNAUTHORIZED_REVIEW_ACCESS);
-        }
-
-        //예약 건의 고객아이디와 요청 받은 고객아이디 검증
-        if (!validatedReservation.getCustomerId().equals(requestReview.getTargetId())) {
-            throw new CustomException(ReviewErrorCode.UNAUTHORIZED_REVIEW_TARGET);
-        }
-
-        return reviewRepository.save(requestReview);
+    //타켓 매니저 와 예약 건의 매니저 검증
+    Long reservationManagerId = getFinalMatchingOfManagerId(
+        validatedReservation.getFinalMatchingId());
+    if (!reservationManagerId.equals(requestReview.getTargetId())) {
+      throw new CustomException(ReviewErrorCode.UNAUTHORIZED_REVIEW_TARGET);
     }
 
-    public void deleteReview(Long reviewId, Long userId) {
-        Review review = reviewRepository.findById(reviewId).orElseThrow(() ->
-                new CustomException(ReviewErrorCode.REVIEW_NOT_FOUND));
+    Review savedReview = reviewRepository.save(requestReview);
+    userRatingUpdateService.updateRating(requestReview.getTargetId(),
+        requestReview.getWriterRole());
 
-        if (!review.getWriterId().equals(userId)) {
-            throw new CustomException(ReviewErrorCode.UNAUTHORIZED_REVIEW_ACCESS);
-        }
+    //Todo 매니저 찜 기능
 
-        reservationRepository.deleteById(reviewId);
+    return savedReview;
+  }
+
+  @Transactional
+  @Override
+  public Review createReviewByManager(Review requestReview) {
+    Reservation validatedReservation = validateReview(requestReview);
+
+    //예약 건의 매니저와 와 요청자의 매니저 아이디 검증
+    Long reservationManagerId = getFinalMatchingOfManagerId(
+        validatedReservation.getFinalMatchingId());
+    if (!reservationManagerId.equals(requestReview.getWriterId())) {
+      throw new CustomException(ReviewErrorCode.UNAUTHORIZED_REVIEW_ACCESS);
     }
+
+    //예약 건의 고객아이디와 요청 받은 고객아이디 검증
+    if (!validatedReservation.getCustomerId().equals(requestReview.getTargetId())) {
+      throw new CustomException(ReviewErrorCode.UNAUTHORIZED_REVIEW_TARGET);
+    }
+
+    Review savedReview = reviewRepository.save(requestReview);
+    userRatingUpdateService.updateRating(requestReview.getTargetId(),
+        requestReview.getWriterRole());
+
+    return savedReview;
+  }
+
+  public void deleteReview(Long reviewId, Long userId) {
+    Review review = reviewRepository.findById(reviewId).orElseThrow(() ->
+        new CustomException(ReviewErrorCode.REVIEW_NOT_FOUND));
+
+    if (!review.getWriterId().equals(userId)) {
+      throw new CustomException(ReviewErrorCode.UNAUTHORIZED_REVIEW_ACCESS);
+    }
+
+    reviewRepository.deleteById(reviewId);
+    userRatingUpdateService.updateRating(review.getTargetId(), review.getWriterRole());
+  }
 
     @Override
     public Page<Review> getReviewOfWriter(Long writerId, Pageable pageable) {
@@ -80,25 +93,26 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
 
-    /**
-     * 요청 받은 예약이 유요한 예약이고 완료상태 검증
-     *
-     * @param requestReview 요청한예약 아이디
-     * @return 조회된 예약
-     */
-    private Reservation validateReview(Review requestReview) {
-        Reservation reservation = reservationRepository.findById(requestReview.getReservationId()).orElseThrow(() ->
-                new CustomException(ReservationErrorCode.RESERVATION_NOT_FOUND));
+  /**
+   * 요청 받은 예약이 유요한 예약이고 완료상태 검증
+   *
+   * @param requestReview 요청한예약 아이디
+   * @return 조회된 예약
+   */
+  private Reservation validateReview(Review requestReview) {
+    Reservation reservation = reservationRepository.findById(requestReview.getReservationId())
+        .orElseThrow(() ->
+            new CustomException(ReservationErrorCode.RESERVATION_NOT_FOUND));
 
-        if (reservation.getStatus() != ReservationStatus.COMPLETED) {
-            throw new CustomException(ReviewErrorCode.REVIEW_NOT_ALLOWED);
-        }
-        return reservation;
+    if (reservation.getStatus() != ReservationStatus.COMPLETED) {
+      throw new CustomException(ReviewErrorCode.REVIEW_NOT_ALLOWED);
     }
+    return reservation;
+  }
 
-    private Long getFinalMatchingOfManagerId(Long finalMatchingId) {
-        return matchingRepository.findById(finalMatchingId).orElseThrow(
-                () -> new CustomException(MatchingErrorCode.MATCHING_NOT_FOUND)
-        ).getManager().getId();
-    }
+  private Long getFinalMatchingOfManagerId(Long finalMatchingId) {
+    return matchingRepository.findById(finalMatchingId).orElseThrow(
+        () -> new CustomException(MatchingErrorCode.MATCHING_NOT_FOUND)
+    ).getManager().getId();
+  }
 }
