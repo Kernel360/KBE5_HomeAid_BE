@@ -30,4 +30,5 @@ public interface ManagerRepository extends JpaRepository<Manager, Long> {
       @Param("subOptionName") String subOptionName
   );
 
+
 }
