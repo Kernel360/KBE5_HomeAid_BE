@@ -7,8 +7,6 @@ pipeline {
         DB_HOST = 'homeaid-db.c98ykwkigxsn.ap-northeast-2.rds.amazonaws.com'
         DB_PORT = '3306'
         DB_NAME = 'homeaid_db'
-        DB_USERNAME = credentials('rds-db-credentials').username
-        DB_PASSWORD = credentials('rds-db-credentials').password
     }
 
     tools {
@@ -36,6 +34,11 @@ pipeline {
         stage('Build and Test') {
             steps {
                 sh 'chmod +x ./gradlew'
+                withCredentials([usernamePassword(
+                    credentialsId: 'rds-db',
+                    usernameVariable: 'DB_USERNAME',
+                    passwordVariable: 'DB_PASSWORD'
+                )]) {
                 withEnv([
                     "DB_DRIVER=${DB_DRIVER}",
                     "DB_HOST=${DB_HOST}",
