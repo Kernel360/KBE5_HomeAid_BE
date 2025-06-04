@@ -111,6 +111,7 @@ public class SwaggerConfig {
   public GroupedOpenApi paymentAPI() {
     return GroupedOpenApi.builder()
         .group("Payments")
+        .displayName("결제")
         .pathsToMatch("/api/v1/payments/**")
         .build();
   }
@@ -118,7 +119,7 @@ public class SwaggerConfig {
   @Bean
   public GroupedOpenApi settlementAPI() {
     return GroupedOpenApi.builder()
-        .group("settlements")
+        .group("정산")
         .pathsToMatch("/api/v1/settlement/**")
         .build();
   }
