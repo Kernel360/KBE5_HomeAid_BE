@@ -1,7 +1,7 @@
 package com.homeaid.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.homeaid.dto.request.SwaggerSignInRequestDto;
+import com.homeaid.dto.request.SignInRequestDto;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -25,8 +25,8 @@ public class SecurityAuthenticationFilter extends UsernamePasswordAuthentication
   public Authentication attemptAuthentication(HttpServletRequest request,
       HttpServletResponse response) throws AuthenticationException {
     try {
-      SwaggerSignInRequestDto requestDto = new ObjectMapper().readValue(request.getInputStream(),
-          SwaggerSignInRequestDto.class);
+      SignInRequestDto requestDto = new ObjectMapper().readValue(request.getInputStream(),
+          SignInRequestDto.class);
 
       UsernamePasswordAuthenticationToken authToken =
           new UsernamePasswordAuthenticationToken(requestDto.getEmail(), requestDto.getPassword());

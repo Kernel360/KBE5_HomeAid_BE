@@ -2,7 +2,7 @@ package com.homeaid.service;
 
 import com.homeaid.domain.Customer;
 import com.homeaid.domain.Manager;
-import com.homeaid.dto.request.SwaggerSignInRequestDto;
+import com.homeaid.dto.request.SignInRequestDto;
 import com.homeaid.exception.CustomException;
 import com.homeaid.exception.UserErrorCode;
 import com.homeaid.repository.UserRepository;
@@ -41,7 +41,7 @@ public class UserServiceImpl implements UserService {
         return customer;
     }
 
-    public String loginAndGetToken(SwaggerSignInRequestDto request) {
+    public String loginAndGetToken(SignInRequestDto request) {
         var user = userRepository.findByEmail(request.getEmail())
             .orElseThrow(() -> new CustomException(UserErrorCode.LOGIN_FAILED));
 

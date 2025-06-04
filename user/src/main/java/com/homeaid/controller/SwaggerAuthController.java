@@ -5,7 +5,7 @@ import com.homeaid.domain.Customer;
 import com.homeaid.domain.Manager;
 import com.homeaid.dto.request.CustomerSignUpRequestDto;
 import com.homeaid.dto.request.ManagerSignUpRequestDto;
-import com.homeaid.dto.request.SwaggerSignInRequestDto;
+import com.homeaid.dto.request.SignInRequestDto;
 import com.homeaid.dto.response.SignUpResponseDto;
 import com.homeaid.dto.response.SignInResponseDto;
 import com.homeaid.service.UserServiceImpl;
@@ -17,7 +17,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -90,7 +89,7 @@ public class SwaggerAuthController {
   })
   @PostMapping("/signin")
   public ResponseEntity<SignInResponseDto> swaggerSignIn(
-      @RequestBody SwaggerSignInRequestDto swaggerRequest) {
+      @RequestBody SignInRequestDto swaggerRequest) {
     String token = userServiceImpl.loginAndGetToken(swaggerRequest);
     return ResponseEntity.ok(new SignInResponseDto(token));
   }
