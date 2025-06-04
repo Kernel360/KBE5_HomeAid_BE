@@ -4,7 +4,7 @@ pipeline {
     environment {
         DISCORD_WEBHOOK = credentials('discord-webhook')
         DB_DRIVER = 'mysql'
-        DB_HOST = 'mysql-ci'     // Docker Compose 서비스명 (같은 네트워크)
+        DB_HOST = 'mysql-ci'
         DB_PORT = '3306'
         DB_NAME = 'homeaid_db'
         DB_USERNAME = 'homeaid_user'
@@ -26,6 +26,7 @@ pipeline {
             steps {
                 wrap([$class: 'BuildUser']) {
                     script {
+                        env.BUILD_USER = "${env.BUILD_USER}"
                         echo "Triggered by: ${env.BUILD_USER}"
                     }
                 }
@@ -69,7 +70,9 @@ pipeline {
                     """
                 }
             }
-            failure {
+        }
+        failure {
+            wrap([$class: 'BuildUser']) {
                 script {
                     def message = """{
                         "embeds": [{
