@@ -1,4 +1,4 @@
-package com.homeaid.serviceoption.controller;
+package com.homeaid.settlement.controller;
 
 import com.homeaid.service.SettlementService;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -14,13 +14,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/admin")
+@RequestMapping("/api/v1/admin/settlement")
 @Tag(name = "AdminSettlement", description = "관리자 정산 API")
 public class AdminSettlementController {
   private final SettlementService settlementService;
 
   // 매니저별 정산 요청 API
-  @PostMapping("/settlement/manager")
+  @PostMapping("/manager")
   public ResponseEntity<Void> createManagerSettlement(
       @RequestParam Long managerId,
       @RequestParam @DateTimeFormat(iso = ISO.DATE) LocalDate weekStart,

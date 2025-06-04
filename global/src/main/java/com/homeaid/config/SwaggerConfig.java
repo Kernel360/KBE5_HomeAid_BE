@@ -101,4 +101,21 @@ public class SwaggerConfig {
             .pathsToMatch("/api/v1/review/**")
             .build();
   }
+
+  @Bean
+  public GroupedOpenApi paymentAPI() {
+    return GroupedOpenApi.builder()
+        .group("Payments")
+        .pathsToMatch("/api/v1/payments/**")
+        .build();
+  }
+
+  @Bean
+  public GroupedOpenApi settlementAPI() {
+    return GroupedOpenApi.builder()
+        .group("settlements")
+        .pathsToMatch("/api/v1/settlement/**")
+        .build();
+  }
+
 }

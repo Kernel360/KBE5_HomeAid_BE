@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/v1/settlements")
+@RequestMapping("/api/v1/settlement")
 @RequiredArgsConstructor
 @Tag(name = "Settlement", description = "매니저 정산")
 public class SettlementController {
@@ -31,7 +31,7 @@ public class SettlementController {
   private final SettlementService settlementService;
 
   @PostMapping("/manager/{managerId}")
-  @Operation(summary = "정산 ", responses = {
+  @Operation(summary = "[관리자] 매니저가 정산 신청", responses = {
       @ApiResponse(responseCode = "201", description = "정산",
           content = @Content(schema = @Schema(implementation = SettlementResponseDto.class))),
       @ApiResponse(responseCode = "404", description = "정산 실패",
@@ -45,7 +45,7 @@ public class SettlementController {
   }
 
   @GetMapping("/list")
-  @Operation(summary = "정산 전체 내역 조회", responses = {
+  @Operation(summary = "[관리자] 정산 전체 내역 조회", responses = {
       @ApiResponse(responseCode = "200", description = "정산 전체 내역 조회 성공",
           content = @Content(schema = @Schema(implementation = SettlementResponseDto.class)))
   })
@@ -58,7 +58,7 @@ public class SettlementController {
   }
 
   @GetMapping("/{settlementId}")
-  @Operation(summary = "정산 단건 조회", responses = {
+  @Operation(summary = "[관리자] 정산 단건 조회", responses = {
       @ApiResponse(responseCode = "200", description = "정산 단건 조회 성공",
           content = @Content(schema = @Schema(implementation = SettlementResponseDto.class)))
   })
@@ -68,7 +68,7 @@ public class SettlementController {
   }
 
   @GetMapping("/manager/{managerId}/list")
-  @Operation(summary = "매니저 정산내역 전체 조회", responses = {
+  @Operation(summary = "[매니저] 매니저별 정산내역 전체 조회", responses = {
       @ApiResponse(responseCode = "200", description = "매니저 정산내역 전체 조회 성공",
           content = @Content(schema = @Schema(implementation = SettlementResponseDto.class)))
   })
