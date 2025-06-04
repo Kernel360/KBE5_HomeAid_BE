@@ -70,7 +70,7 @@ public class SwaggerConfig {
 
     return GroupedOpenApi.builder()
         .group("Users")
-        .pathsToMatch("/api/v1/user/**")
+        .pathsToMatch("/api/v1/swagger/auth/**")
         .build();
   }
 
