@@ -2,6 +2,7 @@ package com.homeaid.service;
 
 import com.homeaid.domain.Customer;
 import com.homeaid.domain.Manager;
+import com.homeaid.domain.User;
 import com.homeaid.exception.CustomException;
 import com.homeaid.exception.UserErrorCode;
 import com.homeaid.repository.UserRepository;
@@ -36,4 +37,8 @@ public class UserServiceImpl implements UserService {
         return customer;
     }
 
+    @Override
+    public User getUserById(Long id) {
+        return userRepository.findById(id).orElseThrow(() -> new CustomException(UserErrorCode.USER_NOT_FOUND));
+    }
 }

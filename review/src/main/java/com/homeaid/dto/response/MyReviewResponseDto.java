@@ -3,9 +3,12 @@ package com.homeaid.dto.response;
 import com.homeaid.domain.Review;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.Setter;
+
 import java.time.LocalDateTime;
 
 @Getter
+@Setter
 @Builder
 public class MyReviewResponseDto {
     private Long id;
@@ -14,6 +17,7 @@ public class MyReviewResponseDto {
     private String comment;
     private LocalDateTime createdAt;
     private Long reservationId;
+    private String name;
 
     public static MyReviewResponseDto from(Review review) {
         return MyReviewResponseDto.builder()

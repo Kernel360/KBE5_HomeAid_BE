@@ -8,6 +8,7 @@ import com.homeaid.paging.PagingResponseDto;
 import com.homeaid.paging.PagingResponseUtil;
 import com.homeaid.security.CustomUserDetails;
 import com.homeaid.service.ReviewService;
+import com.homeaid.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -26,6 +27,7 @@ import org.springframework.web.bind.annotation.*;
 public class ReviewController {
 
     private final ReviewService reviewService;
+    private final UserService userService;
 
     @Operation(summary = "리뷰 생성")
     @PostMapping
@@ -61,6 +63,11 @@ public class ReviewController {
             @PathVariable Long reviewer) {
         Page<MyReviewResponseDto> myReviewResponseDtoPage = reviewService.getReviewOfWriter(reviewer, pageable)
                 .map(MyReviewResponseDto::from);
+
+        //리뷰 대상 이름 셋팅하기
+        myReviewResponseDtoPage.getContent().forEach(review -> {
+            review.setName(userService.getUserById(review.getTargetId()).getName());
+        });
 
         return ResponseEntity.ok(CommonApiResponse.success(PagingResponseUtil.newInstance(myReviewResponseDtoPage)));
     }
