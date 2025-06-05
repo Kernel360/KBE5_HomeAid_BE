@@ -53,10 +53,18 @@ pipeline {
         stage('Docker Build & Push') {
             steps {
                 script {
-                    docker.build("${DOCKER_IMAGE}:${BUILD_NUMBER}")
-                    docker.withRegistry('https://index.docker.io/v1/', 'docker token') {
-                        docker.image("${DOCKER_IMAGE}:${BUILD_NUMBER}").push()
-                        docker.image("${DOCKER_IMAGE}:${BUILD_NUMBER}").push('latest')
+                    sh """
+                        # Docker Build
+                        docker build -t ${DOCKER_IMAGE}:${BUILD_NUMBER} .
+                        docker tag ${DOCKER_IMAGE}:${BUILD_NUMBER} ${DOCKER_IMAGE}:latest
+            
+                        # DockerHub 로그인
+                        echo $DOCKERHUB_PASSWORD | docker login -u $DOCKERHUB_USERNAME --password-stdin
+            
+                        # Docker Push
+                        docker push ${DOCKER_IMAGE}:${BUILD_NUMBER}
+                        docker push ${DOCKER_IMAGE}:latest
+                        """
                     }
                 }
             }
