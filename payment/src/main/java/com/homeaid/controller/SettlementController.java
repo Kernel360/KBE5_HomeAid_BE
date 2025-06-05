@@ -37,11 +37,12 @@ public class SettlementController {
       @ApiResponse(responseCode = "404", description = "정산 실패",
           content = @Content(schema = @Schema(implementation = CommonApiResponse.class)))
   })
-  public ResponseEntity<SettlementResponseDto> calcAndSaveForManager(
+  public ResponseEntity<CommonApiResponse<SettlementResponseDto>> calcAndSaveForManager(
       @Valid @RequestBody SettlementRequestDto dto
   ) {
-    SettlementResponseDto response = settlementService.createWeeklySettlementForManager(dto.getManagerId(), dto.getFrom(), dto.getTo());
-    return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    Settlement settlement = settlementService.createWeeklySettlementForManager(dto.getManagerId(), dto.getFrom(), dto.getTo());
+    SettlementResponseDto responseDto = SettlementResponseDto.from(settlement);
+    return ResponseEntity.status(HttpStatus.CREATED).body(CommonApiResponse.success(responseDto));
   }
 
   @GetMapping("/list")
@@ -49,12 +50,12 @@ public class SettlementController {
       @ApiResponse(responseCode = "200", description = "정산 전체 내역 조회 성공",
           content = @Content(schema = @Schema(implementation = SettlementResponseDto.class)))
   })
-  public ResponseEntity<List<SettlementResponseDto>> getAllSettlements() {
+  public ResponseEntity<CommonApiResponse<List<SettlementResponseDto>>> getAllSettlements() {
     List<Settlement> settlements = settlementService.findAll();
     List<SettlementResponseDto> response = settlements.stream()
         .map(SettlementResponseDto::from)
         .toList();
-    return ResponseEntity.ok(response);
+    return ResponseEntity.ok(CommonApiResponse.success(response));
   }
 
   @GetMapping("/{settlementId}")
@@ -62,9 +63,9 @@ public class SettlementController {
       @ApiResponse(responseCode = "200", description = "정산 단건 조회 성공",
           content = @Content(schema = @Schema(implementation = SettlementResponseDto.class)))
   })
-  public ResponseEntity<SettlementResponseDto> getSettlementById(@PathVariable Long settlementId) {
+  public ResponseEntity<CommonApiResponse<SettlementResponseDto>> getSettlementById(@PathVariable Long settlementId) {
     Settlement settlement = settlementService.findById(settlementId);
-    return ResponseEntity.ok(SettlementResponseDto.from(settlement));
+    return ResponseEntity.ok(CommonApiResponse.success(SettlementResponseDto.from(settlement)));
   }
 
   @GetMapping("/manager/{managerId}/list")
@@ -72,12 +73,12 @@ public class SettlementController {
       @ApiResponse(responseCode = "200", description = "매니저 정산내역 전체 조회 성공",
           content = @Content(schema = @Schema(implementation = SettlementResponseDto.class)))
   })
-  public ResponseEntity<List<SettlementResponseDto>> getSettlementsByManager(@PathVariable Long managerId) {
+  public ResponseEntity<CommonApiResponse<List<SettlementResponseDto>>> getSettlementsByManager(@PathVariable Long managerId) {
     List<Settlement> settlements = settlementService.findByManagerId(managerId);
     List<SettlementResponseDto> response = settlements.stream()
         .map(SettlementResponseDto::from)
         .toList();
-    return ResponseEntity.ok(response);
+    return ResponseEntity.ok(CommonApiResponse.success(response));
   }
 
 }

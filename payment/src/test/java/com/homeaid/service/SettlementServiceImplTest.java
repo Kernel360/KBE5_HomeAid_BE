@@ -69,12 +69,12 @@ class SettlementServiceImplTest {
     given(settlementRepository.save(any(Settlement.class))).willReturn(savedSettlement);
 
     // when
-    SettlementResponseDto result = settlementService.createWeeklySettlementForManager(managerId, weekStart, weekEnd);
+    Settlement result = settlementService.createWeeklySettlementForManager(managerId, weekStart, weekEnd);
 
     // then
     assertThat(result.getManagerId()).isEqualTo(managerId);
     assertThat(result.getTotalAmount()).isEqualTo(15000);
-    assertThat(result.getManagerAmount()).isEqualTo(12000); // 80% of 150_000
+    assertThat(result.getManagerSettlementPrice()).isEqualTo(12000); // 80% of 150_000
   }
 
   @Test
