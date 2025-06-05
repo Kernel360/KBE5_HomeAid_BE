@@ -10,6 +10,9 @@ pipeline {
         DB_USERNAME = 'homeaid_user'
         DB_PASSWORD = 'root'
         DOCKER_IMAGE = 'sangwjdev/homeaid-backend'
+        DOCKERHUB_CREDENTIALS = credentials('dockerhub-credentials')
+        DOCKERHUB_USERNAME = "${DOCKERHUB_CREDENTIALS_USR}"
+        DOCKERHUB_PASSWORD = "${DOCKERHUB_CREDENTIALS_PSW}"
     }
 
     tools {
@@ -68,7 +71,6 @@ pipeline {
                     }
                 }
             }
-        }
 
         stage('Deploy') {
             steps {
