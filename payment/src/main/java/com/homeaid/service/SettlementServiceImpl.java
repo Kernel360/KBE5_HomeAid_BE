@@ -2,7 +2,6 @@ package com.homeaid.service;
 
 import com.homeaid.domain.Payment;
 import com.homeaid.domain.Settlement;
-import com.homeaid.dto.response.SettlementResponseDto;
 import com.homeaid.exception.CustomException;
 import com.homeaid.exception.SettlementErrorCode;
 import com.homeaid.repository.ManagerRepository;
@@ -23,7 +22,7 @@ public class SettlementServiceImpl implements SettlementService {
   private final ManagerRepository managerRepository;
 
   @Override
-  public SettlementResponseDto createWeeklySettlementForManager(Long managerId, LocalDate weekStart, LocalDate weekEnd) {
+  public Settlement createWeeklySettlementForManager(Long managerId, LocalDate weekStart, LocalDate weekEnd) {
 
     if (!managerRepository.existsById(managerId)) {
       throw new CustomException(SettlementErrorCode.MANAGER_NOT_FOUND);
@@ -63,7 +62,7 @@ public class SettlementServiceImpl implements SettlementService {
     // 실제로 정산 내역 저장
     settlementRepository.save(settlement);
 
-    return SettlementResponseDto.from(settlement);
+    return settlement;
   }
 
   // 전체
