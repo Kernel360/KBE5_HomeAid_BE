@@ -16,10 +16,10 @@ public enum UserErrorCode implements BaseErrorCode {
 
   // 401 UNAUTHORIZED
   UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "UNAUTHORIZED", "로그인이 필요합니다."),
-  INVALID_CREDENTIALS(HttpStatus.UNAUTHORIZED, "INVALID_CREDENTIALS", "아이디 또는 비밀번호가 올바르지 않습니다."),
+  LOGIN_FAILED(HttpStatus.UNAUTHORIZED, "INVALID_CREDENTIALS", "아이디 또는 비밀번호가 올바르지 않습니다."),
   INVALID_TOKEN(HttpStatus.UNAUTHORIZED, "INVALID_TOKEN", "유효하지 않은 토큰입니다."),
   TOKEN_EXPIRED(HttpStatus.UNAUTHORIZED, "TOKEN_EXPIRED", "토큰이 만료되었습니다."),
-    USER_NOT_AUTHENTICATED(HttpStatus.UNAUTHORIZED, "USER_NOT_AUTHENTICATED", "인증되지 않은 사용자입니다."),
+  USER_NOT_AUTHENTICATED(HttpStatus.UNAUTHORIZED, "USER_NOT_AUTHENTICATED", "인증되지 않은 사용자입니다."),
 
   // 403 FORBIDDEN
   FORBIDDEN_USER_ACCESS(HttpStatus.FORBIDDEN, "FORBIDDEN_USER_ACCESS", "접근 권한이 없습니다."),
@@ -28,7 +28,6 @@ public enum UserErrorCode implements BaseErrorCode {
   USER_NOT_FOUND(HttpStatus.NOT_FOUND, "USER_NOT_FOUND", "사용자를 찾을 수 없습니다."),
   MANAGER_NOT_FOUND(HttpStatus.NOT_FOUND, "MANAGER_NOT_FOUND", "매니저를 찾을 수 없습니다."),
   CUSTOMER_NOT_FOUND(HttpStatus.NOT_FOUND, "CUSTOMER_NOT_FOUND", "고객을 찾을 수 없습니다."),
-
 
   // 409 CONFLICT
   USER_ALREADY_EXISTS(HttpStatus.CONFLICT, "USER_ALREADY_EXISTS", "이미 가입된 회원입니다."),

@@ -48,6 +48,8 @@ public class Reservation {
 
   private Long customerId;
 
+  private Long managerId;
+
   private Long finalMatchingId;
 
   private Long managerId;
@@ -93,7 +95,6 @@ public class Reservation {
   public void softDelete() {
     this.deletedDate = LocalDateTime.now();
   }
-
 
 
   public void updateStatusCompleted() {

@@ -10,7 +10,7 @@ import lombok.Getter;
 @Getter
 @Builder
 @AllArgsConstructor
-public class UserSignUpResponseDto {
+public class SignUpResponseDto {
 
   @Schema(description = "가입된 이메일", example = "user@example.com")
   private String email;
@@ -19,15 +19,15 @@ public class UserSignUpResponseDto {
   private String message;
 
 
-  public static UserSignUpResponseDto toManagerDto(Manager manager) {
-    return UserSignUpResponseDto.builder()
+  public static SignUpResponseDto toManagerDto(Manager manager) {
+    return SignUpResponseDto.builder()
         .email(manager.getEmail())
         .message("회원가입이 완료되었습니다.")
         .build();
   }
 
-  public static UserSignUpResponseDto toCustomerDto(Customer customer) {
-    return UserSignUpResponseDto.builder()
+  public static SignUpResponseDto toCustomerDto(Customer customer) {
+    return SignUpResponseDto.builder()
         .email(customer.getEmail())
         .message("회원가입이 완료되었습니다.")
         .build();
