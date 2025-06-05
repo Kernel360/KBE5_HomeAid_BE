@@ -67,7 +67,7 @@ pipeline {
                 sshagent(['ssh-secret-key']) {
                     sh '''
                         ssh ubuntu@3.35.183.135 "
-                        cd /your/deployment/dir &&
+                        cd /home/ubuntu/deployment/dir/KBE5_HomeAid_BE &&
                         docker-compose down &&
                         docker-compose pull &&
                         docker-compose up -d
