@@ -12,6 +12,19 @@ services:
     networks:
       - ci-network
 
+  backend:
+    image: sangwjdev/homeaid-backend:latest
+    container_name: backend-app
+    ports:
+      - "8081:8080"  # 호스트포트:컨테이너포트 (Spring Boot 기본포트)
+    env_file:
+      - .env
+    environment:
+      - SPRING_PROFILES_ACTIVE=dev
+    restart: always
+    networks:
+      - ci-network
+
 volumes:
   jenkins_home:
 
