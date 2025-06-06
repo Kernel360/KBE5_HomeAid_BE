@@ -44,7 +44,7 @@ public class SwaggerConfig {
     return GroupedOpenApi.builder()
         .group("reservations")
         .displayName("예약")
-        .pathsToMatch("/api/v1/customer/reservations/**")
+        .pathsToMatch("/api/v1/reservations/**")
         .build();
   }
 

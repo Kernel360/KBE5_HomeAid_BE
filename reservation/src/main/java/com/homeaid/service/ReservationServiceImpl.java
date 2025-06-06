@@ -86,4 +86,16 @@ public class ReservationServiceImpl implements ReservationService {
   public Page<Reservation> getReservations(Pageable pageable) {
     return reservationRepository.findAll(pageable);
   }
+
+  @Override
+  @Transactional(readOnly = true)
+  public Page<Reservation> getReservationsByCustomer(Long userId, Pageable pageable) {
+    return reservationRepository.findAllByCustomerId(userId, pageable);
+  }
+
+  @Override
+  @Transactional(readOnly = true)
+  public Page<Reservation> getReservationsByManager(Long managerId, Pageable pageable) {
+    return reservationRepository.findAllByManagerId(managerId, pageable);
+  }
 }
