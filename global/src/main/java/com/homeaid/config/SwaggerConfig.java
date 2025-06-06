@@ -124,4 +124,12 @@ public class SwaggerConfig {
         .build();
   }
 
+  @Bean
+  public GroupedOpenApi managerAPI() {
+    return GroupedOpenApi.builder()
+        .group("매니저")
+        .pathsToMatch("/api/v1/manager/**")
+        .build();
+  }
+
 }
