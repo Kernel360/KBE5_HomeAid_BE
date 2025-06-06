@@ -199,9 +199,14 @@ class MatchingServiceTest {
   void respondToMatchingAsManager_수락시_acceptByManager_호출() {
     // given
     Long matchingId = 1L;
-    Matching matching = mock(Matching.class);
-    given(matchingRepository.findById(matchingId)).willReturn(Optional.of(matching));
     Long userId = 1L;
+
+    Matching matching = mock(Matching.class);
+    Manager manager = mock(Manager.class);
+
+    given(matchingRepository.findById(matchingId)).willReturn(Optional.of(matching));
+    given(matching.getManager()).willReturn(manager);
+    given(manager.getId()).willReturn(userId);
 
     // when
     matchingService.respondToMatchingAsManager(userId, matchingId, ManagerAction.ACCEPT, null);
@@ -216,14 +221,20 @@ class MatchingServiceTest {
   void respondToMatchingAsManager_거절시_memo가_없으면_예외_발생() {
     // given
     Long matchingId = 1L;
-    Matching matching = mock(Matching.class);
     Long userId = 1L;
+
+    Matching matching = mock(Matching.class);
+    Manager manager = mock(Manager.class);
+
     given(matchingRepository.findById(matchingId)).willReturn(Optional.of(matching));
+    given(matching.getManager()).willReturn(manager);
+    given(manager.getId()).willReturn(userId);
 
     // when & then
     assertThatThrownBy(() ->
         matchingService.respondToMatchingAsManager(userId, matchingId, ManagerAction.REJECT, null)
-    ).isInstanceOf(CustomException.class)
+    )
+        .isInstanceOf(CustomException.class)
         .hasMessageContaining("거절 시에는 메모를 작성해야 합니다.");
   }
 
@@ -233,9 +244,14 @@ class MatchingServiceTest {
     // given
     Long matchingId = 1L;
     String memo = "사정이 있어 수락이 어렵습니다.";
-    Matching matching = mock(Matching.class);
     Long userId = 1L;
+
+    Matching matching = mock(Matching.class);
+    Manager manager = mock(Manager.class);
+
     given(matchingRepository.findById(matchingId)).willReturn(Optional.of(matching));
+    given(matching.getManager()).willReturn(manager);
+    given(manager.getId()).willReturn(userId);
 
     // when
     matchingService.respondToMatchingAsManager(userId, matchingId, ManagerAction.REJECT, memo);
