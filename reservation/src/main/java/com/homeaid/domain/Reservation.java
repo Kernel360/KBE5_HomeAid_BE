@@ -59,7 +59,8 @@ public class Reservation {
   @Column(columnDefinition = "TEXT")
   private String customerMemo;
 
-  @OneToOne(mappedBy = "reservation", cascade = CascadeType.ALL)
+  // 부모 엔티티 저장이나 병합하면 자식 엔티티도 자동으로 저장이나 병합 됨.
+  @OneToOne(mappedBy = "reservation", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
   private ReservationItem item;
 
   @CreatedDate
@@ -92,6 +93,9 @@ public class Reservation {
 
   public void softDelete() {
     this.deletedDate = LocalDateTime.now();
+    if (this.item != null) {
+      this.item.softDelete();
+    }
   }
 
 
