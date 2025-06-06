@@ -6,6 +6,7 @@ import com.homeaid.dto.request.MatchingCustomerResponseDto;
 import com.homeaid.dto.request.MatchingManagerResponseDto;
 import com.homeaid.dto.response.MatchingRecommendationResponseDto;
 import com.homeaid.dto.response.ReservationResponseDto;
+import com.homeaid.security.CustomUserDetails;
 import com.homeaid.service.MatchingService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -18,6 +19,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -47,11 +49,12 @@ public class MatchingController {
   @PatchMapping("/manager/matchings/{matchingId}/to-customer")
   @Operation(summary = "매니저 매칭 응답", description = "매니저가 수락 또는 거절로 매칭에 응답합니다.")
   public ResponseEntity<CommonApiResponse<Void>> respondToMatching(
+      @AuthenticationPrincipal CustomUserDetails user,
       @Parameter(description = "매칭 ID", required = true)
       @PathVariable(name = "matchingId") Long matchingId,
       @RequestBody @Valid MatchingManagerResponseDto requestDto
   ) {
-    matchingService.respondToMatchingAsManager(matchingId, requestDto.getAction(),
+    matchingService.respondToMatchingAsManager(user.getUserId(), matchingId, requestDto.getAction(),
         requestDto.getMemo());
 
     return ResponseEntity.ok().body(CommonApiResponse.success());
@@ -60,11 +63,13 @@ public class MatchingController {
   @PatchMapping("/customer/matchings/{matchingId}/to-manager")
   @Operation(summary = "고객 매칭 응답", description = "고객이 수락 또는 거절로 매칭에 응답합니다.")
   public ResponseEntity<CommonApiResponse<Void>> respondToMatching(
+      @AuthenticationPrincipal CustomUserDetails user,
       @Parameter(description = "매칭 ID", required = true)
       @PathVariable(name = "matchingId") Long matchingId,
       @RequestBody @Valid MatchingCustomerResponseDto requestDto
   ) {
-    matchingService.respondToMatchingAsCustomer(matchingId, requestDto.getAction(),
+
+    matchingService.respondToMatchingAsCustomer(user.getUserId(), matchingId, requestDto.getAction(),
         requestDto.getMemo());
 
     return ResponseEntity.ok().body(CommonApiResponse.success());

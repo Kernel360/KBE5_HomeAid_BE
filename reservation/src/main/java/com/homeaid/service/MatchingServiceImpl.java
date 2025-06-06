@@ -50,9 +50,13 @@ public class MatchingServiceImpl implements MatchingService {
 
   @Override
   @Transactional
-  public void respondToMatchingAsManager(Long matchingId, ManagerAction action, String memo) {
+  public void respondToMatchingAsManager(Long userId, Long matchingId, ManagerAction action, String memo) {
     Matching matching = matchingRepository.findById(matchingId)
         .orElseThrow(() -> new CustomException(MatchingErrorCode.MATCHING_NOT_FOUND));
+
+    if (!matching.getManager().getId().equals(userId)) {
+      throw new CustomException(MatchingErrorCode.UNAUTHORIZED_MATCHING_ACCESS);
+    }
 
     switch (action) {
       case ACCEPT -> matching.acceptByManager();
@@ -68,15 +72,18 @@ public class MatchingServiceImpl implements MatchingService {
 
   @Override
   @Transactional
-  public void respondToMatchingAsCustomer(Long matchingId,
+  public void respondToMatchingAsCustomer(Long userId, Long matchingId,
       CustomerAction action, String memo) {
     Matching matching = matchingRepository.findById(matchingId)
         .orElseThrow(() -> new CustomException(MatchingErrorCode.MATCHING_NOT_FOUND));
 
     switch (action) {
       case CONFIRM -> {
-        matching.confirmByCustomer();
         Reservation reservation = matching.getReservation();
+        if (!reservation.getCustomerId().equals(userId)) {
+          throw new CustomException(MatchingErrorCode.UNAUTHORIZED_MATCHING_ACCESS);
+        }
+        matching.confirmByCustomer();
         reservation.confirmMatching(matchingId);
       }
       case REJECT -> {

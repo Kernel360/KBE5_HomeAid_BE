@@ -185,10 +185,11 @@ class MatchingServiceTest {
     // given
     Long matchingId = 1L;
     given(matchingRepository.findById(matchingId)).willReturn(Optional.empty());
+    Long userId = 1L;
 
     // when & then
     assertThatThrownBy(() ->
-        matchingService.respondToMatchingAsManager(matchingId, ManagerAction.ACCEPT, null)
+        matchingService.respondToMatchingAsManager(userId, matchingId, ManagerAction.ACCEPT, null)
     ).isInstanceOf(CustomException.class)
         .hasMessageContaining("매칭 정보를 찾을 수 없습니다.");
   }
@@ -200,9 +201,10 @@ class MatchingServiceTest {
     Long matchingId = 1L;
     Matching matching = mock(Matching.class);
     given(matchingRepository.findById(matchingId)).willReturn(Optional.of(matching));
+    Long userId = 1L;
 
     // when
-    matchingService.respondToMatchingAsManager(matchingId, ManagerAction.ACCEPT, null);
+    matchingService.respondToMatchingAsManager(userId, matchingId, ManagerAction.ACCEPT, null);
 
     // then
     verify(matching).acceptByManager();
@@ -215,11 +217,12 @@ class MatchingServiceTest {
     // given
     Long matchingId = 1L;
     Matching matching = mock(Matching.class);
+    Long userId = 1L;
     given(matchingRepository.findById(matchingId)).willReturn(Optional.of(matching));
 
     // when & then
     assertThatThrownBy(() ->
-        matchingService.respondToMatchingAsManager(matchingId, ManagerAction.REJECT, null)
+        matchingService.respondToMatchingAsManager(userId, matchingId, ManagerAction.REJECT, null)
     ).isInstanceOf(CustomException.class)
         .hasMessageContaining("거절 시에는 메모를 작성해야 합니다.");
   }
@@ -231,10 +234,11 @@ class MatchingServiceTest {
     Long matchingId = 1L;
     String memo = "사정이 있어 수락이 어렵습니다.";
     Matching matching = mock(Matching.class);
+    Long userId = 1L;
     given(matchingRepository.findById(matchingId)).willReturn(Optional.of(matching));
 
     // when
-    matchingService.respondToMatchingAsManager(matchingId, ManagerAction.REJECT, memo);
+    matchingService.respondToMatchingAsManager(userId, matchingId, ManagerAction.REJECT, memo);
 
     // then
     verify(matching).rejectByManager(memo);
