@@ -37,6 +37,7 @@ public class WorkLog {
     @JoinColumn(name = "reservation_id", nullable = false, unique = true)
     private Reservation reservation;
 
+
     @Builder
     public WorkLog(LocalDateTime checkInTime, LocalDateTime checkOutTime, WorkType workType, Long managerId) {
         this.checkInTime = checkInTime;
