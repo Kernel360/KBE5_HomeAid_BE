@@ -9,6 +9,10 @@ pipeline {
         DB_NAME = 'homeaid_db'
         DB_USERNAME = 'homeaid_user'
         DB_PASSWORD = 'root'
+        DOCKER_IMAGE = 'sangwjdev/homeaid-backend'
+        DOCKERHUB_CREDENTIALS = credentials('dockerhub-credentials')
+        DOCKERHUB_USERNAME = "${DOCKERHUB_CREDENTIALS_USR}"
+        DOCKERHUB_PASSWORD = "${DOCKERHUB_CREDENTIALS_PSW}"
     }
 
     tools {
@@ -48,6 +52,40 @@ pipeline {
                 }
             }
         }
+
+        stage('Docker Build & Push') {
+            steps {
+                script {
+                    sh """
+                        # Docker Build
+                        docker build -t ${DOCKER_IMAGE}:${BUILD_NUMBER} .
+                        docker tag ${DOCKER_IMAGE}:${BUILD_NUMBER} ${DOCKER_IMAGE}:latest
+            
+                        # DockerHub 로그인
+                        echo $DOCKERHUB_PASSWORD | docker login -u $DOCKERHUB_USERNAME --password-stdin
+            
+                        # Docker Push
+                        docker push ${DOCKER_IMAGE}:${BUILD_NUMBER}
+                        docker push ${DOCKER_IMAGE}:latest
+                        """
+                    }
+                }
+            }
+
+        stage('Deploy') {
+            steps {
+                sshagent(['ssh-secret-key']) {
+                    sh '''
+                        ssh ubuntu@3.35.183.135 "
+                        cd /home/ubuntu/deployment/dir/KBE5_HomeAid_BE &&
+                        docker-compose down &&
+                        docker-compose pull &&
+                        docker-compose up -d
+                        "
+                    '''
+                }
+            }
+        }
     }
 
     post {
@@ -56,11 +94,11 @@ pipeline {
                 script {
                     def message = """{
                         "embeds": [{
-                            "title": "✅ CI 성공",
+                            "title": "✅ CI/CD 성공",
                             "description": "**📦 Repository:** `${env.JOB_NAME}`\\n**🌿 Branch:** `${env.BRANCH_NAME}`\\n**👤 Triggered by:** `${env.BUILD_USER}`\\n[🔗 Jenkins 로그 확인하기](${env.BUILD_URL})",
                             "color": 5763719
                         }],
-                        "content": "✅ CI 통과: `${env.BRANCH_NAME}` 브랜치입니다!"
+                        "content": "✅ CI/CD 통과: `${env.BRANCH_NAME}` 브랜치 배포 완료!"
                     }"""
                     sh """
                     curl -H "Content-Type: application/json" \
@@ -76,11 +114,11 @@ pipeline {
                 script {
                     def message = """{
                         "embeds": [{
-                            "title": "❌ CI 실패",
+                            "title": "❌ CI/CD 실패",
                             "description": "**📦 Repository:** `${env.JOB_NAME}`\\n**🌿 Branch:** `${env.BRANCH_NAME}`\\n**👤 Triggered by:** `${env.BUILD_USER}`\\n[🔗 Jenkins 로그 확인하기](${env.BUILD_URL})",
                             "color": 16711680
                         }],
-                        "content": "❗ CI 실패 발생: `${env.BRANCH_NAME}` 브랜치 확인해주세요!"
+                        "content": "❗ CI/CD 실패 발생: `${env.BRANCH_NAME}` 브랜치 확인해주세요!"
                     }"""
                     sh """
                     curl -H "Content-Type: application/json" \
