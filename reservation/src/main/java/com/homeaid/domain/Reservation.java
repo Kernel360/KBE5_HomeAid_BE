@@ -84,7 +84,8 @@ public class Reservation {
     item.setReservation(this);
   }
 
-  public void updateReservation(Reservation newReservation, int newTotalPrice, int newTotalDuration) {
+  public void updateReservation(Reservation newReservation, int newTotalPrice,
+      int newTotalDuration) {
     this.requestedDate = newReservation.getRequestedDate();
     this.requestedTime = newReservation.getRequestedTime();
     this.totalPrice = newTotalPrice;
@@ -103,7 +104,13 @@ public class Reservation {
     this.status = ReservationStatus.COMPLETED;
   }
   
+
+  public void updateStatusMatching() {
+    this.status = ReservationStatus.MATCHING;
+  }
+
   public void confirmMatching(Long matchingId) {
+    this.status = ReservationStatus.MATCHED;
     finalMatchingId = matchingId;
 
   }

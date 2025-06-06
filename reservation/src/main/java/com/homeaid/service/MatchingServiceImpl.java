@@ -44,6 +44,8 @@ public class MatchingServiceImpl implements MatchingService {
     matching.setReservationAndManagerAndMatchingRound(reservation, manager,
         calculateNextMatchingRound(reservationId));
 
+    reservation.updateStatusMatching();
+    
     return matchingRepository.save(matching).getId();
   }
 
