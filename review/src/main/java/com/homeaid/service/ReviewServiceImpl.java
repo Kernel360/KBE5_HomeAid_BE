@@ -12,6 +12,8 @@ import com.homeaid.repository.ReservationRepository;
 import com.homeaid.repository.ReviewRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @RequiredArgsConstructor
@@ -26,6 +28,7 @@ public class ReviewServiceImpl implements ReviewService {
   @Transactional
   @Override
   public Review createReviewByCustomer(Review requestReview) {
+
     Reservation validatedReservation = validateReview(requestReview);
 
     //예약건의 고객아이디와 요청 고객의 아이디 검증
@@ -41,8 +44,8 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     Review savedReview = reviewRepository.save(requestReview);
-    userRatingUpdateService.updateRating(requestReview.getTargetId(),
-        requestReview.getWriterRole());
+    userRatingUpdateService.updateRating(savedReview.getTargetId(),
+        savedReview.getWriterRole());
 
     //Todo 매니저 찜 기능
 
@@ -84,6 +87,11 @@ public class ReviewServiceImpl implements ReviewService {
     reviewRepository.deleteById(reviewId);
     userRatingUpdateService.updateRating(review.getTargetId(), review.getWriterRole());
   }
+
+    @Override
+    public Page<Review> getReviewOfWriter(Long writerId, Pageable pageable) {
+        return reviewRepository.findByWriterId(writerId, pageable);
+    }
 
 
   /**

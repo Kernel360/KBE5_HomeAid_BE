@@ -12,6 +12,9 @@ public enum ReservationErrorCode implements BaseErrorCode {
   INVALID_RESERVATION_TIME(HttpStatus.BAD_REQUEST, "INVALID_RESERVATION_TIME", "예약 시간이 올바르지 않습니다."),
   INVALID_RESERVATION_STATUS(HttpStatus.BAD_REQUEST, "INVALID_RESERVATION_STATUS", "현재 상태에서는 예약을 수정할 수 없습니다."),
 
+  // 403 FORBIDDEN
+  UNAUTHORIZED_RESERVATION_ACCESS(HttpStatus.FORBIDDEN, "UNAUTHORIZED_RESERVATION_ACCESS", "예약에 대한 접근 권한이 없습니다."),
+
   // 404 NOT FOUND
   RESERVATION_NOT_FOUND(HttpStatus.NOT_FOUND, "RESERVATION_NOT_FOUND", "예약을 찾을 수 없습니다."),
   SERVICE_OPTION_NOT_FOUND(HttpStatus.NOT_FOUND, "SERVICE_OPTION_NOT_FOUND", "선택한 서비스 옵션을 찾을 수 없습니다."),

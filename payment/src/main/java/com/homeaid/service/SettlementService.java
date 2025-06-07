@@ -6,7 +6,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 public interface SettlementService {
-  SettlementResponseDto createWeeklySettlementForManager(Long managerId, LocalDate weekStart, LocalDate weekEnd);
+  Settlement createWeeklySettlementForManager(Long managerId, LocalDate weekStart, LocalDate weekEnd);
 
   List<Settlement> findAll();
 

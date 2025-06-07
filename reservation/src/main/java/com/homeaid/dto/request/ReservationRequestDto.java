@@ -17,10 +17,6 @@ import lombok.NoArgsConstructor;
 public class ReservationRequestDto {
 
   @NotNull
-  @Schema(description = "예약을 요청하는 고객의 ID", example = "1")
-  private Long customerId;
-
-  @NotNull
   @Schema(description = "예약 요청 날짜 (yyyy-MM-dd)", example = "2025-06-10")
   private LocalDate requestedDate;
 
@@ -32,14 +28,19 @@ public class ReservationRequestDto {
   @Schema(description = "선택한 서비스 하위 옵션 ID", example = "3")
   private Long subOptionId;
 
-  public static Reservation toEntity(ReservationRequestDto reservationRequestDto) {
-
+  public static Reservation toEntity(ReservationRequestDto reservationRequestDto, Long userId) {
     return Reservation.builder()
-        .customerId(reservationRequestDto.getCustomerId())
+        .customerId(userId)
         .requestedDate(reservationRequestDto.getRequestedDate())
         .requestedTime(reservationRequestDto.getRequestedTime())
         .build();
+  }
 
+  public static Reservation toEntity(ReservationRequestDto reservationRequestDto) {
+    return Reservation.builder()
+        .requestedDate(reservationRequestDto.getRequestedDate())
+        .requestedTime(reservationRequestDto.getRequestedTime())
+        .build();
   }
 
 }
