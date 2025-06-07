@@ -16,7 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/manager/work-logs")
+@RequestMapping("/api/v1/managers/work-logs")
 @RestController
 public class WorkLogController {
     private final WorkLogService workLogService;

@@ -84,7 +84,7 @@ public class SwaggerConfig {
     return GroupedOpenApi.builder()
             .group("workLogs")
             .displayName("작업기록")
-            .pathsToMatch("/api/v1/manager/work-logs/**")
+            .pathsToMatch("/api/v1/managers/work-logs/**")
             .build();
   }
     
@@ -128,7 +128,7 @@ public class SwaggerConfig {
   public GroupedOpenApi managerAPI() {
     return GroupedOpenApi.builder()
         .group("매니저")
-        .pathsToMatch("/api/v1/manager/**")
+        .pathsToMatch("/api/v1/managers/**")
         .build();
   }
 
