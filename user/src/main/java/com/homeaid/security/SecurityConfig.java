@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -29,7 +30,8 @@ public class SecurityConfig {
     http
         .csrf((auth) -> auth.disable())
         .formLogin((auth) -> auth.disable())
-        .cors((auth) -> auth.disable())
+//        .cors((auth) -> auth.disable())
+        .cors(Customizer.withDefaults())
         .httpBasic((auth) -> auth.disable())
         .sessionManagement((session) -> session
             .sessionCreationPolicy(SessionCreationPolicy.STATELESS));
@@ -46,6 +48,8 @@ public class SecurityConfig {
                 "/configuration/security",
                 "/webjars/**"
             ).permitAll()
+
+            .requestMatchers("/api/v1/managers/**").permitAll()
 
             .requestMatchers("/api/v1/admin").hasRole("ADMIN")
             .requestMatchers("/api/v1/customer").hasRole("CUSTOMER")

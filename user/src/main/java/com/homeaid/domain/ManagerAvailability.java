@@ -49,13 +49,15 @@ public class ManagerAvailability {
   private Double longitude;
 
   @Builder
-  public ManagerAvailability(LocalDate date, LocalTime startTime, LocalTime endTime,
-      Double latitude, Double longitude) {
-    this.date = date;
-    this.startTime = startTime;
-    this.endTime = endTime;
+  public ManagerAvailability(Manager manager, Weekday weekday,
+      Double latitude, Double longitude,
+      LocalTime startTime, LocalTime endTime) {
+    this.manager = manager;
+    this.weekday = weekday;
     this.latitude = latitude;
     this.longitude = longitude;
+    this.startTime = startTime;
+    this.endTime = endTime;
   }
 
 }
