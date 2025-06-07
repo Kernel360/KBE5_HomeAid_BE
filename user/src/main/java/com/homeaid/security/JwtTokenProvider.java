@@ -12,14 +12,17 @@ import org.springframework.stereotype.Component;
 public class JwtTokenProvider {
 
   private final SecretKey secretKey;
+  private final Long accessTokenExpirationMs;
+
 
   public JwtTokenProvider(
-      @Value("${JWT_SECRET}") String secret
+      @Value("${spring.jwt.secret}") String secret,
+      @Value ("${spring.jwt.access-token-expire-time}") Long accessTokenExpirationMs
   ) {
     this.secretKey = new SecretKeySpec(secret.getBytes(StandardCharsets.UTF_8),
         Jwts.SIG.HS256.key().build().getAlgorithm());
+    this.accessTokenExpirationMs = accessTokenExpirationMs;
   }
-
 
   public String getEmailFromToken(String token) {
     return Jwts.parser().verifyWith(secretKey).build()
@@ -51,13 +54,13 @@ public class JwtTokenProvider {
   }
 
 
-  public String createJwt(Long userId, String email, String role, Long expiredMs) {
+  public String createJwt(Long userId, String email, String role) {
     return Jwts.builder()
         .claim("userId", userId)
         .claim("email", email)
         .claim("role", role)
         .issuedAt(new Date(System.currentTimeMillis()))
-        .expiration(new Date(System.currentTimeMillis() + expiredMs))
+        .expiration(new Date(System.currentTimeMillis() + accessTokenExpirationMs))
         .signWith(secretKey)
         .compact();
   }

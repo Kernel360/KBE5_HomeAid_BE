@@ -62,6 +62,6 @@ public class UserServiceImpl implements UserService {
             throw new CustomException(UserErrorCode.LOGIN_FAILED);
         }
 
-        return jwtTokenProvider.createJwt(user.get().getId(), user.get().getEmail(), user.get().getRole().name(), 3600000L); // 1시간
+        return jwtTokenProvider.createJwt(user.get().getId(), user.get().getEmail(), user.get().getRole().name());
     }
 }
