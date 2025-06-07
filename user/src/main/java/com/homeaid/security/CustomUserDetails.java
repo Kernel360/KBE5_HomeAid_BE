@@ -29,7 +29,7 @@ public class CustomUserDetails implements UserDetails {
 
   @Override
   public String getUsername() {
-    return this.user.getEmail(); // 인증 ID = email
+    return this.user.getPhone(); // 인증 ID = phone
   }
 
   @Override
