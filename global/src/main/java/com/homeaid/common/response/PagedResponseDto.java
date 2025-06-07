@@ -11,10 +11,10 @@ import org.springframework.data.domain.Page;
 public class PagedResponseDto<T> {
 
   private List<T> content;
-  private int currentPage;
-  private int totalPages;
-  private int totalElements;
-  private int size;
+  private long currentPage;
+  private long totalPages;
+  private long totalElements;
+  private long size;
   private boolean first;
   private boolean last;
   private boolean hasPrevious;
@@ -23,10 +23,10 @@ public class PagedResponseDto<T> {
 
   public static <T> PagedResponseDto<T> of(
       List<T> content,
-      int currentPage,
-      int totalPages,
-      int totalElements,
-      int size
+      long currentPage,
+      long totalPages,
+      long totalElements,
+      long size
   ) {
     return PagedResponseDto.<T>builder()
         .content(content)
@@ -50,7 +50,7 @@ public class PagedResponseDto<T> {
         .content(content)
         .currentPage(page.getNumber())
         .totalPages(page.getTotalPages())
-        .totalElements((int) page.getTotalElements())
+        .totalElements(page.getTotalElements())
         .size(page.getSize())
         .first(page.isFirst())
         .last(page.isLast())
