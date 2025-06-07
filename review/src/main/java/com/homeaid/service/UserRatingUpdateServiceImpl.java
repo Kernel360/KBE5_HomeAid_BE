@@ -1,8 +1,6 @@
 package com.homeaid.service;
 
-import com.homeaid.domain.Customer;
 import com.homeaid.domain.CustomerRating;
-import com.homeaid.domain.Manager;
 import com.homeaid.domain.ManagerRating;
 import com.homeaid.domain.enumerate.UserRole;
 import com.homeaid.repository.CustomerRatingRepository;
@@ -10,7 +8,6 @@ import com.homeaid.repository.CustomerRepository;
 import com.homeaid.repository.ManagerRatingRepository;
 import com.homeaid.repository.ManagerRepository;
 import com.homeaid.repository.ReviewRepository;
-import java.util.Arrays;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,7 +27,7 @@ public class UserRatingUpdateServiceImpl implements UserRatingUpdateService {
   public void updateRating(Long targetId, UserRole writerRole) {
 
     int count = reviewRepository.getReviewCountByTargetId(targetId);
-    double average = reviewRepository.getReviewRatingByTargetId(targetId);
+    double average = reviewRepository.getAverageReviewRatingByTargetId(targetId);
 
     if (writerRole == UserRole.CUSTOMER) {
       updateManagerRating(targetId, count, average);
