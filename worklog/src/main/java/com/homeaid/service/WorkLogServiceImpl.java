@@ -8,9 +8,12 @@ import com.homeaid.exception.WorkLogErrorCode;
 import com.homeaid.repository.ReservationRepository;
 import com.homeaid.repository.WorkLogRepository;
 import com.homeaid.util.GeoUtils;
-import jakarta.transaction.Transactional;
+
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 @Service
@@ -55,6 +58,12 @@ public class WorkLogServiceImpl implements WorkLogService {
         updateReservationStatusCompleted(workLog.getReservation());
 
         return workLog;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<WorkLog> getAllWorkLogsByManager(Long userId, Pageable pageable) {
+        return workLogRepository.findAllByManagerId(userId, pageable);
     }
 
     /**

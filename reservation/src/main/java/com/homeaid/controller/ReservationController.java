@@ -2,6 +2,7 @@ package com.homeaid.controller;
 
 
 import com.homeaid.common.response.CommonApiResponse;
+import com.homeaid.common.response.PagedResponseDto;
 import com.homeaid.domain.Reservation;
 import com.homeaid.dto.request.ReservationRequestDto;
 import com.homeaid.dto.response.ReservationResponseDto;
@@ -16,6 +17,10 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -26,12 +31,13 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/customer/reservations")
-@Tag(name = "Reservation", description = "고객 예약 관련 API")
+@RequestMapping("/api/v1/reservations")
+@Tag(name = "Reservation", description = "예약 관련 API")
 public class ReservationController {
 
   private final ReservationServiceImpl reservationService;
@@ -54,7 +60,7 @@ public class ReservationController {
         .body(CommonApiResponse.success(ReservationResponseDto.toDto(reservation)));
   }
 
-  @GetMapping("/id/{reservationId}")
+  @GetMapping("/{reservationId}")
   @Operation(summary = "예약 단건 조회", description = "예약 ID를 기반으로 예약 상세 정보를 조회합니다.")
   @ApiResponses({
       @ApiResponse(responseCode = "200", description = "예약 조회 성공",
@@ -109,4 +115,64 @@ public class ReservationController {
     reservationService.deleteReservation(reservationId, user.getUserId());
     return ResponseEntity.ok(CommonApiResponse.success(null));
   }
+
+  /**
+   * 관리자용 예약 전체 조회
+   */
+  @GetMapping
+  @Operation(summary = "예약 전체 조회", description = "페이지네이션 기반으로 예약 목록을 조회합니다.")
+  public ResponseEntity<CommonApiResponse<PagedResponseDto<ReservationResponseDto>>> getReservationsList(
+      @RequestParam(value = "page", defaultValue = "0") int page,
+      @RequestParam(value = "size", defaultValue = "10") int size
+  ) {
+    Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdDate"));
+
+    Page<Reservation> reservations = reservationService.getReservations(pageable);
+
+    PagedResponseDto<ReservationResponseDto> response = PagedResponseDto.fromPage(reservations,
+        ReservationResponseDto::toDto);
+    return ResponseEntity.ok(CommonApiResponse.success(response));
+  }
+
+  /**
+   * 로그인한 고객의 예약 전체 조회
+   */
+  @GetMapping("/customer")
+  @Operation(summary = "특정 유저의 예약 전체 조회", description = "고객의 모든 예약을 페이지네이션으로 조회합니다.")
+  public ResponseEntity<CommonApiResponse<PagedResponseDto<ReservationResponseDto>>> getReservationsByCustomer(
+      @AuthenticationPrincipal CustomUserDetails user,
+      @RequestParam(value = "page", defaultValue = "0") int page,
+      @RequestParam(value = "size", defaultValue = "10") int size
+  ) {
+    Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdDate"));
+    Page<Reservation> reservations = reservationService.getReservationsByCustomer(user.getUserId(),
+        pageable);
+
+    PagedResponseDto<ReservationResponseDto> response =
+        PagedResponseDto.fromPage(reservations, ReservationResponseDto::toDto);
+    return ResponseEntity.ok(CommonApiResponse.success(response));
+  }
+
+  /**
+   * 매니저 담당 예약 전체 조회
+   */
+  @GetMapping("/manager")
+  @Operation(summary = "매니저 담당 예약 전체 조회", description = "매니저가 담당 중인 예약을 페이지네이션으로 조회합니다.")
+  public ResponseEntity<CommonApiResponse<PagedResponseDto<ReservationResponseDto>>> getReservationsByManager(
+      @AuthenticationPrincipal CustomUserDetails userDetails,
+      @RequestParam(value = "page", defaultValue = "0") int page,
+      @RequestParam(value = "size", defaultValue = "10") int size
+  ) {
+
+    Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdDate"));
+    Page<Reservation> reservations = reservationService.getReservationsByManager(
+        userDetails.getUserId(), pageable);
+
+    PagedResponseDto<ReservationResponseDto> response =
+        PagedResponseDto.fromPage(reservations, ReservationResponseDto::toDto);
+
+    return ResponseEntity.ok(CommonApiResponse.success(response));
+  }
+
+
 }

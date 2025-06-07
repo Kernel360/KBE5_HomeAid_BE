@@ -10,6 +10,8 @@ import com.homeaid.repository.ReservationRepository;
 import com.homeaid.serviceoption.domain.ServiceSubOption;
 import com.homeaid.serviceoption.repository.ServiceSubOptionRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -77,5 +79,23 @@ public class ReservationServiceImpl implements ReservationService {
     }
 
     reservation.softDelete();
+  }
+
+  @Override
+  @Transactional(readOnly = true)
+  public Page<Reservation> getReservations(Pageable pageable) {
+    return reservationRepository.findAll(pageable);
+  }
+
+  @Override
+  @Transactional(readOnly = true)
+  public Page<Reservation> getReservationsByCustomer(Long userId, Pageable pageable) {
+    return reservationRepository.findAllByCustomerId(userId, pageable);
+  }
+
+  @Override
+  @Transactional(readOnly = true)
+  public Page<Reservation> getReservationsByManager(Long managerId, Pageable pageable) {
+    return reservationRepository.findAllByManagerId(managerId, pageable);
   }
 }
