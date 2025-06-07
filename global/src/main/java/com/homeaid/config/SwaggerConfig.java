@@ -128,4 +128,12 @@ public class SwaggerConfig {
         .build();
   }
 
+  @Bean
+  public GroupedOpenApi customerAPI() {
+    return GroupedOpenApi.builder()
+        .group("고객")
+        .pathsToMatch("/api/v1/customers/**")
+        .build();
+  }
+
 }
