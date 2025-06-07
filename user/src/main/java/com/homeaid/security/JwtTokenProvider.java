@@ -13,8 +13,7 @@ public class JwtTokenProvider {
 
   private final SecretKey secretKey;
   private final Long accessTokenExpirationMs;
-  @Value("${spring.jwt.refresh-token-expire-time}")
-  private Long refreshTokenExpirationMs;
+  private final Long refreshTokenExpirationMs;
 
 
 
@@ -26,6 +25,7 @@ public class JwtTokenProvider {
     this.secretKey = new SecretKeySpec(secret.getBytes(StandardCharsets.UTF_8),
         Jwts.SIG.HS256.key().build().getAlgorithm());
     this.accessTokenExpirationMs = accessTokenExpirationMs;
+    this.refreshTokenExpirationMs = refreshTokenExpirationMs;
   }
 
   // Access Token 생성
