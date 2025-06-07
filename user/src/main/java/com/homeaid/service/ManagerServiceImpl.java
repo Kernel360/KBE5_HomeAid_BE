@@ -3,6 +3,7 @@ package com.homeaid.service;
 import com.homeaid.domain.Manager;
 import com.homeaid.domain.ManagerAvailability;
 import com.homeaid.domain.ManagerServiceOption;
+import com.homeaid.domain.enumerate.ManagerStatus;
 import com.homeaid.domain.enumerate.Weekday;
 import com.homeaid.dto.request.ManagerDetailInfoRequestDto;
 import com.homeaid.exception.CustomException;
@@ -10,11 +11,13 @@ import com.homeaid.exception.UserErrorCode;
 import com.homeaid.repository.ManagerAvailabilityRepository;
 import com.homeaid.repository.ManagerRepository;
 import com.homeaid.repository.ManagerServiceOptionRepository;
-import jakarta.transaction.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -51,6 +54,22 @@ public class ManagerServiceImpl implements ManagerService {
             .build())
         .collect(Collectors.toList());
     managerAvailabilityRepository.saveAll(availableConditions);
+  }
+
+  @Override
+  @Transactional(readOnly = true)
+  public Page<Manager> getAllManagers(Pageable pageable) {
+    return managerRepository.findAll(pageable);
+
+  }
+
+  @Override
+  @Transactional
+  public void updateStatus(Long id, ManagerStatus status) {
+    Manager manager = managerRepository.findById(id)
+        .orElseThrow(() -> new CustomException(UserErrorCode.MANAGER_NOT_FOUND));
+
+    manager.changeStatus(status);
   }
 
   private Weekday convertToWeekday(int day) {
