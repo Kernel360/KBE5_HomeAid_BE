@@ -1,5 +1,7 @@
-package com.homeaid.security;
+package com.homeaid.security.config;
 
+import com.homeaid.security.RefreshTokenFilter;
+import com.homeaid.security.user.CustomUserDetailsService;
 import com.homeaid.security.filter.AccessTokenFilter;
 import com.homeaid.security.filter.JwtAuthenticationFilter;
 import com.homeaid.security.token.JwtTokenProvider;
@@ -27,7 +29,7 @@ public class SecurityConfig {
 
   private final CustomUserDetailsService customUserDetailsService;
   private final JwtTokenProvider jwtTokenProvider;
-  private final String[] allowUrls = {"/", "/api/v1/user/auth/**", "/api/v1/swagger/auth/**"};
+  private final String[] allowUrls = {"/", "/api/v1/users/signup/**", "/api/v1/swagger/signup/**"};
   private final String[] swaggerUrls = {"/swagger-ui/**", "/v3/api-docs/**", "/swagger-resources/**", "/swagger-resources",
       "/configuration/ui", "/configuration/security", "/webjars/**"};
 
@@ -38,7 +40,7 @@ public class SecurityConfig {
       throws Exception {
     JwtAuthenticationFilter filter = new JwtAuthenticationFilter(authManager,
         jwtTokenProvider);
-    filter.setFilterProcessesUrl("/api/v1/user/auth/signin");
+    filter.setFilterProcessesUrl("/api/v1/auth/signin");
 
     http
         .csrf(AbstractHttpConfigurer::disable) // CSRF 비활성화 (JWT 사용)

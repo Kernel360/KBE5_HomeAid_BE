@@ -3,7 +3,7 @@ package com.homeaid.controller;
 
 import com.homeaid.common.response.CommonApiResponse;
 import com.homeaid.dto.request.ManagerDetailInfoRequestDto;
-import com.homeaid.security.CustomUserDetails;
+import com.homeaid.security.user.CustomUserDetails;
 import com.homeaid.service.ManagerService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;

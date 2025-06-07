@@ -1,4 +1,4 @@
-package com.homeaid.security;
+package com.homeaid.security.token;
 
 import io.jsonwebtoken.Jwts;
 import java.nio.charset.StandardCharsets;
