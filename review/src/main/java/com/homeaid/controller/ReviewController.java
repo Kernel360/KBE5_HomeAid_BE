@@ -2,13 +2,21 @@ package com.homeaid.controller;
 
 import com.homeaid.common.response.CommonApiResponse;
 import com.homeaid.domain.Review;
-import com.homeaid.domain.enumerate.UserRole;
 import com.homeaid.dto.request.CustomerReviewRequestDto;
+import com.homeaid.dto.response.MyReviewResponseDto;
+import com.homeaid.paging.PagingResponseDto;
+import com.homeaid.paging.PagingResponseUtil;
 import com.homeaid.security.CustomUserDetails;
 import com.homeaid.service.ReviewService;
+import com.homeaid.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.core.annotations.ParameterObject;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -19,6 +27,7 @@ import org.springframework.web.bind.annotation.*;
 public class ReviewController {
 
     private final ReviewService reviewService;
+    private final UserService userService;
 
     @Operation(summary = "리뷰 생성")
     @PostMapping
@@ -45,6 +54,24 @@ public class ReviewController {
         reviewService.deleteReview(reviewId, userDetails.getUserId());
         return ResponseEntity.ok(CommonApiResponse.success());
     }
+
+    @Operation(summary = "한 리뷰어의 리뷰 리스트", description = "본인리뷰, 상대리뷰 통합")
+    @GetMapping("/{reviewer}")
+    public ResponseEntity<CommonApiResponse<PagingResponseDto<MyReviewResponseDto>>> getReviewOfWriter(
+            @ParameterObject
+            @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable,
+            @PathVariable Long reviewer) {
+        Page<MyReviewResponseDto> myReviewResponseDtoPage = reviewService.getReviewOfWriter(reviewer, pageable)
+                .map(MyReviewResponseDto::from);
+
+        //리뷰 대상 이름 셋팅하기
+        myReviewResponseDtoPage.getContent().forEach(review -> {
+            review.setName(userService.getUserById(review.getTargetId()).getName());
+        });
+
+        return ResponseEntity.ok(CommonApiResponse.success(PagingResponseUtil.newInstance(myReviewResponseDtoPage)));
+    }
+
 
 
 }

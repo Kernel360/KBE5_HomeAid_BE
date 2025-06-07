@@ -12,6 +12,8 @@ import com.homeaid.repository.ReservationRepository;
 import com.homeaid.repository.ReviewRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @RequiredArgsConstructor
@@ -85,6 +87,11 @@ public class ReviewServiceImpl implements ReviewService {
     reviewRepository.deleteById(reviewId);
     userRatingUpdateService.updateRating(review.getTargetId(), review.getWriterRole());
   }
+
+    @Override
+    public Page<Review> getReviewOfWriter(Long writerId, Pageable pageable) {
+        return reviewRepository.findByWriterId(writerId, pageable);
+    }
 
 
   /**
