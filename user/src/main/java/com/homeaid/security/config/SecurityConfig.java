@@ -1,5 +1,8 @@
 package com.homeaid.security;
 
+import com.homeaid.security.filter.AccessTokenFilter;
+import com.homeaid.security.filter.JwtAuthenticationFilter;
+import com.homeaid.security.token.JwtTokenProvider;
 import java.util.Arrays;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -57,7 +60,7 @@ public class SecurityConfig {
 
     // JwtAuthenticationFilter 추가
     http
-        .addFilterBefore(new JwtFilter(jwtTokenProvider, customUserDetailsService),
+        .addFilterBefore(new AccessTokenFilter(jwtTokenProvider, customUserDetailsService),
             UsernamePasswordAuthenticationFilter.class);
 
     // LoginFilter 추가
