@@ -26,9 +26,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/v1/swagger")
+@RequestMapping("/api/v1/swagger/users")
 @RequiredArgsConstructor
-@Tag(name = "사용자(회원가입)", description = "사용자 회원가입 API (매니저/고객)")
+@Tag(name = "로그인/회원가입", description = "사용자 로그인/회원가입 API (매니저/고객)")
 //@Profile("swagger")  // swagger 프로파일에서만 활성화 가능 (선택)
 public class SwaggerAuthController {
 

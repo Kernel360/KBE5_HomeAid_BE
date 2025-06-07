@@ -71,7 +71,7 @@ public class SwaggerConfig {
     return GroupedOpenApi.builder()
         .group("users")
         .displayName("로그인/회원가입")
-        .pathsToMatch("/api/v1/swagger/signup/**")
+        .pathsToMatch("/api/v1/swagger/users/**")
         .build();
   }
 

@@ -29,7 +29,7 @@ public class SecurityConfig {
 
   private final CustomUserDetailsService customUserDetailsService;
   private final JwtTokenProvider jwtTokenProvider;
-  private final String[] allowUrls = {"/", "/api/v1/users/signup/**", "/api/v1/swagger/signup/**"};
+  private final String[] allowUrls = {"/", "/api/v1/users/signup/**", "/api/v1/swagger/users/**"};
   private final String[] swaggerUrls = {"/swagger-ui/**", "/v3/api-docs/**", "/swagger-resources/**", "/swagger-resources",
       "/configuration/ui", "/configuration/security", "/webjars/**"};
 
