@@ -19,7 +19,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
   private final AuthenticationManager authenticationManager;
-  private final JwtUtil jwtUtil;
+  private final JwtTokenProvider jwtTokenProvider;
 
   @Override
   public Authentication attemptAuthentication(HttpServletRequest request,
@@ -52,7 +52,7 @@ public class SecurityAuthenticationFilter extends UsernamePasswordAuthentication
     String role = userDetails.getAuthorities().iterator().next().getAuthority();
 
     // 토큰 생성
-    String token = jwtUtil.createJwt(userId, email, role, 60 * 60 * 1000L); // 유효시간 1시간
+    String token = jwtTokenProvider.createJwt(userId, email, role, 60 * 60 * 1000L); // 유효시간 1시간
     response.addHeader("Authorization", "Bearer " + token);
     new ObjectMapper().writeValue(response.getWriter(), Map.of("token", token));
   }

@@ -22,7 +22,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 @Component
 public class JwtFilter extends OncePerRequestFilter {
 
-  private final JwtUtil jwtUtil;
+  private final JwtTokenProvider jwtTokenProvider;
   private final CustomUserDetailsService customUserDetailsService;
   private final ObjectMapper objectMapper = new ObjectMapper();
 
@@ -48,15 +48,15 @@ public class JwtFilter extends OncePerRequestFilter {
 
     try {
       // 토큰 만료 여부 확인
-      if (jwtUtil.isTokenExpired(token)) {
+      if (jwtTokenProvider.isTokenExpired(token)) {
         filterChain.doFilter(request, response);
         return;
       }
 
       // 토큰에서 email과 role 획득
-      Long userId = jwtUtil.getUserIdFromToken(token);
-      String email = jwtUtil.getEmailFromToken(token);
-      String role = jwtUtil.getRoleFromToken(token);
+      Long userId = jwtTokenProvider.getUserIdFromToken(token);
+      String email = jwtTokenProvider.getEmailFromToken(token);
+      String role = jwtTokenProvider.getRoleFromToken(token);
 
       // 실제 DB 조회 없이 임시 User 객체 생성
       User user = new User(userId, email,

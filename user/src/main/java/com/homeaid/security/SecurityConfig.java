@@ -5,10 +5,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -23,44 +23,41 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 public class SecurityConfig {
 
   private final CustomUserDetailsService customUserDetailsService;
-  private final JwtUtil jwtUtil;
+  private final JwtTokenProvider jwtTokenProvider;
+  private final String[] allowUrls = {"/", "/api/v1/user/auth/**", "/api/v1/swagger/auth/**"};
+  private final String[] swaggerUrls = {"/swagger-ui/**", "/v3/api-docs/**", "/swagger-resources/**", "/swagger-resources",
+      "/configuration/ui", "/configuration/security", "/webjars/**"};
+
+
 
   @Bean
   SecurityFilterChain securityFilterChain(HttpSecurity http, AuthenticationManager authManager)
       throws Exception {
-    SecurityAuthenticationFilter filter = new SecurityAuthenticationFilter(authManager, jwtUtil);
+    SecurityAuthenticationFilter filter = new SecurityAuthenticationFilter(authManager,
+        jwtTokenProvider);
     filter.setFilterProcessesUrl("/api/v1/user/auth/signin");
 
     http
-        .csrf((auth) -> auth.disable())
-        .formLogin((auth) -> auth.disable())
-        .cors((cors) -> cors.configurationSource(corsConfigurationSource()))
-        .httpBasic((auth) -> auth.disable())
+        .csrf(AbstractHttpConfigurer::disable) // CSRF 비활성화 (JWT 사용)
+        .formLogin(AbstractHttpConfigurer::disable)
+        .httpBasic(AbstractHttpConfigurer::disable)
+        .cors((cors) -> cors.configurationSource(corsConfigurationSource())) // CORS 설정 적용
         .sessionManagement((session) -> session
-            .sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+            .sessionCreationPolicy(SessionCreationPolicy.STATELESS)); // 세션 비활성화
 
     http
         .authorizeHttpRequests((auth) -> auth
-            .requestMatchers("/api/v1/user/auth/**", "/api/v1/swagger/auth/**").permitAll()
-            .requestMatchers(
-                "/swagger-ui/**",
-                "/v3/api-docs/**",
-                "/swagger-resources/**",
-                "/swagger-resources",
-                "/configuration/ui",
-                "/configuration/security",
-                "/webjars/**"
-            ).permitAll()
-
-            .requestMatchers("/api/v1/admin").hasRole("ADMIN")
-            .requestMatchers("/api/v1/customer").hasRole("CUSTOMER")
-            .requestMatchers("/api/v1/manager").hasRole("MANAGER")
-            .anyRequest().authenticated()
+            .requestMatchers(allowUrls).permitAll()
+            .requestMatchers(swaggerUrls).permitAll()
+//            .requestMatchers("/api/v1/admin").hasRole("ADMIN") // ex. 관리자 권한 가진 사용자만 접근 가능
+//            .requestMatchers("/api/v1/customer").hasRole("CUSTOMER") // ex. 고객 권한 가진 사용자만 접근 가능
+//            .requestMatchers("/api/v1/manager").hasRole("MANAGER") // ex. 매니저 권한 가진 사용자만 접근 가능
+            .anyRequest().authenticated() // 나머지 모든 요청 인증 필요
         );
 
     // JwtAuthenticationFilter 추가
     http
-        .addFilterBefore(new JwtFilter(jwtUtil, customUserDetailsService),
+        .addFilterBefore(new JwtFilter(jwtTokenProvider, customUserDetailsService),
             UsernamePasswordAuthenticationFilter.class);
 
     // LoginFilter 추가
@@ -90,12 +87,7 @@ public class SecurityConfig {
     // TODO 배포 후 https로 바꾸면 보안 설정 추가해야 함
     // 프론트엔드 도메인 허용
     configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000")); // React 개발 서버
-    // configuration.setAllowedOrigins(Arrays.asList("*")); // 모든 도메인 허용 (개발 환경에서만 사용)
-
-    // 허용할 HTTP 메서드
-    configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-
-    // 허용할 헤더
+    configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS")); // 허용할 HTTP 메서드
     configuration.setAllowedHeaders(Arrays.asList(
         "Authorization",
         "Content-Type",
@@ -104,13 +96,10 @@ public class SecurityConfig {
         "Origin",
         "Access-Control-Request-Method",
         "Access-Control-Request-Headers"
-    ));
+    )); // 허용할 헤더
 
-    // 쿠키 허용
-    configuration.setAllowCredentials(true);
-
-    // preflight 요청의 캐시 시간 (초)
-    configuration.setMaxAge(3600L);
+    configuration.setAllowCredentials(true); // 쿠키 허용
+    configuration.setMaxAge(3600L); // preflight 요청의 캐시 시간 (초)
 
     UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
     source.registerCorsConfiguration("/**", configuration);

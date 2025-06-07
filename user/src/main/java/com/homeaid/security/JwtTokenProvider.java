@@ -9,11 +9,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 @Component
-public class JwtUtil {
+public class JwtTokenProvider {
 
   private final SecretKey secretKey;
 
-  public JwtUtil(
+  public JwtTokenProvider(
       @Value("${JWT_SECRET}") String secret
   ) {
     this.secretKey = new SecretKeySpec(secret.getBytes(StandardCharsets.UTF_8),

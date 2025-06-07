@@ -7,7 +7,7 @@ import com.homeaid.dto.request.SignInRequestDto;
 import com.homeaid.exception.CustomException;
 import com.homeaid.exception.UserErrorCode;
 import com.homeaid.repository.UserRepository;
-import com.homeaid.security.JwtUtil;
+import com.homeaid.security.JwtTokenProvider;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,7 +21,7 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder;
-    private final JwtUtil jwtUtil;
+    private final JwtTokenProvider jwtTokenProvider;
 
     public Manager signUpManager(@Valid Manager manager) {
 
@@ -62,6 +62,6 @@ public class UserServiceImpl implements UserService {
             throw new CustomException(UserErrorCode.LOGIN_FAILED);
         }
 
-        return jwtUtil.createJwt(user.get().getId(), user.get().getEmail(), user.get().getRole().name(), 3600000L); // 1시간
+        return jwtTokenProvider.createJwt(user.get().getId(), user.get().getEmail(), user.get().getRole().name(), 3600000L); // 1시간
     }
 }
