@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 public class SignInRequestDto {
 
     @NotBlank(message = "전화번호는 필수 입력값입니다.")
-    @Schema(description = "전화번호", example = "010-1111-1111")
+    @Schema(description = "전화번호", example = "010-1234-5678")
     private String phone;
 
     @NotBlank(message = "비밀번호는 필수 입력값입니다.")
