@@ -25,7 +25,7 @@ public class UserServiceImpl implements UserService {
 
     public Manager signUpManager(@Valid Manager manager) {
 
-        if (userRepository.existsByEmail(manager.getEmail())) {
+        if (userRepository.existsByPhone(manager.getPhone())) {
             throw new CustomException(UserErrorCode.USER_ALREADY_EXISTS);
         }
 
@@ -36,7 +36,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public Customer signUpCustomer(Customer customer) {
 
-        if (userRepository.existsByEmail(customer.getEmail())) {
+        if (userRepository.existsByPhone(customer.getPhone())) {
             throw new CustomException(UserErrorCode.USER_ALREADY_EXISTS);
         }
 
@@ -51,17 +51,17 @@ public class UserServiceImpl implements UserService {
     }
 
     public String loginAndGetToken(SignInRequestDto request) {
-        var user = userRepository.findByEmail(request.getEmail());
+        var user = userRepository.findByPhone(request.getPhone());
         if (user.isEmpty()) {
-            log.warn("Login failed - User not found: email={}", request.getEmail());
+            log.warn("Login failed - User not found: email={}", request.getPhone());
             throw new CustomException(UserErrorCode.LOGIN_FAILED);
         }
 
         if (!passwordEncoder.matches(request.getPassword(), user.get().getPassword())) {
-            log.warn("Login failed - Invalid password: email={}", request.getEmail());
+            log.warn("Login failed - Invalid password: email={}", request.getPhone());
             throw new CustomException(UserErrorCode.LOGIN_FAILED);
         }
 
-        return jwtTokenProvider.createJwt(user.get().getId(), user.get().getEmail(), user.get().getRole().name());
+        return jwtTokenProvider.createJwt(user.get().getId(), user.get().getRole().name());
     }
 }

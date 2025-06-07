@@ -53,13 +53,12 @@ public class JwtFilter extends OncePerRequestFilter {
         return;
       }
 
-      // 토큰에서 email과 role 획득
+      // 토큰에서 userId과 role 획득
       Long userId = jwtTokenProvider.getUserIdFromToken(token);
-      String email = jwtTokenProvider.getEmailFromToken(token);
       String role = jwtTokenProvider.getRoleFromToken(token);
 
       // 실제 DB 조회 없이 임시 User 객체 생성
-      User user = new User(userId, email,
+      User user = new User(userId,
           UserRole.valueOf(role.replace("ROLE_", ""))); // ROLE 접두사 제거 필요
       CustomUserDetails customUserDetails = new CustomUserDetails(user);
 

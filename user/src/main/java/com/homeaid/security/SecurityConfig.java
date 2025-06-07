@@ -33,7 +33,7 @@ public class SecurityConfig {
   @Bean
   SecurityFilterChain securityFilterChain(HttpSecurity http, AuthenticationManager authManager)
       throws Exception {
-    SecurityAuthenticationFilter filter = new SecurityAuthenticationFilter(authManager,
+    JwtAuthenticationFilter filter = new JwtAuthenticationFilter(authManager,
         jwtTokenProvider);
     filter.setFilterProcessesUrl("/api/v1/user/auth/signin");
 

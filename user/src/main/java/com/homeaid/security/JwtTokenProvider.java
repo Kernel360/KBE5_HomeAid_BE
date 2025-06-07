@@ -13,23 +13,27 @@ public class JwtTokenProvider {
 
   private final SecretKey secretKey;
   private final Long accessTokenExpirationMs;
+  @Value("${spring.jwt.refresh-token-expire-time}")
+  private Long refreshTokenExpirationMs;
+
 
 
   public JwtTokenProvider(
       @Value("${spring.jwt.secret}") String secret,
-      @Value ("${spring.jwt.access-token-expire-time}") Long accessTokenExpirationMs
+      @Value ("${spring.jwt.access-token-expire-time}") Long accessTokenExpirationMs,
+      @Value("${spring.jwt.refresh-token-expire-time}") Long refreshTokenExpirationMs
   ) {
     this.secretKey = new SecretKeySpec(secret.getBytes(StandardCharsets.UTF_8),
         Jwts.SIG.HS256.key().build().getAlgorithm());
     this.accessTokenExpirationMs = accessTokenExpirationMs;
   }
 
-  public String getEmailFromToken(String token) {
-    return Jwts.parser().verifyWith(secretKey).build()
-        .parseSignedClaims(token)
-        .getPayload()
-        .get("email", String.class);
-  }
+//  public String getPhoneFromToken(String token) {
+//    return Jwts.parser().verifyWith(secretKey).build()
+//        .parseSignedClaims(token)
+//        .getPayload()
+//        .get("phone", String.class);
+//  }
 
   public String getRoleFromToken(String token) {
     return Jwts.parser().verifyWith(secretKey).build()
@@ -53,11 +57,20 @@ public class JwtTokenProvider {
         .before(new Date());
   }
 
+//  // 토큰 검증
+//  public boolean validateToken(String token) {
+//    try {
+//      Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token);
+//      return true;
+//    } catch (Exception e) {
+//      return false;
+//    }
+//  }
 
-  public String createJwt(Long userId, String email, String role) {
+
+  public String createJwt(Long userId, String role) {
     return Jwts.builder()
         .claim("userId", userId)
-        .claim("email", email)
         .claim("role", role)
         .issuedAt(new Date(System.currentTimeMillis()))
         .expiration(new Date(System.currentTimeMillis() + accessTokenExpirationMs))
