@@ -59,7 +59,8 @@ public class Reservation {
   @Column(columnDefinition = "TEXT")
   private String customerMemo;
 
-  @OneToOne(mappedBy = "reservation", cascade = CascadeType.ALL)
+  // 부모 엔티티 저장이나 병합하면 자식 엔티티도 자동으로 저장이나 병합 됨.
+  @OneToOne(mappedBy = "reservation", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
   private ReservationItem item;
 
   @CreatedDate
@@ -83,7 +84,8 @@ public class Reservation {
     item.setReservation(this);
   }
 
-  public void updateReservation(Reservation newReservation, int newTotalPrice, int newTotalDuration) {
+  public void updateReservation(Reservation newReservation, int newTotalPrice,
+      int newTotalDuration) {
     this.requestedDate = newReservation.getRequestedDate();
     this.requestedTime = newReservation.getRequestedTime();
     this.totalPrice = newTotalPrice;
@@ -92,6 +94,9 @@ public class Reservation {
 
   public void softDelete() {
     this.deletedDate = LocalDateTime.now();
+    if (this.item != null) {
+      this.item.softDelete();
+    }
   }
 
 
@@ -99,7 +104,13 @@ public class Reservation {
     this.status = ReservationStatus.COMPLETED;
   }
   
+
+  public void updateStatusMatching() {
+    this.status = ReservationStatus.MATCHING;
+  }
+
   public void confirmMatching(Long matchingId) {
+    this.status = ReservationStatus.MATCHED;
     finalMatchingId = matchingId;
 
   }

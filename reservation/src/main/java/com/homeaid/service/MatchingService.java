@@ -12,9 +12,9 @@ public interface MatchingService {
 
   Long createMatching(Long managerId, Long reservationId, Matching matching);
 
-  void respondToMatchingAsManager(Long matchingId, ManagerAction action, String memo);
+  void respondToMatchingAsManager(Long userId, Long matchingId, ManagerAction action, String memo);
 
-  void respondToMatchingAsCustomer(Long matchingId, CustomerAction action, String memo);
+  void respondToMatchingAsCustomer(Long userId, Long matchingId, CustomerAction action, String memo);
 
   List<Manager> recommendManagers(Long reservationId);
 }

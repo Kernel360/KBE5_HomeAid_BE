@@ -1,5 +1,7 @@
 package com.homeaid.dto.request;
 
+import com.homeaid.validation.MatchingActionMemoRequest;
+import com.homeaid.validation.MatchingMemoConstraint;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
@@ -8,7 +10,8 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @Schema(description = "매니저 매칭 응답 DTO")
-public class MatchingManagerResponseDto {
+@MatchingMemoConstraint
+public class MatchingManagerResponseDto implements MatchingActionMemoRequest {
 
   @NotNull
   @Schema(description = "매니저의 응답 액션", example = "ACCEPT")
@@ -22,4 +25,5 @@ public class MatchingManagerResponseDto {
     ACCEPT,
     REJECT
   }
+
 }

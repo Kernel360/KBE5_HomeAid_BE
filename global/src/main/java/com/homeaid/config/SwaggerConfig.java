@@ -58,17 +58,15 @@ public class SwaggerConfig {
   }
 
   @Bean
-
   public GroupedOpenApi matchingAPI() {
     return GroupedOpenApi.builder()
         .group("matchings")
         .displayName("매칭")
-        .pathsToMatch("/api/v1/admin/matchings/**")
+        .pathsToMatch("/api/v1/*/matchings/**")
         .build();
   }
       
   @Bean
-
   public GroupedOpenApi userAPI() {
 
     return GroupedOpenApi.builder()
@@ -79,7 +77,6 @@ public class SwaggerConfig {
   }
 
   @Bean
-
   public GroupedOpenApi worklogAPI() {
     return GroupedOpenApi.builder()
             .group("workLogs")
@@ -106,4 +103,22 @@ public class SwaggerConfig {
             .pathsToMatch("/api/v1/reviews/**")
             .build();
   }
+
+  @Bean
+  public GroupedOpenApi paymentAPI() {
+    return GroupedOpenApi.builder()
+        .group("Payments")
+        .displayName("결제")
+        .pathsToMatch("/api/v1/payments/**")
+        .build();
+  }
+
+  @Bean
+  public GroupedOpenApi settlementAPI() {
+    return GroupedOpenApi.builder()
+        .group("정산")
+        .pathsToMatch("/api/v1/settlement/**")
+        .build();
+  }
+
 }
