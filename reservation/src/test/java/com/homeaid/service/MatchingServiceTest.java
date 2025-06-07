@@ -185,10 +185,11 @@ class MatchingServiceTest {
     // given
     Long matchingId = 1L;
     given(matchingRepository.findById(matchingId)).willReturn(Optional.empty());
+    Long userId = 1L;
 
     // when & then
     assertThatThrownBy(() ->
-        matchingService.respondToMatchingAsManager(matchingId, ManagerAction.ACCEPT, null)
+        matchingService.respondToMatchingAsManager(userId, matchingId, ManagerAction.ACCEPT, null)
     ).isInstanceOf(CustomException.class)
         .hasMessageContaining("매칭 정보를 찾을 수 없습니다.");
   }
@@ -198,11 +199,17 @@ class MatchingServiceTest {
   void respondToMatchingAsManager_수락시_acceptByManager_호출() {
     // given
     Long matchingId = 1L;
+    Long userId = 1L;
+
     Matching matching = mock(Matching.class);
+    Manager manager = mock(Manager.class);
+
     given(matchingRepository.findById(matchingId)).willReturn(Optional.of(matching));
+    given(matching.getManager()).willReturn(manager);
+    given(manager.getId()).willReturn(userId);
 
     // when
-    matchingService.respondToMatchingAsManager(matchingId, ManagerAction.ACCEPT, null);
+    matchingService.respondToMatchingAsManager(userId, matchingId, ManagerAction.ACCEPT, null);
 
     // then
     verify(matching).acceptByManager();
@@ -214,13 +221,20 @@ class MatchingServiceTest {
   void respondToMatchingAsManager_거절시_memo가_없으면_예외_발생() {
     // given
     Long matchingId = 1L;
+    Long userId = 1L;
+
     Matching matching = mock(Matching.class);
+    Manager manager = mock(Manager.class);
+
     given(matchingRepository.findById(matchingId)).willReturn(Optional.of(matching));
+    given(matching.getManager()).willReturn(manager);
+    given(manager.getId()).willReturn(userId);
 
     // when & then
     assertThatThrownBy(() ->
-        matchingService.respondToMatchingAsManager(matchingId, ManagerAction.REJECT, null)
-    ).isInstanceOf(CustomException.class)
+        matchingService.respondToMatchingAsManager(userId, matchingId, ManagerAction.REJECT, null)
+    )
+        .isInstanceOf(CustomException.class)
         .hasMessageContaining("거절 시에는 메모를 작성해야 합니다.");
   }
 
@@ -230,11 +244,17 @@ class MatchingServiceTest {
     // given
     Long matchingId = 1L;
     String memo = "사정이 있어 수락이 어렵습니다.";
+    Long userId = 1L;
+
     Matching matching = mock(Matching.class);
+    Manager manager = mock(Manager.class);
+
     given(matchingRepository.findById(matchingId)).willReturn(Optional.of(matching));
+    given(matching.getManager()).willReturn(manager);
+    given(manager.getId()).willReturn(userId);
 
     // when
-    matchingService.respondToMatchingAsManager(matchingId, ManagerAction.REJECT, memo);
+    matchingService.respondToMatchingAsManager(userId, matchingId, ManagerAction.REJECT, memo);
 
     // then
     verify(matching).rejectByManager(memo);

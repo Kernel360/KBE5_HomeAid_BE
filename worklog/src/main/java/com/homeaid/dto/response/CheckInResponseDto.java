@@ -1,23 +1,36 @@
 package com.homeaid.dto.response;
 
 import com.homeaid.domain.WorkLog;
+import com.homeaid.domain.enumerate.WorkType;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
 
-@Builder
 @Getter
+@Builder
+@Schema(description = "매니저 근무 기록 DTO")
 public class CheckInResponseDto {
-    private LocalDateTime checkInDate;
-    private Long worklogId;
-    private Long reservationId;
+
+    @Schema(description = "근무 기록 ID", example = "1234")
+    private Long workLogId;
+
+    @Schema(description = "체크인 시간", example = "2025-06-06T09:00:00")
+    private LocalDateTime checkInTime;
+
+    @Schema(description = "체크아웃 시간", example = "2025-06-06T12:00:00")
+    private LocalDateTime checkOutTime;
+
+    @Schema(description = "근무 상태", example = "COMPLETED")
+    private WorkType status;
 
     public static CheckInResponseDto toDto(WorkLog workLog) {
         return CheckInResponseDto.builder()
-                .checkInDate(workLog.getCheckInTime())
-                .worklogId(workLog.getId())
-                .reservationId(workLog.getReservation().getId())
-                .build();
+            .workLogId(workLog.getId())
+            .checkInTime(workLog.getCheckInTime())
+            .checkOutTime(workLog.getCheckOutTime())
+            .status(workLog.getWorkType())
+            .build();
     }
 }

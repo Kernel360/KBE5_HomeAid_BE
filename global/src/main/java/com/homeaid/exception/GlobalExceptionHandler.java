@@ -29,7 +29,8 @@ public class GlobalExceptionHandler {
    */
   @ExceptionHandler(MethodArgumentNotValidException.class)
   public ResponseEntity<CommonApiResponse<Void>> handleValidationException(MethodArgumentNotValidException e) {
-    String message = e.getBindingResult().getFieldErrors().stream()
+    // FieldError와 ObjectError 모두 수집
+    String message = e.getBindingResult().getAllErrors().stream()
         .findFirst()
         .map(DefaultMessageSourceResolvable::getDefaultMessage)
         .orElse("입력값이 올바르지 않습니다.");
@@ -61,6 +62,5 @@ public class GlobalExceptionHandler {
     return ResponseEntity.badRequest()
             .body(CommonApiResponse.fail("duplicate value", "이미 처리된 요청 입니다"));
   }
-
 
 }

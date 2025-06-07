@@ -44,7 +44,7 @@ public class SwaggerConfig {
     return GroupedOpenApi.builder()
         .group("reservations")
         .displayName("예약")
-        .pathsToMatch("/api/v1/customer/reservations/**")
+        .pathsToMatch("/api/v1/reservations/**")
         .build();
   }
 
@@ -58,19 +58,16 @@ public class SwaggerConfig {
   }
 
   @Bean
-
   public GroupedOpenApi matchingAPI() {
     return GroupedOpenApi.builder()
         .group("matchings")
         .displayName("매칭")
-        .pathsToMatch("/api/v1/admin/matchings/**")
+        .pathsToMatch("/api/v1/*/matchings/**")
         .build();
   }
-      
+
   @Bean
-
   public GroupedOpenApi userAPI() {
-
     return GroupedOpenApi.builder()
         .group("Users")
         .displayName("로그인/회원가입")
@@ -79,7 +76,6 @@ public class SwaggerConfig {
   }
 
   @Bean
-
   public GroupedOpenApi worklogAPI() {
     return GroupedOpenApi.builder()
             .group("workLogs")
@@ -87,7 +83,7 @@ public class SwaggerConfig {
             .pathsToMatch("/api/v1/managers/work-logs/**")
             .build();
   }
-    
+
   @Bean
   public GroupedOpenApi boardAPI() {
     return GroupedOpenApi.builder()
@@ -101,10 +97,10 @@ public class SwaggerConfig {
   @Bean
   public GroupedOpenApi reviewAPI() {
     return GroupedOpenApi.builder()
-            .group("reviews")
-            .displayName("리뷰")
-            .pathsToMatch("/api/v1/reviews/**")
-            .build();
+        .group("reviews")
+        .displayName("리뷰")
+        .pathsToMatch("/api/v1/reviews/**")
+        .build();
   }
 
   @Bean
