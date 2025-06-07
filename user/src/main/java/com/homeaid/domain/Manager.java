@@ -5,6 +5,8 @@ import com.homeaid.domain.enumerate.GenderType;
 import com.homeaid.domain.enumerate.UserRole;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import java.time.LocalDate;
