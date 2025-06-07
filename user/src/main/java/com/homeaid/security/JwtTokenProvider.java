@@ -28,12 +28,25 @@ public class JwtTokenProvider {
     this.accessTokenExpirationMs = accessTokenExpirationMs;
   }
 
-//  public String getPhoneFromToken(String token) {
-//    return Jwts.parser().verifyWith(secretKey).build()
-//        .parseSignedClaims(token)
-//        .getPayload()
-//        .get("phone", String.class);
-//  }
+  // Access Token 생성
+  public String createJwt(Long userId, String role) {
+    return Jwts.builder()
+        .claim("userId", userId)
+        .claim("role", role)
+        .issuedAt(new Date(System.currentTimeMillis()))
+        .expiration(new Date(System.currentTimeMillis() + accessTokenExpirationMs))
+        .signWith(secretKey)
+        .compact();
+  }
+
+  // Refresh Token 생성
+  public String createRefreshToken(Long userId) {
+    return Jwts.builder()
+        .claim("userId", userId)
+        .issuedAt(new Date(System.currentTimeMillis()))
+        .expiration(new Date(System.currentTimeMillis() + refreshTokenExpirationMs))
+        .compact();
+  }
 
   public String getRoleFromToken(String token) {
     return Jwts.parser().verifyWith(secretKey).build()
@@ -66,16 +79,5 @@ public class JwtTokenProvider {
 //      return false;
 //    }
 //  }
-
-
-  public String createJwt(Long userId, String role) {
-    return Jwts.builder()
-        .claim("userId", userId)
-        .claim("role", role)
-        .issuedAt(new Date(System.currentTimeMillis()))
-        .expiration(new Date(System.currentTimeMillis() + accessTokenExpirationMs))
-        .signWith(secretKey)
-        .compact();
-  }
 
 }

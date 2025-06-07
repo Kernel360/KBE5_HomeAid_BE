@@ -7,11 +7,8 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.Map;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -51,32 +48,30 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
     CustomUserDetails userDetails = (CustomUserDetails) authResult.getPrincipal();
     Long userId = userDetails.getUserId();
-    String email = userDetails.getUsername();
+    String username = userDetails.getUsername();
     String role = userDetails.getAuthorities().iterator().next().getAuthority();
 
-    // 토큰 생성
-    String token = jwtTokenProvider.createJwt(userId, role); // 유효시간 1시간
-    response.addHeader("Authorization", "Bearer " + token);
-    new ObjectMapper().writeValue(response.getWriter(), Map.of("token", token));
+    // AT & RT 생성
+    String accessToken = jwtTokenProvider.createJwt(userId, role);
+    String refreshToken = jwtTokenProvider.createJwt(userId, role);
 
-    // Todo RT 생성 시, RT를 쿠키에 저장
-    // httpOnly 쿠키 설정
-    Cookie cookie = new Cookie("jwt", token);
-    cookie.setHttpOnly(true);
-    cookie.setSecure(true); // HTTPS 사용 시에만 true로 설정
-    cookie.setPath("/");
-    cookie.setMaxAge(3600); // 1시간
-    cookie.setAttribute("SameSite", "Strict");
+    // AT를 헤더로 전달
+    response.addHeader("Authorization", "Bearer " + accessToken);
 
-    // 응답에 쿠키 추가
-    response.addCookie(cookie);
+    // RT를 httpOnly 쿠키에 저장
+    Cookie rtCookie = new Cookie("refresh_token", refreshToken);
+    rtCookie.setHttpOnly(true);
+    rtCookie.setSecure(true); // HTTPS 사용 시에만 true로 설정
+    rtCookie.setPath("/");
+    rtCookie.setMaxAge(7*24*60*60); // 7일
+    response.addCookie(rtCookie);
+    rtCookie.setAttribute("SameSite", "Strict");
 
-    // 응답 본문에 필요한 사용자 정보만 포함
+    // 응답 Body에 필요한 사용자 정보만 포함
     Map<String, Object> responseBody = Map.of(
         "userId", userId,
-        "email", email,
-        "role", role,
-        "message", "로그인 성공"
+        "username", username,
+        "role", role
     );
 
     response.setContentType("application/json");
