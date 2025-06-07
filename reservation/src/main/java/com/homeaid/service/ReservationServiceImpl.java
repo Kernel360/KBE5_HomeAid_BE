@@ -39,10 +39,14 @@ public class ReservationServiceImpl implements ReservationService {
 
   @Override
   @Transactional
-  public Reservation updateReservation(Long id, Reservation newReservation,
+  public Reservation updateReservation(Long reservationId, Long userId, Reservation newReservation,
       Long serviceSubOptionId) {
-    Reservation originReservation = reservationRepository.findById(id)
+    Reservation originReservation = reservationRepository.findById(reservationId)
         .orElseThrow(() -> new CustomException(ReservationErrorCode.RESERVATION_NOT_FOUND));
+
+    if (!originReservation.getCustomerId().equals(userId)) {
+      throw new CustomException(ReservationErrorCode.UNAUTHORIZED_RESERVATION_ACCESS)  ;
+    }
 
     if (originReservation.getStatus() != ReservationStatus.REQUESTED) {
       throw new CustomException(ReservationErrorCode.RESERVATION_CANNOT_UPDATE);
@@ -63,9 +67,14 @@ public class ReservationServiceImpl implements ReservationService {
 
   @Override
   @Transactional
-  public void deleteReservation(Long id) {
-    Reservation reservation = reservationRepository.findById(id)
+  public void deleteReservation(Long reservationId, Long userId) {
+
+    Reservation reservation = reservationRepository.findById(reservationId)
         .orElseThrow(() -> new CustomException(ReservationErrorCode.RESERVATION_NOT_FOUND));
+
+    if (!reservation.getCustomerId().equals(userId)) {
+      throw new CustomException(ReservationErrorCode.UNAUTHORIZED_RESERVATION_ACCESS)  ;
+    }
 
     reservation.softDelete();
   }

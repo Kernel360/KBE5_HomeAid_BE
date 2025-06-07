@@ -5,6 +5,7 @@ import com.homeaid.common.response.CommonApiResponse;
 import com.homeaid.domain.Reservation;
 import com.homeaid.dto.request.ReservationRequestDto;
 import com.homeaid.dto.response.ReservationResponseDto;
+import com.homeaid.security.CustomUserDetails;
 import com.homeaid.service.ReservationServiceImpl;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -17,6 +18,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -41,10 +43,11 @@ public class ReservationController {
   @ApiResponse(responseCode = "400", description = "유효하지 않은 요청",
       content = @Content(schema = @Schema(implementation = CommonApiResponse.class)))
   public ResponseEntity<CommonApiResponse<ReservationResponseDto>> createReservation(
+      @AuthenticationPrincipal CustomUserDetails user,
       @RequestBody @Valid ReservationRequestDto reservationRequestDto) {
 
     Reservation reservation = reservationService.createReservation(
-        ReservationRequestDto.toEntity(reservationRequestDto),
+        ReservationRequestDto.toEntity(reservationRequestDto, user.getUserId()),
         reservationRequestDto.getSubOptionId());
 
     return ResponseEntity.status(HttpStatus.CREATED)
@@ -73,15 +76,17 @@ public class ReservationController {
       @ApiResponse(responseCode = "200", description = "예약 수정 성공",
           content = @Content(schema = @Schema(implementation = ReservationResponseDto.class))),
       @ApiResponse(responseCode = "400", description = "유효하지 않은 요청 또는 수정 불가 상태",
-        content = @Content(schema = @Schema(implementation = CommonApiResponse.class))),
+          content = @Content(schema = @Schema(implementation = CommonApiResponse.class))),
   })
   public ResponseEntity<CommonApiResponse<ReservationResponseDto>> updateReservation(
+      @AuthenticationPrincipal CustomUserDetails user,
       @Parameter(description = "수정할 예약 ID", example = "1")
-      @PathVariable(name = "reservationId") Long id,
+      @PathVariable(name = "reservationId") Long reservationId,
       @RequestBody @Valid ReservationRequestDto reservationRequestDto) {
 
     Reservation updated = reservationService.updateReservation(
-        id,
+        user.getUserId(),
+        reservationId,
         ReservationRequestDto.toEntity(reservationRequestDto),
         reservationRequestDto.getSubOptionId());
 
@@ -94,13 +99,14 @@ public class ReservationController {
       @ApiResponse(responseCode = "200", description = "예약 삭제 성공",
           content = @Content(schema = @Schema(implementation = CommonApiResponse.class))),
       @ApiResponse(responseCode = "404", description = "예약이 존재하지 않음",
-      content = @Content(schema = @Schema(implementation = CommonApiResponse.class))),
+          content = @Content(schema = @Schema(implementation = CommonApiResponse.class))),
   })
   public ResponseEntity<CommonApiResponse<Void>> deleteReservation(
+      @AuthenticationPrincipal CustomUserDetails user,
       @Parameter(description = "삭제할 예약 ID", example = "1")
-      @PathVariable(name = "reservationId") Long id
+      @PathVariable(name = "reservationId") Long reservationId
   ) {
-    reservationService.deleteReservation(id);
+    reservationService.deleteReservation(reservationId, user.getUserId());
     return ResponseEntity.ok(CommonApiResponse.success(null));
   }
 }

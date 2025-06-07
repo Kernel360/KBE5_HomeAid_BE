@@ -58,17 +58,15 @@ public class SwaggerConfig {
   }
 
   @Bean
-
   public GroupedOpenApi matchingAPI() {
     return GroupedOpenApi.builder()
         .group("matchings")
         .displayName("매칭")
-        .pathsToMatch("/api/v1/admin/matchings/**")
+        .pathsToMatch("/api/v1/*/matchings/**")
         .build();
   }
       
   @Bean
-
   public GroupedOpenApi userAPI() {
 
     return GroupedOpenApi.builder()
@@ -79,7 +77,6 @@ public class SwaggerConfig {
   }
 
   @Bean
-
   public GroupedOpenApi worklogAPI() {
     return GroupedOpenApi.builder()
             .group("workLogs")

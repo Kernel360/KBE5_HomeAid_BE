@@ -8,9 +8,9 @@ public interface ReservationService {
 
   Reservation createReservation(Reservation reservation, Long serviceSubOptionId);
 
-  Reservation getReservation(Long id);
+  Reservation getReservation(Long reservationId);
 
-  Reservation updateReservation(Long id, Reservation reservation, Long serviceSubOptionId);
+  Reservation updateReservation(Long reservationId, Long userId, Reservation reservation, Long serviceSubOptionId);
 
-  void deleteReservation(Long id);
+  void deleteReservation(Long reservationId, Long userId);
 }
