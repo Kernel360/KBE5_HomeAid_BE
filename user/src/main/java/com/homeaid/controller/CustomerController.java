@@ -41,7 +41,7 @@ public class CustomerController {
       @Parameter(description = "페이지 크기", example = "10")
       @RequestParam(value = "size", defaultValue = "10") int size
   ) {
-    Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdDate"));
+    Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
 
     return ResponseEntity.ok(
         CommonApiResponse.success(
