@@ -45,7 +45,7 @@ public class ReservationServiceImpl implements ReservationService {
         .orElseThrow(() -> new CustomException(ReservationErrorCode.RESERVATION_NOT_FOUND));
 
     if (!originReservation.getCustomerId().equals(userId)) {
-      throw new CustomException(ReservationErrorCode.RESERVATION_CANNOT_UPDATE)  ;
+      throw new CustomException(ReservationErrorCode.UNAUTHORIZED_RESERVATION_ACCESS)  ;
     }
 
     if (originReservation.getStatus() != ReservationStatus.REQUESTED) {
@@ -73,7 +73,7 @@ public class ReservationServiceImpl implements ReservationService {
         .orElseThrow(() -> new CustomException(ReservationErrorCode.RESERVATION_NOT_FOUND));
 
     if (!reservation.getCustomerId().equals(userId)) {
-      throw new CustomException(ReservationErrorCode.RESERVATION_CANNOT_UPDATE)  ;
+      throw new CustomException(ReservationErrorCode.UNAUTHORIZED_RESERVATION_ACCESS)  ;
     }
 
     reservation.softDelete();
