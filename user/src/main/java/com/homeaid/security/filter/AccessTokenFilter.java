@@ -21,40 +21,34 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-@RequiredArgsConstructor
 @Component
+@RequiredArgsConstructor
 public class AccessTokenFilter extends OncePerRequestFilter {
 
   private final JwtTokenProvider jwtTokenProvider;
   private final CustomUserDetailsService customUserDetailsService;
   private final ObjectMapper objectMapper = new ObjectMapper();
-
+  private static final String TOKEN_HEADER = "Authorization";
+  private static final String TOKEN_PREFIX = "Bearer ";
 
   @Override
-  protected void doFilterInternal(
-      HttpServletRequest request,
-      HttpServletResponse response,
-      FilterChain filterChain
-  ) throws ServletException, IOException {
+  protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+      throws ServletException, IOException {
 
     // 토큰 추출
-    String authorization = request.getHeader("Authorization");
-
+    String authorization = request.getHeader(TOKEN_HEADER);
     // Authorizatioin 헤더가 없거나 형식이 잘못되었으면 다음 핉터로 넘김
-    if (authorization == null || !authorization.startsWith("Bearer ")) {
+    if (authorization == null || !authorization.startsWith(TOKEN_PREFIX)) {
       filterChain.doFilter(request, response);
       return;
     }
 
     // Bearer 토큰 추출
-    String token = authorization.substring(7);
+    String token = authorization.substring(TOKEN_PREFIX.length());
 
     try {
       // 토큰 만료 여부 확인
-      if (jwtTokenProvider.isTokenExpired(token)) {
-        filterChain.doFilter(request, response);
-        return;
-      }
+      jwtTokenProvider.validateToken(token);
 
       // 토큰에서 userId과 role 획득
       Long userId = jwtTokenProvider.getUserIdFromToken(token);
@@ -96,17 +90,15 @@ public class AccessTokenFilter extends OncePerRequestFilter {
     filterChain.doFilter(request, response);
   }
 
-  private void sendErrorResponse(HttpServletResponse response, int status, String errorCode,
-      String message) throws IOException {
+  private void sendErrorResponse(HttpServletResponse response, int status, String errorCode, String message)
+      throws IOException {
     response.setStatus(status);
     response.setContentType("application/json");
     response.setCharacterEncoding("UTF-8");
-
     Map<String, String> errorResponse = Map.of(
         "error", errorCode,
         "message", message
     );
-
     objectMapper.writeValue(response.getWriter(), errorResponse);
   }
 }

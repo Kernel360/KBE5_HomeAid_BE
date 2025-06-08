@@ -15,8 +15,6 @@ public class JwtTokenProvider {
   private final Long accessTokenExpirationMs;
   private final Long refreshTokenExpirationMs;
 
-
-
   public JwtTokenProvider(
       @Value("${spring.jwt.secret}") String secret,
       @Value ("${spring.jwt.access-token-expire-time}") Long accessTokenExpirationMs,
@@ -48,6 +46,7 @@ public class JwtTokenProvider {
         .compact();
   }
 
+  // 토큰에서 userRole 추출
   public String getRoleFromToken(String token) {
     return Jwts.parser().verifyWith(secretKey).build()
         .parseSignedClaims(token)
@@ -55,6 +54,7 @@ public class JwtTokenProvider {
         .get("role", String.class);
   }
 
+  // 토큰에서 userId 추출
   public Long getUserIdFromToken(String token) {
     return Jwts.parser().verifyWith(secretKey).build()
         .parseSignedClaims(token)
@@ -62,6 +62,7 @@ public class JwtTokenProvider {
         .get("userId", Long.class);
   }
 
+  // 토큰에서 만료기간 추출
   public Boolean isTokenExpired(String token) {
     return Jwts.parser().verifyWith(secretKey).build()
         .parseSignedClaims(token)
@@ -70,14 +71,14 @@ public class JwtTokenProvider {
         .before(new Date());
   }
 
-//  // 토큰 검증
-//  public boolean validateToken(String token) {
-//    try {
-//      Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token);
-//      return true;
-//    } catch (Exception e) {
-//      return false;
-//    }
-//  }
+  // 토큰 검증
+  public boolean validateToken(String token) {
+    try {
+      Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token);
+      return true;
+    } catch (Exception e) {
+      return false;
+    }
+  }
 
 }

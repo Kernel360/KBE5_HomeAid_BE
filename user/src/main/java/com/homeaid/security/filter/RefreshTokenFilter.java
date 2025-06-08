@@ -1,4 +1,4 @@
-package com.homeaid.security;
+package com.homeaid.security.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.homeaid.security.token.JwtTokenProvider;
@@ -9,14 +9,16 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.stereotype.Component;
+import org.springframework.web.filter.OncePerRequestFilter;
+
 import java.io.IOException;
 import java.util.Map;
 import java.util.Optional;
-import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.filter.OncePerRequestFilter;
 
+@Component
 @RequiredArgsConstructor
 public class RefreshTokenFilter extends OncePerRequestFilter {
 
@@ -24,10 +26,13 @@ public class RefreshTokenFilter extends OncePerRequestFilter {
   private final CustomUserDetailsService customUserDetailsService;
   private final ObjectMapper objectMapper = new ObjectMapper();
 
+  // refresh 요청만 필터링
+  private static final AntPathRequestMatcher REFRESH_REQUEST_MATCHER =
+      new AntPathRequestMatcher("/api/v1/user/auth/refresh", "POST");
+
   @Override
   protected boolean shouldNotFilter(HttpServletRequest request) {
-    // "/api/v1/user/auth/refresh" 요청만 처리
-    return !request.getRequestURI().equals("/api/v1/user/auth/refresh");
+    return !REFRESH_REQUEST_MATCHER.matches(request);
   }
 
   @Override
@@ -40,7 +45,7 @@ public class RefreshTokenFilter extends OncePerRequestFilter {
     Optional<Cookie> refreshTokenCookie = getRefreshTokenFromCookies(request);
 
     if (refreshTokenCookie.isEmpty()) {
-      sendError(response, HttpServletResponse.SC_UNAUTHORIZED, "RT_MISSING", "리프레시 토큰이 없습니다.");
+      respondWithError(response, HttpServletResponse.SC_UNAUTHORIZED, "RT_MISSING", "리프레시 토큰이 없습니다.");
       return;
     }
 
@@ -48,52 +53,46 @@ public class RefreshTokenFilter extends OncePerRequestFilter {
 
     try {
       if (jwtTokenProvider.isTokenExpired(refreshToken)) {
-        sendError(response, HttpServletResponse.SC_UNAUTHORIZED, "RT_EXPIRED", "리프레시 토큰이 만료되었습니다.");
+        respondWithError(response, HttpServletResponse.SC_UNAUTHORIZED, "RT_EXPIRED", "리프레시 토큰이 만료되었습니다.");
         return;
       }
 
       Long userId = jwtTokenProvider.getUserIdFromToken(refreshToken);
-
       // DB 조회를 통해 유저 검증
       CustomUserDetails userDetails =
           (CustomUserDetails) customUserDetailsService.loadUserByUsernameById(userId);
 
-      // 새로운 액세스 토큰 발급
+      // 새로운 엑세스 토큰 발급
       String newAccessToken = jwtTokenProvider.createJwt(userId, userDetails.getUserRole().name());
 
       response.setHeader("Authorization", "Bearer " + newAccessToken);
-
-      // SecurityContext는 굳이 설정하지 않아도 됨 (선택사항)
-
-      Map<String, Object> responseBody = Map.of(
-          "accessToken", newAccessToken
-      );
       response.setContentType("application/json");
-      objectMapper.writeValue(response.getWriter(), responseBody);
+      objectMapper.writeValue(response.getWriter(), Map.of("accessToken", newAccessToken));
 
     } catch (Exception e) {
-      sendError(response, HttpServletResponse.SC_UNAUTHORIZED, "RT_INVALID", "유효하지 않은 리프레시 토큰입니다.");
+      respondWithError(response, HttpServletResponse.SC_UNAUTHORIZED, "RT_INVALID", "유효하지 않은 리프레시 토큰입니다.");
     }
   }
 
   private Optional<Cookie> getRefreshTokenFromCookies(HttpServletRequest request) {
     if (request.getCookies() == null) return Optional.empty();
+
     for (Cookie cookie : request.getCookies()) {
       if ("refresh_token".equals(cookie.getName())) {
         return Optional.of(cookie);
       }
     }
+
     return Optional.empty();
   }
 
-  private void sendError(HttpServletResponse response, int status, String errorCode, String message)
+  private void respondWithError(HttpServletResponse response, int status, String code, String message)
       throws IOException {
     response.setStatus(status);
     response.setContentType("application/json");
-    Map<String, String> error = Map.of(
-        "error", errorCode,
+    objectMapper.writeValue(response.getWriter(), Map.of(
+        "error", code,
         "message", message
-    );
-    objectMapper.writeValue(response.getWriter(), error);
+    ));
   }
 }
