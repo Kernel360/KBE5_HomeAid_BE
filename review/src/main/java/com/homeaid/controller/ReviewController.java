@@ -6,7 +6,7 @@ import com.homeaid.dto.request.CustomerReviewRequestDto;
 import com.homeaid.dto.response.MyReviewResponseDto;
 import com.homeaid.paging.PagingResponseDto;
 import com.homeaid.paging.PagingResponseUtil;
-import com.homeaid.security.CustomUserDetails;
+import com.homeaid.security.user.CustomUserDetails;
 import com.homeaid.service.ReviewService;
 import com.homeaid.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;

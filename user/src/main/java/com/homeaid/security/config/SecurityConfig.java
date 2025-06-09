@@ -1,5 +1,10 @@
-package com.homeaid.security;
+package com.homeaid.security.config;
 
+import com.homeaid.security.filter.RefreshTokenFilter;
+import com.homeaid.security.user.CustomUserDetailsService;
+import com.homeaid.security.filter.AccessTokenFilter;
+import com.homeaid.security.filter.JwtAuthenticationFilter;
+import com.homeaid.security.token.JwtTokenProvider;
 import java.util.Arrays;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -24,18 +29,19 @@ public class SecurityConfig {
 
   private final CustomUserDetailsService customUserDetailsService;
   private final JwtTokenProvider jwtTokenProvider;
-  private final String[] allowUrls = {"/", "/api/v1/user/auth/**", "/api/v1/swagger/auth/**"};
+  private final RefreshTokenFilter refreshTokenFilter;
+
+  private final String[] allowUrls = {"/", "/api/v1/users/signup/**", "/api/v1/swagger/users/**", "/api/v1/auth/**"};
   private final String[] swaggerUrls = {"/swagger-ui/**", "/v3/api-docs/**", "/swagger-resources/**", "/swagger-resources",
       "/configuration/ui", "/configuration/security", "/webjars/**"};
-
 
 
   @Bean
   SecurityFilterChain securityFilterChain(HttpSecurity http, AuthenticationManager authManager)
       throws Exception {
-    JwtAuthenticationFilter filter = new JwtAuthenticationFilter(authManager,
+    JwtAuthenticationFilter signinFilter = new JwtAuthenticationFilter(authManager,
         jwtTokenProvider);
-    filter.setFilterProcessesUrl("/api/v1/user/auth/signin");
+    signinFilter.setFilterProcessesUrl("/api/v1/auth/signin");
 
     http
         .csrf(AbstractHttpConfigurer::disable) // CSRF 비활성화 (JWT 사용)
@@ -47,22 +53,22 @@ public class SecurityConfig {
 
     http
         .authorizeHttpRequests((auth) -> auth
-            .requestMatchers(allowUrls).permitAll()
-            .requestMatchers(swaggerUrls).permitAll()
+                .requestMatchers(allowUrls).permitAll()
+                .requestMatchers(swaggerUrls).permitAll()
 //            .requestMatchers("/api/v1/admin").hasRole("ADMIN") // ex. 관리자 권한 가진 사용자만 접근 가능
 //            .requestMatchers("/api/v1/customer").hasRole("CUSTOMER") // ex. 고객 권한 가진 사용자만 접근 가능
 //            .requestMatchers("/api/v1/manager").hasRole("MANAGER") // ex. 매니저 권한 가진 사용자만 접근 가능
-            .anyRequest().authenticated() // 나머지 모든 요청 인증 필요
+                .anyRequest().authenticated() // 나머지 모든 요청 인증 필요
         );
 
-    // JwtAuthenticationFilter 추가
     http
-        .addFilterBefore(new JwtFilter(jwtTokenProvider, customUserDetailsService),
-            UsernamePasswordAuthenticationFilter.class);
+        // 로그인 필터 (JWT 발급)
+        .addFilterAt(signinFilter, UsernamePasswordAuthenticationFilter.class)
+        // 리프레시 토큰 필터 (갱신 요청만 처리)
+        .addFilterBefore(refreshTokenFilter, UsernamePasswordAuthenticationFilter.class)
+        // 일반 요청 AccessToken 처리 필터
+        .addFilterBefore(new AccessTokenFilter(jwtTokenProvider, customUserDetailsService), UsernamePasswordAuthenticationFilter.class);
 
-    // LoginFilter 추가
-    http
-        .addFilterAt(filter, UsernamePasswordAuthenticationFilter.class);
 
     return http.build();
 
@@ -97,6 +103,7 @@ public class SecurityConfig {
         "Access-Control-Request-Method",
         "Access-Control-Request-Headers"
     )); // 허용할 헤더
+    configuration.setExposedHeaders(Arrays.asList("Authorization")); // localStorage에 저장
 
     configuration.setAllowCredentials(true); // 쿠키 허용
     configuration.setMaxAge(3600L); // preflight 요청의 캐시 시간 (초)

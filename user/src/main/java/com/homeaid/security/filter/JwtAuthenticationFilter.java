@@ -1,0 +1,95 @@
+package com.homeaid.security.filter;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.homeaid.dto.request.SignInRequestDto;
+import com.homeaid.security.token.JwtTokenProvider;
+import com.homeaid.security.user.CustomUserDetails;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.util.Map;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
+public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
+
+  private static final String TOKEN_HEADER = "Authorization";
+  private static final String TOKEN_PREFIX = "Bearer ";
+  private static final String REFRESH_TOKEN = "refresh_token";
+
+  private final AuthenticationManager authenticationManager;
+  private final JwtTokenProvider jwtTokenProvider;
+
+  public JwtAuthenticationFilter(AuthenticationManager authenticationManager, JwtTokenProvider jwtTokenProvider) {
+    this.authenticationManager = authenticationManager;
+    this.jwtTokenProvider = jwtTokenProvider;
+  }
+
+  @Override
+  public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response)
+      throws AuthenticationException {
+
+    try {
+      // 토큰 유효성 검증 및 인증 처리
+      SignInRequestDto requestDto = new ObjectMapper().readValue(request.getInputStream(), SignInRequestDto.class);
+      UsernamePasswordAuthenticationToken authToken =
+          new UsernamePasswordAuthenticationToken(requestDto.getPhone(), requestDto.getPassword());
+      return authenticationManager.authenticate(authToken);
+    } catch (IOException e) {
+      throw new RuntimeException("인증 요청 파싱 실패", e);
+    }
+  }
+
+  @Override
+  protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response,
+      FilterChain chain, Authentication authResult) throws IOException, ServletException {
+
+    CustomUserDetails userDetails = (CustomUserDetails) authResult.getPrincipal();
+    Long userId = userDetails.getUserId();
+    String role = userDetails.getAuthorities().iterator().next().getAuthority();
+
+    // AT & RT 생성
+    String accessToken = jwtTokenProvider.createJwt(userId, role);
+    String refreshToken = jwtTokenProvider.createRefreshToken(userId);
+
+    // AT를 헤더로 전달
+    response.addHeader(TOKEN_HEADER, TOKEN_PREFIX + accessToken);
+
+    // RT를 httpOnly 쿠키에 저장
+    Cookie refreshCookie = buildRefreshCookie(refreshToken);
+    response.addCookie(refreshCookie);
+
+    // 응답 Body에 필요한 사용자 정보만 포함
+    Map<String, Object> responseBody = Map.of(
+        "userId", userId,
+        "role", role
+    );
+
+    response.setContentType("application/json");
+    new ObjectMapper().writeValue(response.getWriter(), responseBody);
+  }
+
+  private Cookie buildRefreshCookie(String refreshToken) {
+    Cookie cookie = new Cookie(REFRESH_TOKEN, refreshToken);
+    cookie.setHttpOnly(true);
+    cookie.setSecure(true); // HTTPS 사용 시에만 true로 설정
+    cookie.setPath("/");
+    cookie.setMaxAge(7 * 24 * 60 * 60); // 7일
+    return cookie;
+  }
+
+
+  @Override
+  protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response,
+      AuthenticationException failed) throws IOException, ServletException {
+
+    response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
+  }
+}
