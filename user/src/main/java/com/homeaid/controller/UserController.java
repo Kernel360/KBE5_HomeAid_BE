@@ -25,24 +25,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/v1/user")
 @RequiredArgsConstructor
-@Tag(name = "SignUp/SignIn", description = "사용자 회원가입 API (매니저/고객)")
+@RequestMapping("/api/v1/users")
 public class UserController {
 
   private final UserService userService;
   private final BCryptPasswordEncoder passwordEncoder;
 
-  @PostMapping("/auth/signup/manager")
-  @Operation(summary = "매니저 회원가입", description = "매니저 사용자 정보를 입력받아 회원가입을 처리합니다.")
-  @ApiResponses(value = {
-      @ApiResponse(responseCode = "201", description = "회원가입 성공"
-          , content = @Content(schema = @Schema(implementation = SignUpResponseDto.class))),
-      @ApiResponse(responseCode = "400", description = "잘못된 입력값"
-          , content = @Content(schema = @Schema(implementation = CommonApiResponse.class))),
-      @ApiResponse(responseCode = "409", description = "이미 존재하는 이메일"
-          , content = @Content(schema = @Schema(implementation = CommonApiResponse.class)))
-  })
+  @PostMapping("/signup/managers")
   public ResponseEntity<CommonApiResponse<SignUpResponseDto>> signUpManager(
       @RequestBody @Valid ManagerSignUpRequestDto managerSignUpRequestDto
   ) {
@@ -55,16 +45,7 @@ public class UserController {
         .body(CommonApiResponse.success(SignUpResponseDto.toManagerDto(manager)));
   }
 
-  @Operation(summary = "고객 회원가입", description = "고객 사용자 정보를 입력받아 회원가입을 처리합니다.")
-  @ApiResponses(value = {
-      @ApiResponse(responseCode = "201", description = "회원가입 성공"
-          , content = @Content(schema = @Schema(implementation = SignUpResponseDto.class))),
-      @ApiResponse(responseCode = "400", description = "잘못된 입력값"
-          , content = @Content(schema = @Schema(implementation = CommonApiResponse.class))),
-      @ApiResponse(responseCode = "409", description = "이미 존재하는 이메일"
-          , content = @Content(schema = @Schema(implementation = CommonApiResponse.class)))
-  })
-  @PostMapping("/auth/signup/customer")
+  @PostMapping("/signup/customers")
   public ResponseEntity<CommonApiResponse<SignUpResponseDto>> signUpCustomer(
       @RequestBody @Valid CustomerSignUpRequestDto customerSignUpRequestDto
   ) {

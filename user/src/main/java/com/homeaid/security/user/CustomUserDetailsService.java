@@ -1,4 +1,4 @@
-package com.homeaid.security;
+package com.homeaid.security.user;
 
 import com.homeaid.domain.User;
 import com.homeaid.repository.UserRepository;
@@ -19,6 +19,12 @@ public class CustomUserDetailsService implements UserDetailsService {
         User user = userRepository.findByPhone(phone)
                 .orElseThrow(() -> new UsernameNotFoundException("회원이 존재하지 않습니다."));
 
+        return new CustomUserDetails(user);
+    }
+
+    public UserDetails loadUserByUsernameById(Long userId) {
+        User user = userRepository.findById(userId)
+            .orElseThrow(() -> new UsernameNotFoundException("회원을 찾을 수 없습니다."));
         return new CustomUserDetails(user);
     }
 }

@@ -2,6 +2,7 @@ package com.homeaid.domain;
 
 
 import com.homeaid.domain.enumerate.GenderType;
+import com.homeaid.domain.enumerate.ManagerStatus;
 import com.homeaid.domain.enumerate.UserRole;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
@@ -42,6 +43,9 @@ public class Manager extends User {
 
   private LocalDateTime verifiedAt;
 
+  @Enumerated(EnumType.STRING)
+  private ManagerStatus status = ManagerStatus.PENDING;
+
   @Builder
   public Manager(String email, String password, String name, String phone, LocalDate birth,
       GenderType gender, String career, String experience, String profileImage) {
@@ -54,5 +58,9 @@ public class Manager extends User {
   public void approve() {
     this.verified = true;
     this.verifiedAt = LocalDateTime.now();
+  }
+
+  public void changeStatus(ManagerStatus newStatus) {
+    this.status = newStatus;
   }
 }

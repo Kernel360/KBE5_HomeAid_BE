@@ -69,9 +69,9 @@ public class SwaggerConfig {
   @Bean
   public GroupedOpenApi userAPI() {
     return GroupedOpenApi.builder()
-        .group("Users")
+        .group("users")
         .displayName("로그인/회원가입")
-        .pathsToMatch("/api/v1/swagger/auth/**")
+        .pathsToMatch("/api/v1/swagger/users/**")
         .build();
   }
 
@@ -125,6 +125,14 @@ public class SwaggerConfig {
     return GroupedOpenApi.builder()
         .group("매니저")
         .pathsToMatch("/api/v1/managers/**")
+        .build();
+  }
+
+  @Bean
+  public GroupedOpenApi customerAPI() {
+    return GroupedOpenApi.builder()
+        .group("고객")
+        .pathsToMatch("/api/v1/customers/**")
         .build();
   }
 
