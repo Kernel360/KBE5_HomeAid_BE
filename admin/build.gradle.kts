@@ -17,6 +17,7 @@ dependencies {
     implementation(project(":global"))
     implementation(project(":payment"))
     implementation(project(":user"))
+    implementation(project(":board"))
     implementation(project(":reservation"))
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 	implementation("org.springframework.boot:spring-boot-starter-validation")
