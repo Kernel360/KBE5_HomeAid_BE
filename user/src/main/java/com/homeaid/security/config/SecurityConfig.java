@@ -31,9 +31,8 @@ public class SecurityConfig {
   private final JwtTokenProvider jwtTokenProvider;
   private final RefreshTokenFilter refreshTokenFilter;
 
-  private final String[] allowUrls = {"/", "/api/v1/users/signup/**", "/api/v1/user/auth/refresh", "/api/v1/auth/signin", "/api/v1/swagger/users/**"};
-  private final String[] swaggerUrls = {"/swagger-ui/**", "/v3/api-docs/**",
-      "/swagger-resources/**", "/swagger-resources",
+  private final String[] allowUrls = {"/", "/api/v1/users/signup/**", "/api/v1/swagger/users/**", "/api/v1/auth/**"};
+  private final String[] swaggerUrls = {"/swagger-ui/**", "/v3/api-docs/**", "/swagger-resources/**", "/swagger-resources",
       "/configuration/ui", "/configuration/security", "/webjars/**"};
 
 
@@ -104,6 +103,7 @@ public class SecurityConfig {
         "Access-Control-Request-Method",
         "Access-Control-Request-Headers"
     )); // 허용할 헤더
+    configuration.setExposedHeaders(Arrays.asList("Authorization")); // localStorage에 저장
 
     configuration.setAllowCredentials(true); // 쿠키 허용
     configuration.setMaxAge(3600L); // preflight 요청의 캐시 시간 (초)

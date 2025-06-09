@@ -32,6 +32,14 @@ public class AccessTokenFilter extends OncePerRequestFilter {
   private static final String TOKEN_PREFIX = "Bearer ";
 
   @Override
+  protected boolean shouldNotFilter(HttpServletRequest request) {
+    String path = request.getRequestURI();
+    return path.startsWith("/api/v1/users/signup")
+        || path.startsWith("/api/v1/auth/signin")
+        || path.startsWith("/api/v1/auth/refresh");
+  }
+
+  @Override
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
       throws ServletException, IOException {
 
