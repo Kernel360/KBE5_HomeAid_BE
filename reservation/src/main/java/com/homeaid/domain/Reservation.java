@@ -73,10 +73,13 @@ public class Reservation {
   private LocalDateTime deletedDate;
 
   @Builder
-  public Reservation(Long customerId, LocalDate requestedDate, LocalTime requestedTime) {
+  public Reservation(Long customerId, LocalDate requestedDate, LocalTime requestedTime, Double latitude,
+      Double longitude) {
     this.customerId = customerId;
     this.requestedDate = requestedDate;
     this.requestedTime = requestedTime;
+    this.latitude = latitude;
+    this.longitude = longitude;
   }
 
   public void addItem(ServiceSubOption serviceSubOption) {

@@ -28,11 +28,17 @@ public class ReservationRequestDto {
   @Schema(description = "선택한 서비스 하위 옵션 ID", example = "3")
   private Long subOptionId;
 
+  private Double latitude;
+
+  private Double longitude;
+
   public static Reservation toEntity(ReservationRequestDto reservationRequestDto, Long userId) {
     return Reservation.builder()
         .customerId(userId)
         .requestedDate(reservationRequestDto.getRequestedDate())
         .requestedTime(reservationRequestDto.getRequestedTime())
+        .latitude(reservationRequestDto.getLatitude())
+        .longitude(reservationRequestDto.getLongitude())
         .build();
   }
 

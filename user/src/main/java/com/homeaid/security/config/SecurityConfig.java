@@ -6,6 +6,8 @@ import com.homeaid.security.filter.AccessTokenFilter;
 import com.homeaid.security.filter.JwtAuthenticationFilter;
 import com.homeaid.security.token.JwtTokenProvider;
 import java.util.Arrays;
+import static org.springframework.security.config.Customizer.withDefaults;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -49,7 +51,7 @@ public class SecurityConfig {
         .httpBasic(AbstractHttpConfigurer::disable)
         .cors((cors) -> cors.configurationSource(corsConfigurationSource())) // CORS 설정 적용
         .sessionManagement((session) -> session
-            .sessionCreationPolicy(SessionCreationPolicy.STATELESS)); // 세션 비활성화
+            .sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
     http
         .authorizeHttpRequests((auth) -> auth

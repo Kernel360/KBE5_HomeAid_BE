@@ -30,5 +30,10 @@ public interface ManagerRepository extends JpaRepository<Manager, Long> {
       @Param("subOptionName") String subOptionName
   );
 
+  @Query("SELECT COUNT(m) FROM Manager m WHERE m.verified = true")
+  long countActiveManagers();
+
+  @Query("SELECT COUNT(m) FROM Manager m WHERE m.verified = false")
+  long countPendingManagers();
 
 }
