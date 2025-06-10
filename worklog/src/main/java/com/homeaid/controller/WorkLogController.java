@@ -6,7 +6,7 @@ import com.homeaid.domain.WorkLog;
 import com.homeaid.dto.request.CheckInRequestDto;
 import com.homeaid.dto.request.CheckOutRequestDto;
 import com.homeaid.dto.response.CheckInResponseDto;
-import com.homeaid.security.CustomUserDetails;
+import com.homeaid.security.user.CustomUserDetails;
 import com.homeaid.service.WorkLogService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;

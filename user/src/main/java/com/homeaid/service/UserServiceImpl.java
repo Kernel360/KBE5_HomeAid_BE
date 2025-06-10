@@ -7,7 +7,7 @@ import com.homeaid.dto.request.SignInRequestDto;
 import com.homeaid.exception.CustomException;
 import com.homeaid.exception.UserErrorCode;
 import com.homeaid.repository.UserRepository;
-import com.homeaid.security.JwtTokenProvider;
+import com.homeaid.security.token.JwtTokenProvider;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

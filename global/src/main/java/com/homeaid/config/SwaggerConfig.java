@@ -69,9 +69,9 @@ public class SwaggerConfig {
   @Bean
   public GroupedOpenApi userAPI() {
     return GroupedOpenApi.builder()
-        .group("Users")
+        .group("users")
         .displayName("로그인/회원가입")
-        .pathsToMatch("/api/v1/swagger/auth/**")
+        .pathsToMatch("/api/v1/swagger/users/**")
         .build();
   }
 

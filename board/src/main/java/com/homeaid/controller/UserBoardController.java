@@ -8,7 +8,7 @@ import com.homeaid.dto.request.UpdateBoardRequestDto;
 import com.homeaid.common.response.PagedResponseDto;
 import com.homeaid.dto.response.UserBoardListResponseDto;
 import com.homeaid.dto.response.UserBoardResponseDto;
-import com.homeaid.security.CustomUserDetails;
+import com.homeaid.security.user.CustomUserDetails;
 import com.homeaid.service.UserBoardService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;

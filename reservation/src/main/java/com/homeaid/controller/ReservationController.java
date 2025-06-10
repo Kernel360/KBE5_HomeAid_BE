@@ -6,7 +6,7 @@ import com.homeaid.common.response.PagedResponseDto;
 import com.homeaid.domain.Reservation;
 import com.homeaid.dto.request.ReservationRequestDto;
 import com.homeaid.dto.response.ReservationResponseDto;
-import com.homeaid.security.CustomUserDetails;
+import com.homeaid.security.user.CustomUserDetails;
 import com.homeaid.service.ReservationServiceImpl;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;

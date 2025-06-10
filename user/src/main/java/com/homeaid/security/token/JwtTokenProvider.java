@@ -1,4 +1,4 @@
-package com.homeaid.security;
+package com.homeaid.security.token;
 
 import io.jsonwebtoken.Jwts;
 import java.nio.charset.StandardCharsets;
@@ -13,10 +13,7 @@ public class JwtTokenProvider {
 
   private final SecretKey secretKey;
   private final Long accessTokenExpirationMs;
-  @Value("${spring.jwt.refresh-token-expire-time}")
-  private Long refreshTokenExpirationMs;
-
-
+  private final Long refreshTokenExpirationMs;
 
   public JwtTokenProvider(
       @Value("${spring.jwt.secret}") String secret,
@@ -26,48 +23,10 @@ public class JwtTokenProvider {
     this.secretKey = new SecretKeySpec(secret.getBytes(StandardCharsets.UTF_8),
         Jwts.SIG.HS256.key().build().getAlgorithm());
     this.accessTokenExpirationMs = accessTokenExpirationMs;
+    this.refreshTokenExpirationMs = refreshTokenExpirationMs;
   }
 
-//  public String getPhoneFromToken(String token) {
-//    return Jwts.parser().verifyWith(secretKey).build()
-//        .parseSignedClaims(token)
-//        .getPayload()
-//        .get("phone", String.class);
-//  }
-
-  public String getRoleFromToken(String token) {
-    return Jwts.parser().verifyWith(secretKey).build()
-        .parseSignedClaims(token)
-        .getPayload()
-        .get("role", String.class);
-  }
-
-  public Long getUserIdFromToken(String token) {
-    return Jwts.parser().verifyWith(secretKey).build()
-        .parseSignedClaims(token)
-        .getPayload()
-        .get("userId", Long.class);
-  }
-
-  public Boolean isTokenExpired(String token) {
-    return Jwts.parser().verifyWith(secretKey).build()
-        .parseSignedClaims(token)
-        .getPayload()
-        .getExpiration()
-        .before(new Date());
-  }
-
-//  // 토큰 검증
-//  public boolean validateToken(String token) {
-//    try {
-//      Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token);
-//      return true;
-//    } catch (Exception e) {
-//      return false;
-//    }
-//  }
-
-
+  // Access Token 생성
   public String createJwt(Long userId, String role) {
     return Jwts.builder()
         .claim("userId", userId)
@@ -76,6 +35,50 @@ public class JwtTokenProvider {
         .expiration(new Date(System.currentTimeMillis() + accessTokenExpirationMs))
         .signWith(secretKey)
         .compact();
+  }
+
+  // Refresh Token 생성
+  public String createRefreshToken(Long userId) {
+    return Jwts.builder()
+        .claim("userId", userId)
+        .issuedAt(new Date(System.currentTimeMillis()))
+        .expiration(new Date(System.currentTimeMillis() + refreshTokenExpirationMs))
+        .compact();
+  }
+
+  // 토큰에서 userRole 추출
+  public String getRoleFromToken(String token) {
+    return Jwts.parser().verifyWith(secretKey).build()
+        .parseSignedClaims(token)
+        .getPayload()
+        .get("role", String.class);
+  }
+
+  // 토큰에서 userId 추출
+  public Long getUserIdFromToken(String token) {
+    return Jwts.parser().verifyWith(secretKey).build()
+        .parseSignedClaims(token)
+        .getPayload()
+        .get("userId", Long.class);
+  }
+
+  // 토큰에서 만료기간 추출
+  public Boolean isTokenExpired(String token) {
+    return Jwts.parser().verifyWith(secretKey).build()
+        .parseSignedClaims(token)
+        .getPayload()
+        .getExpiration()
+        .before(new Date());
+  }
+
+  // 토큰 검증
+  public boolean validateToken(String token) {
+    try {
+      Jwts.parser().verifyWith(secretKey).build().parseSignedClaims(token);
+      return true;
+    } catch (Exception e) {
+      return false;
+    }
   }
 
 }

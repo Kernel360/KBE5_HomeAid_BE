@@ -26,16 +26,16 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/v1/swagger/auth")
+@RequestMapping("/api/v1/swagger/users")
 @RequiredArgsConstructor
-@Tag(name = "SignUp/SignIn", description = "사용자 회원가입 API (매니저/고객)")
+@Tag(name = "로그인/회원가입", description = "사용자 로그인/회원가입 API (매니저/고객)")
 //@Profile("swagger")  // swagger 프로파일에서만 활성화 가능 (선택)
 public class SwaggerAuthController {
 
   private final UserServiceImpl userServiceImpl;
   private final BCryptPasswordEncoder passwordEncoder;
 
-  @PostMapping("/signup/manager")
+  @PostMapping("/signup/managers")
   @Operation(summary = "매니저 회원가입", description = "매니저 사용자 정보를 입력받아 회원가입을 처리합니다.")
   @ApiResponses(value = {
       @ApiResponse(responseCode = "201", description = "회원가입 성공"
@@ -66,7 +66,7 @@ public class SwaggerAuthController {
       @ApiResponse(responseCode = "409", description = "이미 존재하는 이메일"
           , content = @Content(schema = @Schema(implementation = CommonApiResponse.class)))
   })
-  @PostMapping("/signup/customer")
+  @PostMapping("/signup/customers")
   public ResponseEntity<CommonApiResponse<SignUpResponseDto>> signUpCustomer(
       @RequestBody @Valid CustomerSignUpRequestDto customerSignUpRequestDto
   ) {
