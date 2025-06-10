@@ -29,10 +29,10 @@ public class ReservationResponseDto {
   @Schema(description = "예약 서비스 명", example = "대청소")
   private String subOptionName;
 
-  @Schema(description = "고객 ID", example = "대청소")
+  @Schema(description = "고객 ID", example = "1")
   private Long customerId;
 
-  @Schema(description = "매니저 ID", example = "대청소")
+  @Schema(description = "매니저 ID", example = "2")
   private Long managerId;
 
   @Schema(description = "서비스 이용 날짜")
