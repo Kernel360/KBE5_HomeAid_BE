@@ -1,9 +1,12 @@
 package com.homeaid.controller;
 
 import com.homeaid.common.response.CommonApiResponse;
+import com.homeaid.common.response.PagedResponseDto;
+import com.homeaid.domain.Matching;
 import com.homeaid.dto.request.CreateMatchingRequestDto;
 import com.homeaid.dto.request.MatchingCustomerResponseDto;
 import com.homeaid.dto.request.MatchingManagerResponseDto;
+import com.homeaid.dto.response.MatchingListResponseDto;
 import com.homeaid.dto.response.MatchingRecommendationResponseDto;
 import com.homeaid.security.user.CustomUserDetails;
 import com.homeaid.service.MatchingService;
@@ -16,15 +19,14 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1")
@@ -87,6 +89,22 @@ public class MatchingController {
     return ResponseEntity.ok().body(CommonApiResponse.success(
         MatchingRecommendationResponseDto.toDto(
             matchingService.recommendManagers(reservationId))));
+  }
+
+  @GetMapping("/manager/matchings")
+  @Operation(summary = "매니저 매칭 기록 조회", description = "로그인한 매니저의 매칭 기록을 페이지네이션 기반으로 조회합니다.")
+  public ResponseEntity<CommonApiResponse<PagedResponseDto<MatchingListResponseDto>>> getManagerMatchings(
+          @AuthenticationPrincipal CustomUserDetails user,
+          @RequestParam(value = "page", defaultValue = "0") int page,
+          @RequestParam(value = "size", defaultValue = "10") int size
+  ) {
+    Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdDate"));
+
+    Page<Matching> matchings = matchingService.getManagerMatchings(user.getUserId(), pageable);
+
+    PagedResponseDto<MatchingListResponseDto> response = PagedResponseDto.fromPage(matchings,
+            MatchingListResponseDto::toDto);
+    return ResponseEntity.ok(CommonApiResponse.success(response));
   }
 
 }

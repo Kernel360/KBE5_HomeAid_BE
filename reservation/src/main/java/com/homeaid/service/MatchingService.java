@@ -2,9 +2,11 @@ package com.homeaid.service;
 
 import com.homeaid.domain.Manager;
 import com.homeaid.domain.Matching;
-import com.homeaid.domain.User;
 import com.homeaid.dto.request.MatchingCustomerResponseDto.CustomerAction;
 import com.homeaid.dto.request.MatchingManagerResponseDto.ManagerAction;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
 import java.util.List;
 
 
@@ -17,4 +19,7 @@ public interface MatchingService {
   void respondToMatchingAsCustomer(Long userId, Long matchingId, CustomerAction action, String memo);
 
   List<Manager> recommendManagers(Long reservationId);
+
+
+  Page<Matching> getManagerMatchings(Long userId, Pageable pageable);
 }
