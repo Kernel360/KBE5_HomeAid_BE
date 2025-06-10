@@ -27,9 +27,9 @@ public class PaymentServiceImpl implements PaymentService {
     Reservation reservation = reservationRepository.findById(dto.getReservationId())
         .orElseThrow(() -> new IllegalArgumentException("예약이 존재하지 않습니다."));
 
-    // 2. 예약 상태가 COMPLETED 인지 확인
-    if (reservation.getStatus() != ReservationStatus.COMPLETED) {
-      throw new IllegalStateException("예약 상태가 COMPLETED 일 때만 결제할 수 있습니다.");
+    // 2. 예약 상태가 MATCHED 인지 확인
+    if (reservation.getStatus() != ReservationStatus.MATCHED) {
+      throw new IllegalStateException("예약 상태가 MATCHED 일 때만 결제할 수 있습니다.");
     }
 
     // 3. 결제 생성 및 저장
