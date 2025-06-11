@@ -118,6 +118,7 @@ public class MatchingServiceImpl implements MatchingService {
 
   }
 
+  // 매니저 매칭 전체 조회
   @Override
   public Page<Matching> getMatchingListByManager(Long userId, Pageable pageable) {
     if (managerRepository.findById(userId).isEmpty()) {
@@ -126,6 +127,7 @@ public class MatchingServiceImpl implements MatchingService {
     return matchingRepository.findAllByManagerId(userId, pageable);
   }
 
+  // 매니저 매칭 단건 조회
   @Override
   public Matching getMatchingByManager(Long matchingId, Long userId) {
     if (managerRepository.findById(userId).isEmpty()) {
@@ -133,6 +135,7 @@ public class MatchingServiceImpl implements MatchingService {
     }
     return matchingRepository.findById(matchingId).get();
   }
+
 
   private int calculateNextMatchingRound(Long reservationId) {
     return matchingRepository.countByReservationId(reservationId) + 1;

@@ -1,6 +1,7 @@
 package com.homeaid.dto.response;
 
 import com.homeaid.domain.Matching;
+import com.homeaid.domain.enumerate.MatchingStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -36,6 +37,12 @@ public class MatchingResponseDto {
   @Schema(description = "고객 요청 사항", example = "주방 기름때 제거에 신경써주세요. 욕실 곰팡이도 깔끔하게 청소 부탁드립니다.")
   private String customerRequest;
 
+  @Schema(description = "매니저 매칭 상태", example = "REQUESTED, ACCEPTED, REJECTED")
+  private MatchingStatus managerStatus;
+
+  @Schema(description = "고객 매칭 상태", example = "WAITING, CONFIRMED, REJECTED")
+  private MatchingStatus customerStatus;
+
   public static MatchingResponseDto toDto(Matching matching) {
     return MatchingResponseDto.builder()
         .matchingId(matching.getId())
@@ -46,6 +53,8 @@ public class MatchingResponseDto {
         .latitude(matching.getReservation().getLatitude())
         .longitude(matching.getReservation().getLongitude())
         .customerRequest(matching.getReservation().getCustomerMemo())
+        .managerStatus(matching.getStatus())
+        .customerStatus(matching.getStatus())
         .build();
   }
 }

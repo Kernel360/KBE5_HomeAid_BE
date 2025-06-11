@@ -128,7 +128,8 @@ public class MatchingController {
     return ResponseEntity.ok(CommonApiResponse.success(response));
   }
 
-  @GetMapping("manager/matching/{matchingId}")
+  // 매니저 담당 매칭 상세 조회
+  @GetMapping("manager/matchings/{matchingId}")
   @Operation(summary = "매니저 매칭 단건 조회", description = "매니저 매칭 단건 조회")
   @ApiResponses(value = {
       @ApiResponse(responseCode = "200", description = "매니저 매칭 단건 조회 성공",
@@ -140,7 +141,7 @@ public class MatchingController {
       @ApiResponse(responseCode = "404", description = "해당 매니저의 매칭 존재하지 않음",
           content = @Content(schema = @Schema(implementation = CommonApiResponse.class)))
   })
-  public ResponseEntity<CommonApiResponse<MatchingResponseDto>> getBoard(
+  public ResponseEntity<CommonApiResponse<MatchingResponseDto>> getMatching(
       @Parameter(description = "조회할 매칭 ID", example = "1")
       @PathVariable(name = "matchingId") Long matchingId,
       @AuthenticationPrincipal CustomUserDetails customUserDetails
