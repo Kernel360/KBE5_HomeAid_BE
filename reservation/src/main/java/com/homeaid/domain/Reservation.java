@@ -57,9 +57,9 @@ public class Reservation {
 
   private Double longitude;
 
-   private String address;
+  private String address;
 
-   private String addressDetail;
+  private String addressDetail;
 
 
   @Column(columnDefinition = "TEXT")

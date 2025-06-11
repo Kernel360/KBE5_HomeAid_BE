@@ -41,6 +41,12 @@ public class ReservationResponseDto {
   @Schema(description = "서비스 이용 시간")
   private LocalTime requestedTime;
 
+  @Schema(description = "주소 정보")
+  private String address;
+
+  @Schema(description = "상세 주소 정보")
+  private String addressDetail;
+
   public static ReservationResponseDto toDto(Reservation reservation) {
     return ReservationResponseDto.builder()
         .reservationId(reservation.getId())
