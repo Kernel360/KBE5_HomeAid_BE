@@ -88,7 +88,7 @@ public class MatchingServiceImpl implements MatchingService {
           throw new CustomException(MatchingErrorCode.UNAUTHORIZED_MATCHING_ACCESS);
         }
         matching.confirmByCustomer();
-        reservation.confirmMatching(matchingId);
+        reservation.confirmMatching(matchingId, matching.getManager().getId());
       }
       case REJECT -> {
         if (memo == null || memo.isBlank()) {
