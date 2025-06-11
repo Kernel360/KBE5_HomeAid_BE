@@ -11,6 +11,7 @@ import jakarta.persistence.EntityListeners;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToOne;
 import java.time.LocalDate;
@@ -31,7 +32,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 public class Reservation {
 
   @Id
-  @GeneratedValue
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
   private LocalDate requestedDate;
@@ -56,6 +57,11 @@ public class Reservation {
 
   private Double longitude;
 
+   private String address;
+
+   private String addressDetail;
+
+
   @Column(columnDefinition = "TEXT")
   private String customerMemo;
 
@@ -74,12 +80,14 @@ public class Reservation {
 
   @Builder
   public Reservation(Long customerId, LocalDate requestedDate, LocalTime requestedTime, Double latitude,
-      Double longitude) {
+      Double longitude, String address, String addressDetail) {
     this.customerId = customerId;
     this.requestedDate = requestedDate;
     this.requestedTime = requestedTime;
     this.latitude = latitude;
     this.longitude = longitude;
+    this.address = address;
+    this.addressDetail = addressDetail;
   }
 
   public void addItem(ServiceSubOption serviceSubOption) {
