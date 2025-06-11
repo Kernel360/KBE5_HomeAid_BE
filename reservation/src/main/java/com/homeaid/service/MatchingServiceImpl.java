@@ -17,6 +17,8 @@ import com.homeaid.repository.ReservationRepository;
 import java.time.LocalTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -115,6 +117,25 @@ public class MatchingServiceImpl implements MatchingService {
     return managerRepository.findMatchingManagers(reservationWeekday, startTime, endTime, subOptionName);
 
   }
+
+  // 매니저 매칭 전체 조회
+  @Override
+  public Page<Matching> getMatchingListByManager(Long userId, Pageable pageable) {
+    if (managerRepository.findById(userId).isEmpty()) {
+      throw new CustomException(UserErrorCode.MANAGER_NOT_FOUND);
+    }
+    return matchingRepository.findAllByManagerId(userId, pageable);
+  }
+
+  // 매니저 매칭 단건 조회
+  @Override
+  public Matching getMatchingByManager(Long matchingId, Long userId) {
+    if (managerRepository.findById(userId).isEmpty()) {
+      throw new CustomException(UserErrorCode.MANAGER_NOT_FOUND);
+    }
+    return matchingRepository.findById(matchingId).get();
+  }
+
 
   private int calculateNextMatchingRound(Long reservationId) {
     return matchingRepository.countByReservationId(reservationId) + 1;
