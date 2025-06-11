@@ -110,18 +110,17 @@ public class Reservation {
     }
   }
 
-
   public void updateStatusCompleted() {
     this.status = ReservationStatus.COMPLETED;
   }
-  
 
   public void updateStatusMatching() {
     this.status = ReservationStatus.MATCHING;
   }
 
-  public void confirmMatching(Long matchingId) {
+  public void confirmMatching(Long matchingId, Long managerId) {
     this.status = ReservationStatus.MATCHED;
+    this.managerId = managerId;
     finalMatchingId = matchingId;
 
   }
