@@ -69,6 +69,7 @@ public class MatchingServiceImpl implements MatchingService {
           throw new CustomException(MatchingErrorCode.MEMO_REQUIRED_FOR_REJECTION);
         }
         matching.rejectByManager(memo);
+        matching.getReservation().failedMatching();
       }
     }
 
@@ -95,6 +96,7 @@ public class MatchingServiceImpl implements MatchingService {
           throw new CustomException(MatchingErrorCode.MEMO_REQUIRED_FOR_REJECTION);
         }
         matching.rejectByCustomer(memo);
+        matching.getReservation().failedMatching();
       }
     }
   }
@@ -140,4 +142,5 @@ public class MatchingServiceImpl implements MatchingService {
   private int calculateNextMatchingRound(Long reservationId) {
     return matchingRepository.countByReservationId(reservationId) + 1;
   }
+
 }

@@ -59,4 +59,18 @@ public class PagedResponseDto<T> {
         .build();
   }
 
+  public static <R> PagedResponseDto<R> fromPage(Page<R> page) {
+    return PagedResponseDto.<R>builder()
+        .content(page.getContent())
+        .currentPage(page.getNumber())
+        .totalPages(page.getTotalPages())
+        .totalElements(page.getTotalElements())
+        .size(page.getSize())
+        .first(page.isFirst())
+        .last(page.isLast())
+        .hasPrevious(page.hasPrevious())
+        .hasNext(page.hasNext())
+        .build();
+  }
+
 }

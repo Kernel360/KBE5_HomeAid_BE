@@ -1,11 +1,14 @@
 package com.homeaid.dto.response;
 
 
+import com.homeaid.domain.Customer;
+import com.homeaid.domain.Manager;
 import com.homeaid.domain.Reservation;
 import com.homeaid.domain.enumerate.ReservationStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.LocalDateTime;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -46,6 +49,31 @@ public class ReservationResponseDto {
 
   @Schema(description = "상세 주소 정보")
   private String addressDetail;
+
+  @Schema(description = "예약 시작 일시", example = "2025-06-15T14:00:00")
+  private LocalDateTime startTime;
+
+  @Schema(description = "예약 고객 이름", example = "홍길동")
+  private String customerName;
+
+  @Schema(description = "매칭된 매니저 이름", example = "김매니저")
+  private String matchedManagerName;
+
+  public static ReservationResponseDto toDto(Reservation reservation, Customer customer, Manager manager) {
+    return ReservationResponseDto.builder()
+        .reservationId(reservation.getId())
+        .status(reservation.getStatus())
+        .totalPrice(reservation.getTotalPrice())
+        .totalDuration(reservation.getTotalDuration())
+        .subOptionName(reservation.getItem().getSubOptionName())
+        .startTime(LocalDateTime.of(
+            reservation.getRequestedDate(),
+            reservation.getRequestedTime()
+        ))
+        .customerName(customer.getName())
+        .matchedManagerName(manager != null ? manager.getName() : null)
+        .build();
+  }
 
   public static ReservationResponseDto toDto(Reservation reservation) {
     return ReservationResponseDto.builder()
