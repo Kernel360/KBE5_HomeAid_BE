@@ -79,15 +79,16 @@ public class Reservation {
   private LocalDateTime deletedDate;
 
   @Builder
-  public Reservation(Long customerId, LocalDate requestedDate, LocalTime requestedTime, Double latitude,
-      Double longitude, String address, String addressDetail) {
-    this.customerId = customerId;
+  public Reservation(LocalDate requestedDate, LocalTime requestedTime, Long customerId, Double latitude, Double longitude, String address, String addressDetail, Integer totalPrice, Integer totalDuration) {
     this.requestedDate = requestedDate;
     this.requestedTime = requestedTime;
+    this.customerId = customerId;
     this.latitude = latitude;
     this.longitude = longitude;
     this.address = address;
     this.addressDetail = addressDetail;
+    this.totalPrice = totalPrice;
+    this.totalDuration = totalDuration;
   }
 
   public void addItem(ServiceSubOption serviceSubOption) {
