@@ -3,6 +3,7 @@ package com.homeaid.repository;
 import com.homeaid.domain.Manager;
 import com.homeaid.domain.enumerate.Weekday;
 import java.time.LocalTime;
+import java.util.Collection;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -36,4 +37,5 @@ public interface ManagerRepository extends JpaRepository<Manager, Long> {
   @Query("SELECT COUNT(m) FROM Manager m WHERE m.verified = false")
   long countPendingManagers();
 
+  Collection<Manager> findByIdIn(List<Long> managerIds);
 }

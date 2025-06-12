@@ -4,9 +4,13 @@ package com.homeaid.controller;
 import com.homeaid.common.response.CommonApiResponse;
 import com.homeaid.common.response.PagedResponseDto;
 import com.homeaid.domain.Reservation;
+import com.homeaid.domain.enumerate.ReservationStatus;
 import com.homeaid.dto.request.ReservationRequestDto;
 import com.homeaid.dto.response.ReservationResponseDto;
+import com.homeaid.exception.CustomException;
+import com.homeaid.exception.ReservationErrorCode;
 import com.homeaid.security.user.CustomUserDetails;
+import com.homeaid.service.ReservationService;
 import com.homeaid.service.ReservationServiceImpl;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -40,7 +44,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Tag(name = "Reservation", description = "예약 관련 API")
 public class ReservationController {
 
-  private final ReservationServiceImpl reservationService;
+  private final ReservationService reservationService;
 
   @PostMapping
   @Operation(summary = "예약 생성", description = "고객이 예약 옵션을 선택하여 예약을 생성합니다.")
@@ -123,14 +127,14 @@ public class ReservationController {
   @Operation(summary = "예약 전체 조회", description = "페이지네이션 기반으로 예약 목록을 조회합니다.")
   public ResponseEntity<CommonApiResponse<PagedResponseDto<ReservationResponseDto>>> getReservationsList(
       @RequestParam(value = "page", defaultValue = "0") int page,
-      @RequestParam(value = "size", defaultValue = "10") int size
+      @RequestParam(value = "size", defaultValue = "10") int size,
+      @RequestParam(value = "status", required = false) ReservationStatus status
   ) {
     Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdDate"));
 
-    Page<Reservation> reservations = reservationService.getReservations(pageable);
+    Page<ReservationResponseDto> reservations = reservationService.getReservations(pageable, status);
 
-    PagedResponseDto<ReservationResponseDto> response = PagedResponseDto.fromPage(reservations,
-        ReservationResponseDto::toDto);
+    PagedResponseDto<ReservationResponseDto> response = PagedResponseDto.fromPage(reservations);
     return ResponseEntity.ok(CommonApiResponse.success(response));
   }
 

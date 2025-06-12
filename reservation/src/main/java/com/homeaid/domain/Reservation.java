@@ -44,7 +44,7 @@ public class Reservation {
   private Integer totalDuration;
 
   @Enumerated(EnumType.STRING)
-  @Column(nullable = false)
+  @Column(name = "status", nullable = false)
   private ReservationStatus status = REQUESTED;
 
   private Long customerId;
