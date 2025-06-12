@@ -46,3 +46,11 @@ springdoc:
     # 문서를 로드할때 기본적으로 API가 모두 접힌 상태로 설정
     # list: 태그만 펼침, full: 모든 API 펼침
     doc-expansion: none
+server:
+  forward-headers-strategy: native
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
