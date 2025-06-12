@@ -4,10 +4,12 @@ import com.homeaid.domain.Customer;
 import com.homeaid.domain.Manager;
 import com.homeaid.domain.User;
 import com.homeaid.dto.request.SignInRequestDto;
+import com.homeaid.dto.request.UserUpdateRequestDto;
 import com.homeaid.exception.CustomException;
 import com.homeaid.exception.UserErrorCode;
 import com.homeaid.repository.UserRepository;
 import com.homeaid.security.token.JwtTokenProvider;
+import org.springframework.transaction.annotation.Transactional;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -63,5 +65,13 @@ public class UserServiceImpl implements UserService {
         }
 
         return jwtTokenProvider.createJwt(user.get().getId(), user.get().getRole().name());
+    }
+
+    @Transactional
+    public void updateUserInfo(Long userId, UserUpdateRequestDto dto) {
+        User user = userRepository.findById(userId)
+            .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
+
+        user.updateInfo(dto.getName(), dto.getEmail(), dto.getPhone());
     }
 }
