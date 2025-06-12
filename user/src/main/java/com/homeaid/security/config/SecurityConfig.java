@@ -9,6 +9,7 @@ import java.util.Arrays;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -31,7 +32,7 @@ public class SecurityConfig {
   private final JwtTokenProvider jwtTokenProvider;
   private final RefreshTokenFilter refreshTokenFilter;
 
-  private final String[] allowUrls = {"/", "/api/v1/users/signup/**", "/api/v1/swagger/users/**", "/api/v1/auth/**"};
+  private final String[] allowUrls = {"/", "/actuator/health",  "/api/v1/users/signup/**", "/api/v1/swagger/users/**", "/api/v1/auth/**"};
   private final String[] swaggerUrls = {"/swagger-ui/**", "/v3/api-docs/**", "/swagger-resources/**", "/swagger-resources",
       "/configuration/ui", "/configuration/security", "/webjars/**"};
 
@@ -53,6 +54,7 @@ public class SecurityConfig {
 
     http
         .authorizeHttpRequests((auth) -> auth
+		.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                 .requestMatchers(allowUrls).permitAll()
                 .requestMatchers(swaggerUrls).permitAll()
 //            .requestMatchers("/api/v1/admin").hasRole("ADMIN") // ex. 관리자 권한 가진 사용자만 접근 가능
@@ -90,10 +92,17 @@ public class SecurityConfig {
   public CorsConfigurationSource corsConfigurationSource() {
     CorsConfiguration configuration = new CorsConfiguration();
 
-    // TODO 배포 후 https로 바꾸면 보안 설정 추가해야 함
-    // 프론트엔드 도메인 허용
-    configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000")); // React 개발 서버
-    configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS")); // 허용할 HTTP 메서드
+    // 🔑 배포환경 도메인 추가
+    configuration.setAllowedOrigins(Arrays.asList(
+        "http://localhost:3000", 
+        "https://kbe-5-home-aid-fe.vercel.app", 
+        "https://homeaid-service.com"
+    ));
+
+    // 🔑 허용할 HTTP 메서드
+    configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
+
+    // 🔑 허용할 헤더
     configuration.setAllowedHeaders(Arrays.asList(
         "Authorization",
         "Content-Type",
@@ -102,16 +111,17 @@ public class SecurityConfig {
         "Origin",
         "Access-Control-Request-Method",
         "Access-Control-Request-Headers"
-    )); // 허용할 헤더
-    configuration.setExposedHeaders(Arrays.asList("Authorization")); // localStorage에 저장
+    ));
 
-    configuration.setAllowCredentials(true); // 쿠키 허용
-    configuration.setMaxAge(3600L); // preflight 요청의 캐시 시간 (초)
+    // 🔑 응답 헤더 중 노출할 것들
+    configuration.setExposedHeaders(Arrays.asList("Authorization"));
+
+    configuration.setAllowCredentials(true);
+    configuration.setMaxAge(3600L);
 
     UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
     source.registerCorsConfiguration("/**", configuration);
 
     return source;
-  }
-
+  }	
 }
