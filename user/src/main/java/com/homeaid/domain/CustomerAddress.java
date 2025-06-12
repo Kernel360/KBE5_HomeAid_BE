@@ -33,9 +33,22 @@ public class CustomerAddress {
 
   private String addressDetail;
 
+  private Double latitude;
+
+  private Double longitude;
+
   @Builder
-  public CustomerAddress(String address, String addressDetail) {
+  public CustomerAddress(String address, String addressDetail, Double latitude, Double longitude) {
     this.address = address;
     this.addressDetail = addressDetail;
+    this.latitude = latitude;
+    this.longitude = longitude;
+  }
+
+  public void updateAddressInfo(String address, String addressDetail, Double latitude, Double longitude) {
+    this.address = address;
+    this.addressDetail = addressDetail;
+    this.latitude = latitude;
+    this.longitude = longitude;
   }
 }

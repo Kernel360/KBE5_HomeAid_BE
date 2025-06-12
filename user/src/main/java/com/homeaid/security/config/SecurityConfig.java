@@ -6,6 +6,8 @@ import com.homeaid.security.filter.AccessTokenFilter;
 import com.homeaid.security.filter.JwtAuthenticationFilter;
 import com.homeaid.security.token.JwtTokenProvider;
 import java.util.Arrays;
+import static org.springframework.security.config.Customizer.withDefaults;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -50,7 +52,7 @@ public class SecurityConfig {
         .httpBasic(AbstractHttpConfigurer::disable)
         .cors((cors) -> cors.configurationSource(corsConfigurationSource())) // CORS 설정 적용
         .sessionManagement((session) -> session
-            .sessionCreationPolicy(SessionCreationPolicy.STATELESS)); // 세션 비활성화
+            .sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
     http
         .authorizeHttpRequests((auth) -> auth
@@ -103,6 +105,10 @@ public class SecurityConfig {
     configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
 
     // 🔑 허용할 헤더
+    // TODO 배포 후 https로 바꾸면 보안 설정 추가해야 함
+    // 프론트엔드 도메인 허용
+    configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000")); // React 개발 서버
+    configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS")); // 허용할 HTTP 메서드
     configuration.setAllowedHeaders(Arrays.asList(
         "Authorization",
         "Content-Type",

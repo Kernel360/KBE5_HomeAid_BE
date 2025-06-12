@@ -17,6 +17,8 @@ import com.homeaid.repository.ReservationRepository;
 import java.time.LocalTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -67,6 +69,7 @@ public class MatchingServiceImpl implements MatchingService {
           throw new CustomException(MatchingErrorCode.MEMO_REQUIRED_FOR_REJECTION);
         }
         matching.rejectByManager(memo);
+        matching.getReservation().failedMatching();
       }
     }
 
@@ -74,25 +77,27 @@ public class MatchingServiceImpl implements MatchingService {
 
   @Override
   @Transactional
-  public void respondToMatchingAsCustomer(Long userId, Long matchingId,
+  public void respondToMatchingAsCustomer(Long userId, Long reservationId,
       CustomerAction action, String memo) {
-    Matching matching = matchingRepository.findById(matchingId)
+    Reservation reservation = reservationRepository.findById(reservationId).orElseThrow(() -> new CustomException(ReservationErrorCode.RESERVATION_NOT_FOUND));
+
+    Matching matching = matchingRepository.findById(reservation.getFinalMatchingId())
         .orElseThrow(() -> new CustomException(MatchingErrorCode.MATCHING_NOT_FOUND));
 
     switch (action) {
       case CONFIRM -> {
-        Reservation reservation = matching.getReservation();
         if (!reservation.getCustomerId().equals(userId)) {
           throw new CustomException(MatchingErrorCode.UNAUTHORIZED_MATCHING_ACCESS);
         }
         matching.confirmByCustomer();
-        reservation.confirmMatching(matchingId);
+        reservation.confirmMatching(matching.getManager().getId());
       }
       case REJECT -> {
         if (memo == null || memo.isBlank()) {
           throw new CustomException(MatchingErrorCode.MEMO_REQUIRED_FOR_REJECTION);
         }
         matching.rejectByCustomer(memo);
+        matching.getReservation().failedMatching();
       }
     }
   }
@@ -116,7 +121,27 @@ public class MatchingServiceImpl implements MatchingService {
 
   }
 
+  // 매니저 매칭 전체 조회
+  @Override
+  public Page<Matching> getMatchingListByManager(Long userId, Pageable pageable) {
+    if (managerRepository.findById(userId).isEmpty()) {
+      throw new CustomException(UserErrorCode.MANAGER_NOT_FOUND);
+    }
+    return matchingRepository.findAllByManagerId(userId, pageable);
+  }
+
+  // 매니저 매칭 단건 조회
+  @Override
+  public Matching getMatchingByManager(Long matchingId, Long userId) {
+    if (managerRepository.findById(userId).isEmpty()) {
+      throw new CustomException(UserErrorCode.MANAGER_NOT_FOUND);
+    }
+    return matchingRepository.findById(matchingId).get();
+  }
+
+
   private int calculateNextMatchingRound(Long reservationId) {
     return matchingRepository.countByReservationId(reservationId) + 1;
   }
+
 }

@@ -81,6 +81,7 @@ public class Matching {
   public void acceptByManager() {
     this.managerStatus = MatchingStatus.ACCEPTED;
     this.status = MatchingStatus.ACCEPTED;
+    this.reservation.setFinalMatchingId(this.id);
   }
 
   public void rejectByManager(String memo) {
@@ -99,6 +100,7 @@ public class Matching {
     this.customerStatus = MatchingStatus.REJECTED;
     this.status = MatchingStatus.REJECTED;
     this.customerMemo = memo;
+    this.reservation.setFinalMatchingId(null);
   }
 
   public boolean isCompleted() {

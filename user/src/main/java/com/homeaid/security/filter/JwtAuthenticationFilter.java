@@ -54,6 +54,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     CustomUserDetails userDetails = (CustomUserDetails) authResult.getPrincipal();
     Long userId = userDetails.getUserId();
     String role = userDetails.getAuthorities().iterator().next().getAuthority();
+    String username = userDetails.getUser().getName();
 
     // AT & RT 생성
     String accessToken = jwtTokenProvider.createJwt(userId, role);
@@ -69,10 +70,11 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     // 응답 Body에 필요한 사용자 정보만 포함
     Map<String, Object> responseBody = Map.of(
         "userId", userId,
+        "username", username,
         "role", role
     );
 
-    response.setContentType("application/json");
+    response.setContentType("application/json; charset=UTF-8");
     new ObjectMapper().writeValue(response.getWriter(), responseBody);
   }
 

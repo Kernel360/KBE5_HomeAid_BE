@@ -20,6 +20,10 @@ public class WebConfig {
             )
             .allowedMethods("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")
             .allowCredentials(true);
+            .allowedOrigins("http://localhost:3000")
+            .allowedOrigins("http://localhost:3001")
+            .allowedMethods("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")
+            .allowCredentials(true); // 프론트에서 withCredentials 쓰는 경우
       }
     };
   }

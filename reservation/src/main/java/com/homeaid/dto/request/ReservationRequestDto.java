@@ -28,11 +28,27 @@ public class ReservationRequestDto {
   @Schema(description = "선택한 서비스 하위 옵션 ID", example = "3")
   private Long subOptionId;
 
+  @NotNull
+  @Schema(description = "선택한 서비스 총액", example = "30000")
+  private Integer totalPrice;
+
+  @NotNull
+  @Schema(description = "선택한 서비스 소요 시간(분)", example = "80")
+  private Integer totalDuration;
+
+  private Double latitude;
+
+  private Double longitude;
+
   public static Reservation toEntity(ReservationRequestDto reservationRequestDto, Long userId) {
     return Reservation.builder()
         .customerId(userId)
         .requestedDate(reservationRequestDto.getRequestedDate())
         .requestedTime(reservationRequestDto.getRequestedTime())
+        .latitude(reservationRequestDto.getLatitude())
+        .longitude(reservationRequestDto.getLongitude())
+        .totalPrice(reservationRequestDto.getTotalPrice())
+        .totalDuration(reservationRequestDto.getTotalDuration())
         .build();
   }
 

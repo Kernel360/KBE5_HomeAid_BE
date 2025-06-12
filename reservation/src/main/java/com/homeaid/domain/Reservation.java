@@ -11,6 +11,7 @@ import jakarta.persistence.EntityListeners;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToOne;
 import java.time.LocalDate;
@@ -20,6 +21,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -31,7 +33,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 public class Reservation {
 
   @Id
-  @GeneratedValue
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
   private LocalDate requestedDate;
@@ -43,18 +45,24 @@ public class Reservation {
   private Integer totalDuration;
 
   @Enumerated(EnumType.STRING)
-  @Column(nullable = false)
+  @Column(name = "status", nullable = false)
   private ReservationStatus status = REQUESTED;
 
   private Long customerId;
 
   private Long managerId;
 
+  @Setter
   private Long finalMatchingId;
 
   private Double latitude;
 
   private Double longitude;
+
+  private String address;
+
+  private String addressDetail;
+
 
   @Column(columnDefinition = "TEXT")
   private String customerMemo;
@@ -73,10 +81,16 @@ public class Reservation {
   private LocalDateTime deletedDate;
 
   @Builder
-  public Reservation(Long customerId, LocalDate requestedDate, LocalTime requestedTime) {
-    this.customerId = customerId;
+  public Reservation(LocalDate requestedDate, LocalTime requestedTime, Long customerId, Double latitude, Double longitude, String address, String addressDetail, Integer totalPrice, Integer totalDuration) {
     this.requestedDate = requestedDate;
     this.requestedTime = requestedTime;
+    this.customerId = customerId;
+    this.latitude = latitude;
+    this.longitude = longitude;
+    this.address = address;
+    this.addressDetail = addressDetail;
+    this.totalPrice = totalPrice;
+    this.totalDuration = totalDuration;
   }
 
   public void addItem(ServiceSubOption serviceSubOption) {
@@ -99,20 +113,21 @@ public class Reservation {
     }
   }
 
-
   public void updateStatusCompleted() {
     this.status = ReservationStatus.COMPLETED;
   }
-  
 
   public void updateStatusMatching() {
     this.status = ReservationStatus.MATCHING;
   }
 
-  public void confirmMatching(Long matchingId) {
+  public void confirmMatching(Long managerId) {
     this.status = ReservationStatus.MATCHED;
-    finalMatchingId = matchingId;
+    this.managerId = managerId;
+  }
 
+  public void failedMatching() {
+    this.status = ReservationStatus.REQUESTED;
   }
 }
 

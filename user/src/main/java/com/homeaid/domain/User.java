@@ -87,4 +87,9 @@ public class User {
     this.role = role;
   }
 
+  public void updateInfo(String name, String email, String phone) {
+    this.name = name;
+    this.email = email;
+  }
+
 }
