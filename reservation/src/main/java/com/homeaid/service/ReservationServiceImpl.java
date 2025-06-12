@@ -1,14 +1,28 @@
 package com.homeaid.service;
 
 
+import com.homeaid.domain.Customer;
+import com.homeaid.domain.Manager;
+import com.homeaid.domain.Matching;
 import com.homeaid.domain.Reservation;
 import com.homeaid.domain.ReservationItem;
 import com.homeaid.domain.enumerate.ReservationStatus;
+import com.homeaid.dto.response.ReservationResponseDto;
 import com.homeaid.exception.CustomException;
+import com.homeaid.exception.MatchingErrorCode;
 import com.homeaid.exception.ReservationErrorCode;
+import com.homeaid.exception.UserErrorCode;
+import com.homeaid.repository.CustomerRepository;
+import com.homeaid.repository.ManagerRepository;
+import com.homeaid.repository.MatchingRepository;
 import com.homeaid.repository.ReservationRepository;
 import com.homeaid.serviceoption.domain.ServiceSubOption;
 import com.homeaid.serviceoption.repository.ServiceSubOptionRepository;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -23,6 +37,12 @@ public class ReservationServiceImpl implements ReservationService {
 
   private final ServiceSubOptionRepository serviceSubOptionRepository;
 
+  private final CustomerRepository customerRepository;
+
+  private final ManagerRepository managerRepository;
+
+  private final MatchingRepository matchingRepository;
+
   @Override
   @Transactional
   public Reservation createReservation(Reservation reservation, Long serviceSubOptionId) {
@@ -34,9 +54,19 @@ public class ReservationServiceImpl implements ReservationService {
 
   @Override
   @Transactional(readOnly = true)
-  public Reservation getReservation(Long id) {
-    return reservationRepository.findById(id)
+  public ReservationResponseDto getReservation(Long id) {
+    Reservation reservation = reservationRepository.findById(id)
         .orElseThrow(() -> new CustomException(ReservationErrorCode.RESERVATION_NOT_FOUND));
+
+    Long finalMatchingId = reservation.getFinalMatchingId();
+
+    if (finalMatchingId != null) {
+      Matching matching = matchingRepository.findById(finalMatchingId)
+          .orElseThrow(() -> new CustomException(MatchingErrorCode.MATCHING_NOT_FOUND));
+      return ReservationResponseDto.toDto(reservation, matching.getStatus());
+    } else {
+      return ReservationResponseDto.toDto(reservation, null);
+    }
   }
 
   @Override
@@ -83,8 +113,43 @@ public class ReservationServiceImpl implements ReservationService {
 
   @Override
   @Transactional(readOnly = true)
-  public Page<Reservation> getReservations(Pageable pageable) {
-    return reservationRepository.findAll(pageable);
+  public Page<ReservationResponseDto> getReservations(Pageable pageable, ReservationStatus status) {
+    Page<Reservation> reservations = (status != null)
+        ? reservationRepository.findByStatus(status, pageable)
+        : reservationRepository.findAll(pageable);
+
+    // 고객 ID 모으기
+    List<Long> customerIds = reservations.stream()
+        .map(Reservation::getCustomerId)
+        .distinct()
+        .toList();
+
+    // 매니저 ID 모으기 (nullable 처리 필요)
+    List<Long> managerIds = reservations.stream()
+        .map(Reservation::getManagerId)
+        .filter(Objects::nonNull)
+        .distinct()
+        .toList();
+
+    // 일괄 조회
+    Map<Long, Customer> customerMap = customerRepository.findByIdIn(customerIds).stream()
+        .collect(Collectors.toMap(Customer::getId, Function.identity()));
+
+    Map<Long, Manager> managerMap = managerRepository.findByIdIn(managerIds).stream()
+        .collect(Collectors.toMap(Manager::getId, Function.identity()));
+
+    return reservations.map(reservation -> {
+      Customer customer = customerMap.get(reservation.getCustomerId());
+      if (customer == null) {
+        throw new CustomException(UserErrorCode.CUSTOMER_NOT_FOUND);
+      }
+
+      Manager manager = reservation.getManagerId() != null
+          ? managerMap.get(reservation.getManagerId())
+          : null;
+
+      return ReservationResponseDto.toDto(reservation, customer, manager);
+    });
   }
 
   @Override

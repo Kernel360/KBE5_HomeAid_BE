@@ -69,6 +69,7 @@ public class MatchingServiceImpl implements MatchingService {
           throw new CustomException(MatchingErrorCode.MEMO_REQUIRED_FOR_REJECTION);
         }
         matching.rejectByManager(memo);
+        matching.getReservation().failedMatching();
       }
     }
 
@@ -76,25 +77,27 @@ public class MatchingServiceImpl implements MatchingService {
 
   @Override
   @Transactional
-  public void respondToMatchingAsCustomer(Long userId, Long matchingId,
+  public void respondToMatchingAsCustomer(Long userId, Long reservationId,
       CustomerAction action, String memo) {
-    Matching matching = matchingRepository.findById(matchingId)
+    Reservation reservation = reservationRepository.findById(reservationId).orElseThrow(() -> new CustomException(ReservationErrorCode.RESERVATION_NOT_FOUND));
+
+    Matching matching = matchingRepository.findById(reservation.getFinalMatchingId())
         .orElseThrow(() -> new CustomException(MatchingErrorCode.MATCHING_NOT_FOUND));
 
     switch (action) {
       case CONFIRM -> {
-        Reservation reservation = matching.getReservation();
         if (!reservation.getCustomerId().equals(userId)) {
           throw new CustomException(MatchingErrorCode.UNAUTHORIZED_MATCHING_ACCESS);
         }
         matching.confirmByCustomer();
-        reservation.confirmMatching(matchingId, matching.getManager().getId());
+        reservation.confirmMatching(matching.getManager().getId());
       }
       case REJECT -> {
         if (memo == null || memo.isBlank()) {
           throw new CustomException(MatchingErrorCode.MEMO_REQUIRED_FOR_REJECTION);
         }
         matching.rejectByCustomer(memo);
+        matching.getReservation().failedMatching();
       }
     }
   }
@@ -140,4 +143,5 @@ public class MatchingServiceImpl implements MatchingService {
   private int calculateNextMatchingRound(Long reservationId) {
     return matchingRepository.countByReservationId(reservationId) + 1;
   }
+
 }

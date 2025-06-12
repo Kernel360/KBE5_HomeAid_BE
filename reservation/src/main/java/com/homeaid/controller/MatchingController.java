@@ -69,16 +69,16 @@ public class MatchingController {
     return ResponseEntity.ok().body(CommonApiResponse.success());
   }
 
-  @PatchMapping("/customer/matchings/{matchingId}/to-manager")
+  @PatchMapping("/customer/matchings/{reservationId}/to-manager")
   @Operation(summary = "고객 매칭 응답", description = "고객이 수락 또는 거절로 매칭에 응답합니다.")
   public ResponseEntity<CommonApiResponse<Void>> respondToMatching(
       @AuthenticationPrincipal CustomUserDetails user,
       @Parameter(description = "매칭 ID", required = true)
-      @PathVariable(name = "matchingId") Long matchingId,
+      @PathVariable(name = "reservationId") Long reservationId,
       @RequestBody @Valid MatchingCustomerResponseDto requestDto
   ) {
 
-    matchingService.respondToMatchingAsCustomer(user.getUserId(), matchingId, requestDto.getAction(),
+    matchingService.respondToMatchingAsCustomer(user.getUserId(), reservationId, requestDto.getAction(),
         requestDto.getMemo());
 
     return ResponseEntity.ok().body(CommonApiResponse.success());

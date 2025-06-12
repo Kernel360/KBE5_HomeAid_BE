@@ -95,7 +95,7 @@ public class SecurityConfig {
     // TODO 배포 후 https로 바꾸면 보안 설정 추가해야 함
     // 프론트엔드 도메인 허용
     configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000")); // React 개발 서버
-    configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")); // 허용할 HTTP 메서드
+    configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS")); // 허용할 HTTP 메서드
     configuration.setAllowedHeaders(Arrays.asList(
         "Authorization",
         "Content-Type",

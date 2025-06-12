@@ -15,7 +15,7 @@ public interface MatchingService {
 
   void respondToMatchingAsManager(Long userId, Long matchingId, ManagerAction action, String memo);
 
-  void respondToMatchingAsCustomer(Long userId, Long matchingId, CustomerAction action, String memo);
+  void respondToMatchingAsCustomer(Long userId, Long reservationId, CustomerAction action, String memo);
 
   List<Manager> recommendManagers(Long reservationId);
 
