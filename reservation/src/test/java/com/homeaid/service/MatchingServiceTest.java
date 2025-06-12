@@ -248,10 +248,12 @@ class MatchingServiceTest {
 
     Matching matching = mock(Matching.class);
     Manager manager = mock(Manager.class);
+    Reservation reservation = mock(Reservation.class); // ✅ Reservation mock 추가
 
     given(matchingRepository.findById(matchingId)).willReturn(Optional.of(matching));
     given(matching.getManager()).willReturn(manager);
     given(manager.getId()).willReturn(userId);
+    given(matching.getReservation()).willReturn(reservation); // ✅ 여기 설정 필수
 
     // when
     matchingService.respondToMatchingAsManager(userId, matchingId, ManagerAction.REJECT, memo);
@@ -259,5 +261,6 @@ class MatchingServiceTest {
     // then
     verify(matching).rejectByManager(memo);
     verify(matching, never()).acceptByManager();
+    verify(reservation).failedMatching(); // ✅ 호출 여부도 검증 가능
   }
 }
