@@ -93,6 +93,8 @@ public class ReservationResponseDto {
         .build();
   }
 
+  private String customerMemo;
+
   public static ReservationResponseDto toDto(Reservation reservation) {
     return ReservationResponseDto.builder()
         .reservationId(reservation.getId())
@@ -104,6 +106,9 @@ public class ReservationResponseDto {
         .managerId(reservation.getManagerId())
         .requestedDate(reservation.getRequestedDate())
         .requestedTime(reservation.getRequestedTime())
+            .address(reservation.getAddress())
+            .addressDetail(reservation.getAddressDetail())
+            .customerMemo(reservation.getCustomerMemo())
         .build();
   }
 }

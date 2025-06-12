@@ -43,6 +43,10 @@ public class MatchingResponseDto {
   @Schema(description = "고객 매칭 상태", example = "WAITING, CONFIRMED, REJECTED")
   private MatchingStatus customerStatus;
 
+  private MatchingStatus status;
+
+  private Long reservationId;
+
   public static MatchingResponseDto toDto(Matching matching) {
     return MatchingResponseDto.builder()
         .matchingId(matching.getId())
@@ -55,6 +59,8 @@ public class MatchingResponseDto {
         .customerRequest(matching.getReservation().getCustomerMemo())
         .managerStatus(matching.getStatus())
         .customerStatus(matching.getStatus())
+            .status(matching.getStatus())
+            .reservationId(matching.getReservation().getId())
         .build();
   }
 }

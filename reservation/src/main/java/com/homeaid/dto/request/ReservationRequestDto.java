@@ -47,6 +47,8 @@ public class ReservationRequestDto {
         .requestedTime(reservationRequestDto.getRequestedTime())
         .latitude(reservationRequestDto.getLatitude())
         .longitude(reservationRequestDto.getLongitude())
+        .totalPrice(reservationRequestDto.getTotalPrice())
+        .totalDuration(reservationRequestDto.getTotalDuration())
         .build();
   }
 
