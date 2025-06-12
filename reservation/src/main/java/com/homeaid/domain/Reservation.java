@@ -122,7 +122,10 @@ public class Reservation {
     this.status = ReservationStatus.MATCHED;
     this.managerId = managerId;
     finalMatchingId = matchingId;
+  }
 
+  public void failedMatching() {
+    this.status = ReservationStatus.REQUESTED;
   }
 }
 
