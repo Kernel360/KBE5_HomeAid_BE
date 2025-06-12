@@ -7,11 +7,8 @@ import com.homeaid.domain.Reservation;
 import com.homeaid.domain.enumerate.ReservationStatus;
 import com.homeaid.dto.request.ReservationRequestDto;
 import com.homeaid.dto.response.ReservationResponseDto;
-import com.homeaid.exception.CustomException;
-import com.homeaid.exception.ReservationErrorCode;
 import com.homeaid.security.user.CustomUserDetails;
 import com.homeaid.service.ReservationService;
-import com.homeaid.service.ReservationServiceImpl;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -76,8 +73,8 @@ public class ReservationController {
       @Parameter(description = "조회할 예약 ID", example = "1")
       @PathVariable(name = "reservationId") Long reservationId
   ) {
-    Reservation reservation = reservationService.getReservation(reservationId);
-    return ResponseEntity.ok(CommonApiResponse.success(ReservationResponseDto.toDto(reservation)));
+
+    return ResponseEntity.ok(CommonApiResponse.success(reservationService.getReservation(reservationId)));
   }
 
   @PutMapping("/{reservationId}")
