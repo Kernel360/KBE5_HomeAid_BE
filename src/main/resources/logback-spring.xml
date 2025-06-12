@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+    <property name="LOG_PATTERN"
+              value="%d{yyyy-MM-dd HH:mm:ss} %-5level %logger{50} - %msg%n"/>
+
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>${LOG_PATTERN}</pattern>
+            <charset>UTF-8</charset>
+        </encoder>
+    </appender>
+
+    <root level="info">
+        <appender-ref ref="CONSOLE"/>
+    </root>
+
+    <!-- Hibernate 바인딩 로그만 TRACE로 설정 -->
+    <logger name="org.hibernate.orm.jdbc.bind" level="TRACE"/>
+    <!-- 🔥 컨트롤러 메서드 호출 로그 -->
+    <logger name="com.homeaid.controller" level="DEBUG"/>
+
+    <!-- 🔥 서비스 메서드 호출 로그 -->
+    <logger name="com.homeaid.service" level="DEBUG"/>
+
+    <!-- 🔥 전체 애플리케이션 패키지 로그 -->
+    <logger name="com.homeaid" level="DEBUG"/>
+</configuration>
