@@ -21,6 +21,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -51,6 +52,7 @@ public class Reservation {
 
   private Long managerId;
 
+  @Setter
   private Long finalMatchingId;
 
   private Double latitude;
@@ -118,10 +120,9 @@ public class Reservation {
     this.status = ReservationStatus.MATCHING;
   }
 
-  public void confirmMatching(Long matchingId, Long managerId) {
+  public void confirmMatching(Long managerId) {
     this.status = ReservationStatus.MATCHED;
     this.managerId = managerId;
-    finalMatchingId = matchingId;
   }
 
   public void failedMatching() {

@@ -3,15 +3,18 @@ package com.homeaid.service;
 
 import com.homeaid.domain.Customer;
 import com.homeaid.domain.Manager;
+import com.homeaid.domain.Matching;
 import com.homeaid.domain.Reservation;
 import com.homeaid.domain.ReservationItem;
 import com.homeaid.domain.enumerate.ReservationStatus;
 import com.homeaid.dto.response.ReservationResponseDto;
 import com.homeaid.exception.CustomException;
+import com.homeaid.exception.MatchingErrorCode;
 import com.homeaid.exception.ReservationErrorCode;
 import com.homeaid.exception.UserErrorCode;
 import com.homeaid.repository.CustomerRepository;
 import com.homeaid.repository.ManagerRepository;
+import com.homeaid.repository.MatchingRepository;
 import com.homeaid.repository.ReservationRepository;
 import com.homeaid.serviceoption.domain.ServiceSubOption;
 import com.homeaid.serviceoption.repository.ServiceSubOptionRepository;
@@ -38,6 +41,8 @@ public class ReservationServiceImpl implements ReservationService {
 
   private final ManagerRepository managerRepository;
 
+  private final MatchingRepository matchingRepository;
+
   @Override
   @Transactional
   public Reservation createReservation(Reservation reservation, Long serviceSubOptionId) {
@@ -49,9 +54,19 @@ public class ReservationServiceImpl implements ReservationService {
 
   @Override
   @Transactional(readOnly = true)
-  public Reservation getReservation(Long id) {
-    return reservationRepository.findById(id)
+  public ReservationResponseDto getReservation(Long id) {
+    Reservation reservation = reservationRepository.findById(id)
         .orElseThrow(() -> new CustomException(ReservationErrorCode.RESERVATION_NOT_FOUND));
+
+    Long finalMatchingId = reservation.getFinalMatchingId();
+
+    if (finalMatchingId != null) {
+      Matching matching = matchingRepository.findById(finalMatchingId)
+          .orElseThrow(() -> new CustomException(MatchingErrorCode.MATCHING_NOT_FOUND));
+      return ReservationResponseDto.toDto(reservation, matching.getStatus());
+    } else {
+      return ReservationResponseDto.toDto(reservation, null);
+    }
   }
 
   @Override
