@@ -53,8 +53,10 @@ public class ReservationResponseDto {
   @Schema(description = "예약 시작 일시", example = "2025-06-15T14:00:00")
   private LocalDateTime startTime;
 
+  @Schema(description = "예약 고객 이름", example = "홍길동")
   private String customerName;
 
+  @Schema(description = "매칭된 매니저 이름", example = "김매니저")
   private String matchedManagerName;
 
   public static ReservationResponseDto toDto(Reservation reservation, Customer customer, Manager manager) {
