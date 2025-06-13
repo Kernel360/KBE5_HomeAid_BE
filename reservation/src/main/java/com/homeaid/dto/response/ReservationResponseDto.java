@@ -69,6 +69,10 @@ public class ReservationResponseDto {
         .totalPrice(reservation.getTotalPrice())
         .totalDuration(reservation.getTotalDuration())
         .subOptionName(reservation.getItem().getSubOptionName())
+            .address(reservation.getAddress())
+            .addressDetail(reservation.getAddressDetail())
+            .customerMemo(reservation.getCustomerMemo())
+
         .startTime(LocalDateTime.of(
             reservation.getRequestedDate(),
             reservation.getRequestedTime()
@@ -90,6 +94,9 @@ public class ReservationResponseDto {
         .requestedDate(reservation.getRequestedDate())
         .requestedTime(reservation.getRequestedTime())
         .matchingStatus(matchingStatus)
+        .address(reservation.getAddress())
+        .addressDetail(reservation.getAddressDetail())
+        .customerMemo(reservation.getCustomerMemo())
         .build();
   }
 
