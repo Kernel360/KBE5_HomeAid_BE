@@ -6,10 +6,10 @@ import org.springframework.data.domain.Pageable;
 
 public interface WorkLogService {
 
-  WorkLog createWorkLog(WorkLog workLog, Long reservationId, Double longitude, Double latitude);
+  WorkLog createWorkLog(Long userId, Long reservationId, Double longitude, Double latitude);
 
-  WorkLog updateWorkLogForCheckOut(WorkLog workLog, Long workLogId, Double longitude,
-      Double latitude);
+  void updateWorkLogForCheckOut(Long userId, Long reservationId,
+      Double longitude, Double latitude);
 
   Page<WorkLog> getAllWorkLogsByManager(Long userId, Pageable pageable);
 }

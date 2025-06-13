@@ -39,20 +39,15 @@ public class WorkLog {
 
 
     @Builder
-    public WorkLog(LocalDateTime checkInTime, LocalDateTime checkOutTime, WorkType workType, Long managerId) {
-        this.checkInTime = checkInTime;
-        this.checkOutTime = checkOutTime;
+    public WorkLog(WorkType workType, Long managerId, Reservation reservation) {
         this.workType = workType;
         this.managerId = managerId;
-    }
-
-    public void updateCheckOutTime(WorkLog workLog) {
-        this.checkOutTime = LocalDateTime.now();
-        this.workType = workLog.getWorkType();
-    }
-
-    public void assignReservation(Reservation reservation) {
         this.reservation = reservation;
+    }
+
+    public void updateCheckOut() {
+        this.checkOutTime = LocalDateTime.now();
+        this.workType = WorkType.CHECKOUT;
     }
 
 }

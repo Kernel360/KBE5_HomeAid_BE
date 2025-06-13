@@ -1,7 +1,5 @@
 package com.homeaid.dto.request;
 
-import com.homeaid.domain.WorkLog;
-import com.homeaid.domain.enumerate.WorkType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
@@ -19,16 +17,6 @@ public class CheckInRequestDto {
     private Double lng;
 
     @NotNull
-    @Schema(example = "1")
-    private Long managerId;
-
-    @NotNull
     private Long reservationId;
 
-    public static WorkLog toEntity(CheckInRequestDto checkInRequestDto) {
-        return WorkLog.builder()
-                .workType(WorkType.CHECKIN)
-                .managerId(checkInRequestDto.managerId)
-                .build();
-    }
 }

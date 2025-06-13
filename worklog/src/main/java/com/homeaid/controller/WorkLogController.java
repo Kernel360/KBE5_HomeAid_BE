@@ -37,16 +37,17 @@ public class WorkLogController {
       @ApiResponse(responseCode = "403", description = "예약 위치 범위 밖의 잘못된 요청")
   })
   public ResponseEntity<CommonApiResponse<CheckInResponseDto>> createCheckIn(
+      @AuthenticationPrincipal CustomUserDetails user,
       @RequestBody @Valid CheckInRequestDto checkInRequestDto) {
-    WorkLog workLog = workLogService.createWorkLog(CheckInRequestDto.toEntity(checkInRequestDto),
-        checkInRequestDto.getReservationId(), checkInRequestDto.getLat(),
+
+    WorkLog workLog = workLogService.createWorkLog(user.getUserId(), checkInRequestDto.getReservationId(), checkInRequestDto.getLat(),
         checkInRequestDto.getLng());
 
     return ResponseEntity.status(HttpStatus.CREATED)
         .body(CommonApiResponse.success(CheckInResponseDto.toDto(workLog)));
   }
 
-  @PatchMapping
+  @PatchMapping("/{reservationId}")
   @Operation(summary = "체크아웃 요청", description = "매니저의 예약건에 대한 체크아웃 요청")
   @ApiResponses({
       @ApiResponse(responseCode = "200", description = "체크아웃 성공"),
@@ -55,9 +56,11 @@ public class WorkLogController {
       @ApiResponse(responseCode = "403", description = "예약 위치 범위 밖의 잘못된 요청")
   })
   public ResponseEntity<CommonApiResponse<Void>> updateWorkLogForCheckOut(
+      @AuthenticationPrincipal CustomUserDetails user,
+      @PathVariable(name = "reservationId") Long reservationId,
       @RequestBody @Valid CheckOutRequestDto checkOutRequestDto) {
-    workLogService.updateWorkLogForCheckOut(CheckOutRequestDto.toEntity(checkOutRequestDto),
-        checkOutRequestDto.getWorkLogId(), checkOutRequestDto.getLat(),
+
+    workLogService.updateWorkLogForCheckOut(user.getUserId(), reservationId, checkOutRequestDto.getLat(),
         checkOutRequestDto.getLng());
 
     return ResponseEntity.ok(CommonApiResponse.success());
