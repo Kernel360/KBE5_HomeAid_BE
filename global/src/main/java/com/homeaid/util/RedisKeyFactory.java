@@ -2,11 +2,11 @@ package com.homeaid.util;
 
 public class RedisKeyFactory {
 
-  public static String refreshTokenKey(String username) {
-    return "RT:" + username;
+  public static String buildeRefreshTokenKey(Long userId) {
+    return "RT:" + userId;
   }
 
-  public static String blacklistTokenKey(String accessToken) {
+  public static String buildBlacklistTokenKey(String accessToken) {
     return "BL:" + accessToken;
   }
 }
