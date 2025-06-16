@@ -71,6 +71,13 @@ pipeline {
                 else
                     echo "이미지 없음 → 삭제 생략"
                 fi
+                echo "🧽 Dangling 이미지 정리"
+                DANGLING_IDS=\$(docker images -f "dangling=true" -q)
+                if [ ! -z "\$DANGLING_IDS" ]; then
+                    docker rmi \$DANGLING_IDS || true
+                else
+                    echo "Dangling 이미지 없음"
+                fi
                 """
             }
         }
