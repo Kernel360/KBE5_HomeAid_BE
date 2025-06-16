@@ -61,9 +61,9 @@ pipeline {
         }
 
         stage('Stop and Remove Backend Container & Image') {
-            when {
-                expression { env.BRANCH_NAME == 'dev' }
-            }
+            // when {
+            //     expression { env.BRANCH_NAME == 'dev' }
+            // }
             steps {
                 sh """
                 docker stop backend-app || true
@@ -87,9 +87,9 @@ pipeline {
         }
 
         stage('Build & Run via Docker Compose') {
-            when {
-                    expression { env.BRANCH_NAME == 'dev' }
-                }
+            // when {
+            //         expression { env.BRANCH_NAME == 'dev' }
+            //     }
             steps {
                 sh """
                 docker-compose build backend
