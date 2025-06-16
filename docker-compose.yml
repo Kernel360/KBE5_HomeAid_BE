@@ -15,6 +15,7 @@ services:
       - ci-network
 
   backend:
+    container_name: backend-app
     build:
       context: .
     ports:
