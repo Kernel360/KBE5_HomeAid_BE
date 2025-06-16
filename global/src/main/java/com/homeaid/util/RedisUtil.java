@@ -1,7 +1,7 @@
 package com.homeaid.util;
 
 import io.lettuce.core.RedisConnectionException;
-import java.util.concurrent.TimeUnit;
+import java.time.Duration;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.RedisConnectionFailureException;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -18,9 +18,9 @@ public class RedisUtil {
   }
 
   // 데이터 저장
-  public void save(String key, Object val, Long time, TimeUnit timeUnit) {
+  public void save(String key, Object val, Duration timeout) {
     try {
-      redisTemplate.opsForValue().set(key, val, time, timeUnit);
+      redisTemplate.opsForValue().set(key, val, timeout);
       log.debug("Redis 저장 성공 - Key: {}", key);
     } catch (RedisConnectionFailureException | RedisConnectionException e) {
       throw new RuntimeException("Redis 연결 실패", e);

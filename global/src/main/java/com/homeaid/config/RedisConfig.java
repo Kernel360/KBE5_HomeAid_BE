@@ -33,7 +33,6 @@ public class RedisConfig {
     if (password != null && !password.trim().isEmpty()) {
       config.setPassword(password);
     }
-
     return new LettuceConnectionFactory(config);
   }
 
