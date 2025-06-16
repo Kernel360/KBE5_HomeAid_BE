@@ -11,8 +11,7 @@ pipeline {
         DB_PASSWORD = 'root'
 
         IMAGE_NAME = 'homeaid-backend'
-        IMAGE_TAG = 'dev'
-        CONTAINER_NAME = 'backend-app'
+        IMAGE_TAG = 'latest'
     }
 
     tools {
@@ -64,7 +63,7 @@ pipeline {
             steps {
                 sh """
                 docker-compose stop backend || true
-                docker-compose rm -f backend || true
+                docker-compose rm backend || true
 
                 IMAGE_ID=\$(docker images -q ${IMAGE_NAME}:${IMAGE_TAG})
                 if [ ! -z "\$IMAGE_ID" ]; then
