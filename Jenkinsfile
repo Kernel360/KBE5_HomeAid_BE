@@ -62,8 +62,8 @@ pipeline {
         stage('Stop and Remove Backend Container & Image') {
             steps {
                 sh """
-                docker-compose stop backend || true
-                docker-compose rm backend || true
+                docker stop backend-app || true
+                docker rm backend-app || true
 
                 IMAGE_ID=\$(docker images -q ${IMAGE_NAME}:${IMAGE_TAG})
                 if [ ! -z "\$IMAGE_ID" ]; then
