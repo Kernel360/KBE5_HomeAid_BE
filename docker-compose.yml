@@ -14,7 +14,6 @@ services:
       - ci-network
 
   backend:
-    #   image: sangwjdev/homeaid-backend:latest
     container_name: backend-app
     build:
       context: .

@@ -9,6 +9,10 @@ pipeline {
         DB_NAME = 'homeaid_db'
         DB_USERNAME = 'homeaid_user'
         DB_PASSWORD = 'root'
+
+        IMAGE_NAME = 'homeaid-backend'
+        IMAGE_TAG = 'dev'
+        CONTAINER_NAME = 'backend-app'
     }
 
     tools {
@@ -24,11 +28,18 @@ pipeline {
 
         stage('Set Variables') {
             steps {
-                wrap([$class: 'BuildUser']) {
-                    script {
-                        env.BUILD_USER = "${env.BUILD_USER}"
-                        echo "Triggered by: ${env.BUILD_USER}"
-                    }
+                script {
+                    def author = sh(script: "git log -1 --pretty=format:'%an'", returnStdout: true).trim()
+                    def email = sh(script: "git log -1 --pretty=format:'%ae'", returnStdout: true).trim()
+                    def message = sh(script: "git log -1 --pretty=format:'%s'", returnStdout: true).trim()
+                    def hash = sh(script: "git rev-parse --short HEAD", returnStdout: true).trim()
+                    env.BUILD_USER = "${author} (${email})"
+                    env.GIT_COMMIT_MSG = message
+                    env.GIT_COMMIT_HASH = hash
+
+                    echo "📌 Commit by: ${env.BUILD_USER}"
+                    echo "📄 Message: ${env.GIT_COMMIT_MSG}"
+                    echo "🔗 Hash: ${env.GIT_COMMIT_HASH}"
                 }
             }
         }
@@ -48,47 +59,69 @@ pipeline {
                 }
             }
         }
+
+        stage('Stop and Remove Backend Container & Image') {
+            steps {
+                sh """
+                docker-compose stop backend || true
+                docker-compose rm -f backend || true
+
+                IMAGE_ID=\$(docker images -q ${IMAGE_NAME}:${IMAGE_TAG})
+                if [ ! -z "\$IMAGE_ID" ]; then
+                    docker rmi \$IMAGE_ID
+                else
+                    echo "이미지 없음 → 삭제 생략"
+                fi
+                """
+            }
+        }
+
+        stage('Build & Run via Docker Compose') {
+            steps {
+                sh """
+                docker-compose build backend
+                docker-compose up -d backend
+                """
+            }
+        }
     }
 
     post {
         success {
-            wrap([$class: 'BuildUser']) {
-                script {
-                    def message = """{
-                        "embeds": [{
-                            "title": "✅ CI 성공",
-                            "description": "**📦 Repository:** `${env.JOB_NAME}`\\n**🌿 Branch:** `${env.BRANCH_NAME}`\\n**👤 Triggered by:** `${env.BUILD_USER}`\\n[🔗 Jenkins 로그 확인하기](${env.BUILD_URL})",
-                            "color": 5763719
-                        }],
-                        "content": "✅ CI 통과: `${env.BRANCH_NAME}` 브랜치입니다!"
-                    }"""
-                    sh """
-                    curl -H "Content-Type: application/json" \
-                         -X POST \
-                         -d '${message}' \
-                         ${DISCORD_WEBHOOK}
-                    """
-                }
+            script {
+                def message = """{
+                    "embeds": [{
+                        "title": "✅ CI/CD 성공",
+                        "description": "**📦 Repository:** `${env.JOB_NAME}`\\n**🌿 Branch:** `${env.BRANCH_NAME}`\\n**🧑 Commit by:** `${env.BUILD_USER}`\\n**📝 Message:** ${env.GIT_COMMIT_MSG}\\n[🔗 Jenkins 로그 확인하기](${env.BUILD_URL})",
+                        "color": 5763719
+                    }],
+                    "content": "✅ CI/CD 완료: `${env.BRANCH_NAME}` 브랜치입니다!"
+                }"""
+                sh """
+                curl -H "Content-Type: application/json" \
+                     -X POST \
+                     -d '${message}' \
+                     ${DISCORD_WEBHOOK}
+                """
             }
         }
+
         failure {
-            wrap([$class: 'BuildUser']) {
-                script {
-                    def message = """{
-                        "embeds": [{
-                            "title": "❌ CI 실패",
-                            "description": "**📦 Repository:** `${env.JOB_NAME}`\\n**🌿 Branch:** `${env.BRANCH_NAME}`\\n**👤 Triggered by:** `${env.BUILD_USER}`\\n[🔗 Jenkins 로그 확인하기](${env.BUILD_URL})",
-                            "color": 16711680
-                        }],
-                        "content": "❗ CI 실패 발생: `${env.BRANCH_NAME}` 브랜치 확인해주세요!"
-                    }"""
-                    sh """
-                    curl -H "Content-Type: application/json" \
-                         -X POST \
-                         -d '${message}' \
-                         ${DISCORD_WEBHOOK}
-                    """
-                }
+            script {
+                def message = """{
+                    "embeds": [{
+                        "title": "❌ CI/CD 실패",
+                        "description": "**📦 Repository:** `${env.JOB_NAME}`\\n**🌿 Branch:** `${env.BRANCH_NAME}`\\n**🧑 Commit by:** `${env.BUILD_USER}`\\n**📝 Message:** ${env.GIT_COMMIT_MSG}\\n[🔗 Jenkins 로그 확인하기](${env.BUILD_URL})",
+                        "color": 16711680
+                    }],
+                    "content": "❗ 오류 발생: `${env.BRANCH_NAME}` 브랜치 확인 요망!"
+                }"""
+                sh """
+                curl -H "Content-Type: application/json" \
+                     -X POST \
+                     -d '${message}' \
+                     ${DISCORD_WEBHOOK}
+                """
             }
         }
     }
