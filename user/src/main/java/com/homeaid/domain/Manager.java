@@ -38,8 +38,8 @@ public class Manager extends User {
   @Column(name = "profile_image_s3_key") // 삭제를 위한 S3 키
   private String profileImageS3Key;
 
-  @Setter
-  private String documentUrl;
+  @OneToMany(mappedBy = "manager", cascade = CascadeType.ALL, orphanRemoval = true)
+  private List<ManagerDocument> documents = new ArrayList<>();
 
   private Boolean verified = false;
 
