@@ -1,7 +1,7 @@
 package com.homeaid.payment.controller;
 
 import com.homeaid.common.response.CommonApiResponse;
-import com.homeaid.dto.response.PaymentResponseDto;
+import com.homeaid.payment.dto.response.PaymentResponseDto;
 import com.homeaid.payment.service.AdminPaymentService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
