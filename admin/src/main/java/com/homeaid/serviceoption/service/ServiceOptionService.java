@@ -13,13 +13,6 @@ public interface ServiceOptionService {
 
   void deleteOption(Long optionId);
 
-  // 하위 옵션
-  ServiceSubOption createSubOption(Long optionId, ServiceSubOption serviceSubOption);
-
-  ServiceSubOption updateSubOption(Long subOptionId, ServiceSubOption serviceSubOption);
-
-  void deleteSubOption(Long subOptionId);
-
   // 전체 옵션 조회 (상위 + 하위)
   List<ServiceOption> getAllOptions();
 

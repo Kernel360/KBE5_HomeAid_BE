@@ -31,7 +31,7 @@ public class ServiceOptionServiceImpl implements ServiceOptionService {
     ServiceOption option = serviceOptionRepository.findById(optionId)
         .orElseThrow(() -> new CustomException(ServiceOptionErrorCode.OPTION_NOT_FOUND));
 
-    option.update(serviceOption.getName(), serviceOption.getDescription());
+    option.update(serviceOption.getName(), 20000);
     return serviceOptionRepository.save(option);
   }
 
@@ -42,42 +42,7 @@ public class ServiceOptionServiceImpl implements ServiceOptionService {
         .orElseThrow(() -> new CustomException(ServiceOptionErrorCode.OPTION_NOT_FOUND));
     serviceOptionRepository.delete(option);
   }
-
-  @Override
-  @Transactional
-  public ServiceSubOption createSubOption(Long optionId,
-      ServiceSubOption serviceSubOption) {
-    ServiceOption option = serviceOptionRepository.findById(optionId)
-        .orElseThrow(() -> new CustomException(ServiceOptionErrorCode.OPTION_NOT_FOUND));
-
-    option.addSubOption(serviceSubOption);
-    return serviceSubOptionRepository.save(serviceSubOption);
-  }
-
-  @Override
-  @Transactional
-  public ServiceSubOption updateSubOption(Long subOptionId,
-      ServiceSubOption serviceSubOption) {
-    ServiceSubOption subOption = serviceSubOptionRepository.findById(subOptionId)
-        .orElseThrow(() -> new CustomException(ServiceOptionErrorCode.SUB_OPTION_NOT_FOUND));
-
-    subOption.update(
-        serviceSubOption.getName(),
-        serviceSubOption.getDescription(),
-        serviceSubOption.getDurationMinutes(),
-        serviceSubOption.getBasePrice()
-    );
-
-    return subOption;
-  }
-
-  @Override
-  @Transactional
-  public void deleteSubOption(Long subOptionId) {
-    ServiceSubOption subOption = serviceSubOptionRepository.findById(subOptionId)
-        .orElseThrow(() -> new CustomException(ServiceOptionErrorCode.SUB_OPTION_NOT_FOUND));
-    serviceSubOptionRepository.delete(subOption);
-  }
+  
 
   @Override
   @Transactional(readOnly = true)

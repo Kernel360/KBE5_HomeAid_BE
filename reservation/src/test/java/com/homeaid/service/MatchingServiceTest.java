@@ -110,7 +110,6 @@ class MatchingServiceTest {
 
     ServiceOption serviceOption = ServiceOption.builder()
         .name("가사 서비스")
-        .description("집안일 전반")
         .build();
 
     ServiceSubOption subOption = ServiceSubOption.builder()
