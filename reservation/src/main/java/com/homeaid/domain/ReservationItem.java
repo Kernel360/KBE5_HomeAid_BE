@@ -1,6 +1,7 @@
 package com.homeaid.domain;
 
 
+import com.homeaid.serviceoption.domain.ServiceOption;
 import com.homeaid.serviceoption.domain.ServiceSubOption;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -29,11 +30,9 @@ public class ReservationItem {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
-  private String subOptionName;
+  private String serviceOptionName;
 
   private Integer basePrice;
-
-  private Integer duration;
 
   @Setter
   @OneToOne(fetch = FetchType.LAZY)
@@ -48,16 +47,14 @@ public class ReservationItem {
 
   private LocalDateTime deletedDate;
 
-  public ReservationItem(ServiceSubOption serviceSubOption) {
-    this.subOptionName = serviceSubOption.getName();
-    this.basePrice = serviceSubOption.getBasePrice();
-    this.duration = serviceSubOption.getDurationMinutes();
+  public ReservationItem(ServiceOption serviceOption) {
+    this.serviceOptionName = serviceOption.getName();
+    this.basePrice = serviceOption.getPrice();
   }
 
-  public void updateItem(ServiceSubOption subOption) {
-    this.subOptionName = subOption.getName();
-    this.basePrice = subOption.getBasePrice();
-    this.duration = subOption.getDurationMinutes();
+  public void updateItem(ServiceOption serviceOption) {
+    this.serviceOptionName = serviceOption.getName();
+    this.basePrice = serviceOption.getPrice();
   }
 
   public void softDelete() {

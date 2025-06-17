@@ -54,8 +54,7 @@ public class ReservationController {
       @RequestBody @Valid ReservationRequestDto reservationRequestDto) {
 
     Reservation reservation = reservationService.createReservation(
-        ReservationRequestDto.toEntity(reservationRequestDto, user.getUserId()),
-        reservationRequestDto.getSubOptionId());
+        ReservationRequestDto.toEntity(reservationRequestDto, user.getUserId()), reservationRequestDto.getOptionId());
 
     return ResponseEntity.status(HttpStatus.CREATED)
         .body(CommonApiResponse.success(ReservationResponseDto.toDto(reservation)));
@@ -74,7 +73,8 @@ public class ReservationController {
       @PathVariable(name = "reservationId") Long reservationId
   ) {
 
-    return ResponseEntity.ok(CommonApiResponse.success(reservationService.getReservation(reservationId)));
+    return ResponseEntity.ok(
+        CommonApiResponse.success(reservationService.getReservation(reservationId)));
   }
 
   @PutMapping("/{reservationId}")
@@ -129,7 +129,8 @@ public class ReservationController {
   ) {
     Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdDate"));
 
-    Page<ReservationResponseDto> reservations = reservationService.getReservations(pageable, status);
+    Page<ReservationResponseDto> reservations = reservationService.getReservations(pageable,
+        status);
 
     PagedResponseDto<ReservationResponseDto> response = PagedResponseDto.fromPage(reservations);
     return ResponseEntity.ok(CommonApiResponse.success(response));

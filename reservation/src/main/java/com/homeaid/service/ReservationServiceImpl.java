@@ -16,8 +16,9 @@ import com.homeaid.repository.CustomerRepository;
 import com.homeaid.repository.ManagerRepository;
 import com.homeaid.repository.MatchingRepository;
 import com.homeaid.repository.ReservationRepository;
+import com.homeaid.serviceoption.domain.ServiceOption;
 import com.homeaid.serviceoption.domain.ServiceSubOption;
-import com.homeaid.serviceoption.repository.ServiceSubOptionRepository;
+import com.homeaid.serviceoption.repository.ServiceOptionRepository;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -35,20 +36,19 @@ public class ReservationServiceImpl implements ReservationService {
 
   private final ReservationRepository reservationRepository;
 
-  private final ServiceSubOptionRepository serviceSubOptionRepository;
-
   private final CustomerRepository customerRepository;
 
   private final ManagerRepository managerRepository;
 
   private final MatchingRepository matchingRepository;
 
+  private final ServiceOptionRepository serviceOptionRepository;
+
   @Override
   @Transactional
-  public Reservation createReservation(Reservation reservation, Long serviceSubOptionId) {
-    ServiceSubOption serviceSubOption = serviceSubOptionRepository.findById(serviceSubOptionId)
-        .orElseThrow(() -> new CustomException(ReservationErrorCode.SERVICE_OPTION_NOT_FOUND));
-    reservation.addItem(serviceSubOption);
+  public Reservation createReservation(Reservation reservation, Long serviceOptionId) {
+    ServiceOption serviceOption = serviceOptionRepository.findById(serviceOptionId).orElseThrow(() -> new CustomException(ReservationErrorCode.RESERVATION_NOT_FOUND));
+    reservation.addItem(serviceOption);
     return reservationRepository.save(reservation);
   }
 

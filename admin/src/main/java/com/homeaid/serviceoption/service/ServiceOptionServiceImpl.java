@@ -2,10 +2,8 @@ package com.homeaid.serviceoption.service;
 
 import com.homeaid.exception.CustomException;
 import com.homeaid.serviceoption.domain.ServiceOption;
-import com.homeaid.serviceoption.domain.ServiceSubOption;
 import com.homeaid.serviceoption.exception.ServiceOptionErrorCode;
 import com.homeaid.serviceoption.repository.ServiceOptionRepository;
-import com.homeaid.serviceoption.repository.ServiceSubOptionRepository;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -16,7 +14,6 @@ import org.springframework.transaction.annotation.Transactional;
 public class ServiceOptionServiceImpl implements ServiceOptionService {
 
   private final ServiceOptionRepository serviceOptionRepository;
-  private final ServiceSubOptionRepository serviceSubOptionRepository;
 
   @Override
   @Transactional
@@ -42,7 +39,7 @@ public class ServiceOptionServiceImpl implements ServiceOptionService {
         .orElseThrow(() -> new CustomException(ServiceOptionErrorCode.OPTION_NOT_FOUND));
     serviceOptionRepository.delete(option);
   }
-  
+
 
   @Override
   @Transactional(readOnly = true)
