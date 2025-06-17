@@ -18,7 +18,6 @@ public class ServiceOptionServiceImpl implements ServiceOptionService {
   @Override
   @Transactional
   public ServiceOption createOption(ServiceOption serviceOption) {
-
     return serviceOptionRepository.save(serviceOption);
   }
 
