@@ -111,8 +111,8 @@ public class MatchingServiceImpl implements MatchingService {
     Weekday reservationWeekday = Weekday.from(reservation.getRequestedDate());
 
     LocalTime startTime = reservation.getRequestedTime();
-    Integer durationMinutes = reservation.getDuration();
-    LocalTime endTime = startTime.plusMinutes(durationMinutes);
+    Integer duration = reservation.getDuration();
+    LocalTime endTime = startTime.plusHours(duration);
 
     String optionName = reservation.getItem().getServiceOptionName();
 

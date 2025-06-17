@@ -109,12 +109,15 @@ class MatchingServiceTest {
 
     ServiceOption serviceOption = ServiceOption.builder()
         .name("가사 서비스")
+        .price(20000)
         .build();
 
     Reservation reservation = Reservation.builder()
         .customerId(1L)
         .requestedDate(LocalDate.of(2025, 6, 3))  // 화요일
         .requestedTime(LocalTime.of(14, 0))
+        .duration(2)
+        .totalPrice(serviceOption.getPrice())
         .build();
 
     List<Manager> managerList = List.of(
@@ -156,11 +159,13 @@ class MatchingServiceTest {
 
     given(reservationRepository.findById(reservationId))
         .willReturn(Optional.of(reservation));
-    given(managerRepository.findMatchingManagers(eq(Weekday.TUESDAY), any(), any(), eq("청소")))
+    given(managerRepository.findMatchingManagers(eq(Weekday.TUESDAY), any(), any(), eq("가사 서비스")))
         .willReturn(managerList);
 
+    reservation.addItem(serviceOption);
+
     // when
-    List<Manager> result = matchingService.recommendManagers(reservationId);
+      List<Manager> result = matchingService.recommendManagers(reservationId);
 
     // then
     assertThat(result).hasSize(3);
