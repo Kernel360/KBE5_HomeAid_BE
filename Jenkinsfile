@@ -3,12 +3,16 @@ pipeline {
 
     environment {
         DISCORD_WEBHOOK = credentials('discord-webhook')
-        DB_DRIVER = 'mysql'
-        DB_HOST = 'mysql-ci'
-        DB_PORT = '3306'
-        DB_NAME = 'homeaid_db'
-        DB_USERNAME = 'homeaid_user'
-        DB_PASSWORD = 'root'
+        DB_DRIVER = credentials('DB_DRIVER')
+        DB_HOST = credentials('DB_HOST')
+        DB_PORT = credentials('DB_PORT')
+        DB_NAME = credentials('DB_NAME')
+        DB_USERNAME = credentials('DB_USERNAME')
+        DB_PASSWORD = credentials('DB_PASSWORD')
+
+        JWT_SECRET = credentials('JWT_SECRET')
+        ACCESS_TOKEN_EXPIRE_TIME = credentials('ACCESS_TOKEN_EXPIRE_TIME')
+        REFRESH_TOKEN_EXPIRE_TIME = credentials('REFRESH_TOKEN_EXPIRE_TIME')
 
         IMAGE_NAME = 'homeaid-backend'
         IMAGE_TAG = 'latest'
