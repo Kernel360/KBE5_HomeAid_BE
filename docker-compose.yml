@@ -20,6 +20,8 @@ services:
       context: .
     ports:
       - "8081:8080"  # 호스트포트:컨테이너포트 (Spring Boot 기본포트)
+    env_file:
+      - dev.env
     environment:
       - SPRING_PROFILES_ACTIVE=dev
       - DB_HOST=${DB_HOST}
