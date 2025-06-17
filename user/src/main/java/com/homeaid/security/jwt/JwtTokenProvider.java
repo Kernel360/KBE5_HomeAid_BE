@@ -52,6 +52,7 @@ public class JwtTokenProvider {
         .claim("userId", userId)
         .issuedAt(new Date(System.currentTimeMillis()))
         .expiration(new Date(System.currentTimeMillis() + refreshTokenExpirationMs))
+        .signWith(secretKey)
         .compact();
   }
 
@@ -79,7 +80,7 @@ public class JwtTokenProvider {
         .getExpiration()
         .before(new Date());
   }
-
+  // 토큰에서 남은 유효기간 추출
   public long getRemainingTime(String token) {
     Date expiration = Jwts.parser().verifyWith(secretKey).build()
         .parseSignedClaims(token)

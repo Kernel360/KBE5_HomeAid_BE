@@ -24,7 +24,7 @@ public class AuthController {
   }
 
   @PostMapping("/refresh/reissue")
-  public ResponseEntity<TokenResponse> reissue(@CookieValue("refreshToken") String refreshToken) {
+  public ResponseEntity<TokenResponse> reissue(@CookieValue("refresh_token") String refreshToken) {
     TokenResponse newTokens = authService.reissueToken(refreshToken);
     return ResponseEntity.ok(newTokens);
   }

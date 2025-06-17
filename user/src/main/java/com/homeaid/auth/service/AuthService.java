@@ -34,6 +34,7 @@ public class AuthService {
   }
 
   public TokenResponse reissueToken(String refreshToken) {
+
     if (refreshToken == null) {
       throw new CustomException(TokenErrorCode.REFRESH_TOKEN_MISSING);
     }

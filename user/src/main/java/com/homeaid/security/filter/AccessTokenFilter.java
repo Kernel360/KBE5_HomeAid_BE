@@ -39,7 +39,7 @@ public class AccessTokenFilter extends OncePerRequestFilter {
     String path = request.getRequestURI();
     return path.startsWith("/api/v1/users/signup")
         || path.startsWith("/api/v1/auth/signin")
-        || path.startsWith("/api/v1/auth/refresh");
+        || path.startsWith("/api/v1/auth/refresh/reissue");
   }
 
   @Override
