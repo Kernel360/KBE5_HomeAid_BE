@@ -20,14 +20,15 @@ services:
       context: .
     ports:
       - "8081:8080"  # 호스트포트:컨테이너포트 (Spring Boot 기본포트)
-    env_file:
-      - dev.env
     environment:
       - SPRING_PROFILES_ACTIVE=dev
       - DB_HOST=${DB_HOST}
       - DB_PORT=${DB_PORT}
       - DB_USERNAME=${DB_USERNAME}
       - DB_PASSWORD=${DB_PASSWORD}
+      - JWT_SECRET=${JWT_SECRET}
+      - ACCESS_TOKEN_EXPIRE_TIME=${ACCESS_TOKEN_EXPIRE_TIME}
+      - REFRESH_TOKEN_EXPIRE_TIME=${REFRESH_TOKEN_EXPIRE_TIME}
     restart: always
     networks:
       - ci-network
