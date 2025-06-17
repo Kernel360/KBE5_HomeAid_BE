@@ -5,6 +5,7 @@ import com.homeaid.domain.enumerate.GenderType;
 import com.homeaid.domain.enumerate.ManagerStatus;
 import com.homeaid.domain.enumerate.UserRole;
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -31,7 +32,11 @@ public class Manager extends User {
 
   private String experience;
 
-  private String profileImage;
+  @Column(name = "profile_image_url")
+  private String profileImageUrl;
+
+  @Column(name = "profile_image_s3_key") // 삭제를 위한 S3 키
+  private String profileImageS3Key;
 
   @Setter
   private String documentUrl;
@@ -48,11 +53,12 @@ public class Manager extends User {
 
   @Builder
   public Manager(String email, String password, String name, String phone, LocalDate birth,
-      GenderType gender, String career, String experience, String profileImage) {
+      GenderType gender, String career, String experience, String profileImageUrl, String profileImageS3Key) {
     super(email, password, name, phone, birth, gender, UserRole.MANAGER);
     this.career = career;
     this.experience = experience;
-    this.profileImage = profileImage;
+    this.profileImageUrl = profileImageUrl;
+    this.profileImageS3Key = profileImageS3Key;
   }
 
   public void approve() {
@@ -62,5 +68,10 @@ public class Manager extends User {
 
   public void changeStatus(ManagerStatus newStatus) {
     this.status = newStatus;
+  }
+
+  public void updateProfileImage(String imageUrl, String s3Key) {
+    this.profileImageUrl = imageUrl;
+    this.profileImageS3Key = s3Key;
   }
 }
