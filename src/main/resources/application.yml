@@ -4,6 +4,16 @@ spring:
   server:
     port: 8080
 
+  cloud:
+    aws:
+      credentials:
+        access-key: ${AWS_S3_ACCESS}
+        secret-key: ${AWS_S3_SECRET}
+      region:
+        static: ap-northeast-2
+      s3:
+        bucket: ${BUCKET_NAME}
+
   profiles:
     active: local
 
@@ -61,12 +71,3 @@ management:
       exposure:
         include: '*'
 
-cloud:
-  aws:
-    credentials:
-      access-key: ${AWS_S3_ACCESS}
-      secret-key: ${AWS_S3_SECRET}
-    region:
-      static: ap-northeast-2
-    s3:
-      bucket: ${BUCKET_NAME}
