@@ -60,3 +60,13 @@ management:
     web:
       exposure:
         include: '*'
+
+cloud:
+  aws:
+    credentials:
+      access-key: ${AWS_S3_ACCESS}
+      secret-key: ${AWS_S3_SECRET}
+    region:
+      static: ap-northeast-2
+    s3:
+      bucket: ${BUCKET_NAME}
