@@ -96,6 +96,17 @@ pipeline {
             when {
                     expression { env.BRANCH_NAME == 'dev' }
                 }
+           withEnv([
+                      "DB_DRIVER=${DB_DRIVER}",
+                      "DB_HOST=${DB_HOST}",
+                      "DB_PORT=${DB_PORT}",
+                      "DB_NAME=${DB_NAME}",
+                      "DB_USERNAME=${DB_USERNAME}",
+                      "DB_PASSWORD=${DB_PASSWORD}",
+                      "JWT_SECRET=${JWT_SECRET}",
+                      "ACCESS_TOKEN_EXPIRE_TIME=${ACCESS_TOKEN_EXPIRE_TIME}",
+                      "REFRESH_TOKEN_EXPIRE_TIME=${REFRESH_TOKEN_EXPIRE_TIME}"
+                  ])
             steps {
                 sh """
                 docker-compose build backend
