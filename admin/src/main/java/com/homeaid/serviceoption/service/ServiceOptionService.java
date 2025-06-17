@@ -1,7 +1,6 @@
 package com.homeaid.serviceoption.service;
 
 import com.homeaid.serviceoption.domain.ServiceOption;
-import com.homeaid.serviceoption.domain.ServiceSubOption;
 import java.util.List;
 
 public interface ServiceOptionService {
