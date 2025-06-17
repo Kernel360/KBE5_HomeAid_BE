@@ -1,7 +1,6 @@
 package com.homeaid.dto.request;
 
 import com.homeaid.domain.PaymentMethod;
-import com.homeaid.domain.PaymentStatus;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -23,5 +22,4 @@ public class PaymentRequestDto {
   @NotNull(message = "결제수단은 null이면 안됩니다!")
   private PaymentMethod paymentMethod;
 
-  private PaymentStatus status;
 }

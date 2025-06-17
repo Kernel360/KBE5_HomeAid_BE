@@ -1,0 +1,79 @@
+package com.homeaid.payment.service;
+
+import com.homeaid.domain.Payment;
+import com.homeaid.domain.PaymentStatus;
+import com.homeaid.domain.enumerate.ReservationStatus;
+import com.homeaid.dto.response.PaymentResponseDto;
+import com.homeaid.exception.CustomException;
+import com.homeaid.exception.PaymentErrorCode;
+import com.homeaid.repository.PaymentRepository;
+import jakarta.transaction.Transactional;
+import java.util.List;
+import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+
+@Service
+@RequiredArgsConstructor
+public class AdminPaymentServiceImpl implements AdminPaymentService {
+
+  private final PaymentRepository paymentRepository;
+
+  @Override
+  public PaymentResponseDto getPayment(Long paymentId) {
+    Payment payment = paymentRepository.findById(paymentId)
+        .orElseThrow(() -> new CustomException(PaymentErrorCode.PAYMENT_NOT_FOUND));
+    return PaymentResponseDto.toDto(payment);
+  }
+
+  @Override
+  @Transactional
+  public PaymentResponseDto refundPayment(Long paymentId) { // 전체환불
+    Payment payment = paymentRepository.findById(paymentId)
+        .orElseThrow(() -> new CustomException(PaymentErrorCode.PAYMENT_NOT_FOUND));
+
+    // 서비스가 완료된 예약만 환불 가능
+    if (payment.getReservation().getStatus() != ReservationStatus.COMPLETED) {
+      throw new CustomException(PaymentErrorCode.PAYMENT_REFUND_NOT_ALLOWED);
+    }
+
+    if (payment.getStatus() == PaymentStatus.REFUNDED) {
+      throw new CustomException(PaymentErrorCode.PAYMENT_ALREADY_REFUNDED);
+    }
+
+    payment.markRefunded();
+    return PaymentResponseDto.toDto(payment);
+  }
+
+  // TODO : 결제 도메인에 refundedAmount 추가했지만 아직 DB에 반영안됨. 추후 수정예정
+  @Override
+  @Transactional
+  public PaymentResponseDto partialRefund(Long paymentId, int refundAmount) {
+    Payment payment = paymentRepository.findById(paymentId)
+        .orElseThrow(() -> new CustomException(PaymentErrorCode.PAYMENT_NOT_FOUND));
+
+    if (payment.getReservation().getStatus() != ReservationStatus.COMPLETED) {
+      throw new CustomException(PaymentErrorCode.PAYMENT_REFUND_NOT_ALLOWED);
+    }
+
+    if (payment.getStatus() == PaymentStatus.REFUNDED) {
+      throw new CustomException(PaymentErrorCode.PAYMENT_ALREADY_REFUNDED);
+    }
+
+    payment.applyPartialRefund(refundAmount);
+    return PaymentResponseDto.toDto(payment);
+  }
+
+  @Override
+  public List<PaymentResponseDto> getAllPayments() {
+    return paymentRepository.findAll().stream()
+        .map(PaymentResponseDto::toDto).collect(Collectors.toList());
+  }
+
+  @Override
+  public List<PaymentResponseDto> getAllPaymentsByCustomer(Long customerId) {
+    return paymentRepository.findByCustomerId(customerId)
+        .stream().map(PaymentResponseDto::toDto).collect(Collectors.toList());
+  }
+
+}

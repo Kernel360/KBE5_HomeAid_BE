@@ -1,5 +1,7 @@
 package com.homeaid.domain;
 
+import com.homeaid.exception.CustomException;
+import com.homeaid.exception.PaymentErrorCode;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
@@ -48,5 +50,31 @@ public class Payment {
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "reservation_id")
   private Reservation reservation;
+
+  @Column(nullable = false)
+  private Integer refundedAmount = 0;  // 부분환불 누적 금액
+
+  public void markRefunded() {
+    this.status = PaymentStatus.REFUNDED;
+    this.refundedAmount = this.amount;
+  }
+
+  public void applyPartialRefund(int refundAmount) {
+    int total = this.refundedAmount + refundAmount;
+    if (total > this.amount) {
+      throw new CustomException(PaymentErrorCode.REFUND_AMOUNT_EXCEEDS_PAYMENT);
+    }
+    this.refundedAmount = total;
+    if (total == this.amount) {
+      this.status = PaymentStatus.REFUNDED;
+    } else {
+      this.status = PaymentStatus.PARTIAL_REFUNDED;
+    }
+  }
+
+  public void cancelPayment() {
+    this.status = PaymentStatus.CANCELED;
+    this.refundedAmount = this.amount;
+  }
 
 }

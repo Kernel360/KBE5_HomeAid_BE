@@ -4,13 +4,17 @@ import com.homeaid.domain.Payment;
 import java.time.LocalDateTime;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 @Repository
 public interface PaymentRepository extends JpaRepository<Payment, Long> {
 
-  // payment 에서 reservation - managerId 를 타고 결제일 paidAt 로 필터링
   List<Payment> findAllByReservation_ManagerIdAndPaidAtBetween(Long managerId, LocalDateTime start, LocalDateTime end);
+  boolean existsByReservationId(Long reservationId); // 중복 결제 방지
 
-  // boolean existsByReservationIdAndStatus(Long reservationId, PaymentStatus status);
+  @Query("SELECT p FROM Payment p WHERE p.reservation.customerId = :customerId")
+  List<Payment> findByCustomerId(@Param("customerId") Long customerId);
+
 }
