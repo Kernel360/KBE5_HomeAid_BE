@@ -4,6 +4,7 @@ services:
   jenkins:
     image: jenkins/jenkins:lts
     container_name: jenkins
+    user: root
     ports:
       - "8080:8080"
       - "50000:50000"
@@ -14,16 +15,22 @@ services:
       - ci-network
 
   backend:
-    #   image: sangwjdev/homeaid-backend:latest
     container_name: backend-app
     build:
       context: .
     ports:
       - "8081:8080"  # 호스트포트:컨테이너포트 (Spring Boot 기본포트)
     env_file:
-      - .env
+      - dev.env
     environment:
-      - SPRING_PROFILES_ACTIVE=dev
+      SPRING_PROFILES_ACTIVE: dev
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT}
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET}
+      ACCESS_TOKEN_EXPIRE_TIME: ${ACCESS_TOKEN_EXPIRE_TIME}
+      REFRESH_TOKEN_EXPIRE_TIME: ${REFRESH_TOKEN_EXPIRE_TIME}
     restart: always
     networks:
       - ci-network

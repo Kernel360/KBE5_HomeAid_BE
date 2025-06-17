@@ -3,12 +3,19 @@ pipeline {
 
     environment {
         DISCORD_WEBHOOK = credentials('discord-webhook')
-        DB_DRIVER = 'mysql'
-        DB_HOST = 'mysql-ci'
-        DB_PORT = '3306'
-        DB_NAME = 'homeaid_db'
-        DB_USERNAME = 'homeaid_user'
-        DB_PASSWORD = 'root'
+        DB_DRIVER = credentials('DB_DRIVER')
+        DB_HOST = credentials('DB_HOST')
+        DB_PORT = credentials('DB_PORT')
+        DB_NAME = credentials('DB_NAME')
+        DB_USERNAME = credentials('DB_USERNAME')
+        DB_PASSWORD = credentials('DB_PASSWORD')
+
+        JWT_SECRET = credentials('JWT_SECRET')
+        ACCESS_TOKEN_EXPIRE_TIME = credentials('ACCESS_TOKEN_EXPIRE_TIME')
+        REFRESH_TOKEN_EXPIRE_TIME = credentials('REFRESH_TOKEN_EXPIRE_TIME')
+
+        IMAGE_NAME = 'homeaid-backend'
+        IMAGE_TAG = 'latest'
     }
 
     tools {
@@ -24,11 +31,18 @@ pipeline {
 
         stage('Set Variables') {
             steps {
-                wrap([$class: 'BuildUser']) {
-                    script {
-                        env.BUILD_USER = "${env.BUILD_USER}"
-                        echo "Triggered by: ${env.BUILD_USER}"
-                    }
+                script {
+                    def author = sh(script: "git log -1 --pretty=format:'%an'", returnStdout: true).trim()
+                    def email = sh(script: "git log -1 --pretty=format:'%ae'", returnStdout: true).trim()
+                    def message = sh(script: "git log -1 --pretty=format:'%s'", returnStdout: true).trim()
+                    def hash = sh(script: "git rev-parse --short HEAD", returnStdout: true).trim()
+                    env.BUILD_USER = "${author} (${email})"
+                    env.GIT_COMMIT_MSG = message
+                    env.GIT_COMMIT_HASH = hash
+
+                    echo "📌 Commit by: ${env.BUILD_USER}"
+                    echo "📄 Message: ${env.GIT_COMMIT_MSG}"
+                    echo "🔗 Hash: ${env.GIT_COMMIT_HASH}"
                 }
             }
         }
@@ -42,53 +56,91 @@ pipeline {
                     "DB_PORT=${DB_PORT}",
                     "DB_NAME=${DB_NAME}",
                     "DB_USERNAME=${DB_USERNAME}",
-                    "DB_PASSWORD=${DB_PASSWORD}"
+                    "DB_PASSWORD=${DB_PASSWORD}",
+                    "JWT_SECRET=${JWT_SECRET}",
+                    "ACCESS_TOKEN_EXPIRE_TIME=${ACCESS_TOKEN_EXPIRE_TIME}",
+                    "REFRESH_TOKEN_EXPIRE_TIME=${REFRESH_TOKEN_EXPIRE_TIME}"
                 ]) {
                     sh './gradlew clean build'
                 }
+            }
+        }
+
+        stage('Stop and Remove Backend Container & Image') {
+            when {
+                expression { env.BRANCH_NAME == 'dev' }
+            }
+            steps {
+                sh """
+                docker stop backend-app || true
+                docker rm backend-app || true
+
+                IMAGE_ID=\$(docker images -q ${IMAGE_NAME}:${IMAGE_TAG})
+                if [ ! -z "\$IMAGE_ID" ]; then
+                    docker rmi \$IMAGE_ID
+                else
+                    echo "이미지 없음 → 삭제 생략"
+                fi
+                echo "🧽 Dangling 이미지 정리"
+                DANGLING_IDS=\$(docker images -f "dangling=true" -q)
+                if [ ! -z "\$DANGLING_IDS" ]; then
+                    docker rmi \$DANGLING_IDS || true
+                else
+                    echo "Dangling 이미지 없음"
+                fi
+                """
+            }
+        }
+
+        stage('Build & Run via Docker Compose') {
+            when {
+                    expression { env.BRANCH_NAME == 'dev' }
+                }
+            steps {
+                sh """
+                docker-compose build backend
+                docker-compose up -d backend
+                """
             }
         }
     }
 
     post {
         success {
-            wrap([$class: 'BuildUser']) {
-                script {
-                    def message = """{
-                        "embeds": [{
-                            "title": "✅ CI 성공",
-                            "description": "**📦 Repository:** `${env.JOB_NAME}`\\n**🌿 Branch:** `${env.BRANCH_NAME}`\\n**👤 Triggered by:** `${env.BUILD_USER}`\\n[🔗 Jenkins 로그 확인하기](${env.BUILD_URL})",
-                            "color": 5763719
-                        }],
-                        "content": "✅ CI 통과: `${env.BRANCH_NAME}` 브랜치입니다!"
-                    }"""
-                    sh """
-                    curl -H "Content-Type: application/json" \
-                         -X POST \
-                         -d '${message}' \
-                         ${DISCORD_WEBHOOK}
-                    """
-                }
+            script {
+                def message = """{
+                    "embeds": [{
+                        "title": "✅ CI/CD 성공",
+                        "description": "**📦 Repository:** `${env.JOB_NAME}`\\n**🌿 Branch:** `${env.BRANCH_NAME}`\\n**🧑 Commit by:** `${env.BUILD_USER}`\\n**📝 Message:** ${env.GIT_COMMIT_MSG}\\n[🔗 Jenkins 로그 확인하기](${env.BUILD_URL})",
+                        "color": 5763719
+                    }],
+                    "content": "✅ CI/CD 완료: `${env.BRANCH_NAME}` 브랜치입니다!"
+                }"""
+                sh """
+                curl -H "Content-Type: application/json" \
+                     -X POST \
+                     -d '${message}' \
+                     ${DISCORD_WEBHOOK}
+                """
             }
         }
+
         failure {
-            wrap([$class: 'BuildUser']) {
-                script {
-                    def message = """{
-                        "embeds": [{
-                            "title": "❌ CI 실패",
-                            "description": "**📦 Repository:** `${env.JOB_NAME}`\\n**🌿 Branch:** `${env.BRANCH_NAME}`\\n**👤 Triggered by:** `${env.BUILD_USER}`\\n[🔗 Jenkins 로그 확인하기](${env.BUILD_URL})",
-                            "color": 16711680
-                        }],
-                        "content": "❗ CI 실패 발생: `${env.BRANCH_NAME}` 브랜치 확인해주세요!"
-                    }"""
-                    sh """
-                    curl -H "Content-Type: application/json" \
-                         -X POST \
-                         -d '${message}' \
-                         ${DISCORD_WEBHOOK}
-                    """
-                }
+            script {
+                def message = """{
+                    "embeds": [{
+                        "title": "❌ CI/CD 실패",
+                        "description": "**📦 Repository:** `${env.JOB_NAME}`\\n**🌿 Branch:** `${env.BRANCH_NAME}`\\n**🧑 Commit by:** `${env.BUILD_USER}`\\n**📝 Message:** ${env.GIT_COMMIT_MSG}\\n[🔗 Jenkins 로그 확인하기](${env.BUILD_URL})",
+                        "color": 16711680
+                    }],
+                    "content": "❗ 오류 발생: `${env.BRANCH_NAME}` 브랜치 확인 요망!"
+                }"""
+                sh """
+                curl -H "Content-Type: application/json" \
+                     -X POST \
+                     -d '${message}' \
+                     ${DISCORD_WEBHOOK}
+                """
             }
         }
     }
