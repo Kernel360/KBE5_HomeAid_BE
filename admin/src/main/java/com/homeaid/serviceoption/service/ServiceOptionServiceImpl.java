@@ -27,7 +27,7 @@ public class ServiceOptionServiceImpl implements ServiceOptionService {
     ServiceOption option = serviceOptionRepository.findById(optionId)
         .orElseThrow(() -> new CustomException(ServiceOptionErrorCode.OPTION_NOT_FOUND));
 
-    option.update(serviceOption.getName(), 20000);
+    option.update(serviceOption.getName(), serviceOption.getPrice());
     return serviceOptionRepository.save(option);
   }
 

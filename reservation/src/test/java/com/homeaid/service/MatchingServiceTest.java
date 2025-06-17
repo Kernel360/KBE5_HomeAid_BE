@@ -22,7 +22,6 @@ import com.homeaid.repository.ManagerRepository;
 import com.homeaid.repository.MatchingRepository;
 import com.homeaid.repository.ReservationRepository;
 import com.homeaid.serviceoption.domain.ServiceOption;
-import com.homeaid.serviceoption.domain.ServiceSubOption;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
@@ -112,22 +111,11 @@ class MatchingServiceTest {
         .name("가사 서비스")
         .build();
 
-    ServiceSubOption subOption = ServiceSubOption.builder()
-        .name("청소")
-        .description("기본 청소 서비스")
-        .durationMinutes(90)
-        .basePrice(30000)
-        .option(serviceOption)
-        .build();
-
-
     Reservation reservation = Reservation.builder()
         .customerId(1L)
         .requestedDate(LocalDate.of(2025, 6, 3))  // 화요일
         .requestedTime(LocalTime.of(14, 0))
         .build();
-
-    reservation.addItem(subOption);
 
     List<Manager> managerList = List.of(
         new Manager(
