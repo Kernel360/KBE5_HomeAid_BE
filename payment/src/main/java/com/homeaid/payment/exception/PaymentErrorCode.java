@@ -1,12 +1,13 @@
-package com.homeaid.exception;
+package com.homeaid.payment.exception;
 
+import com.homeaid.exception.BaseErrorCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 
 @Getter
 @RequiredArgsConstructor
-public enum PaymentErrorCode implements BaseErrorCode{
+public enum PaymentErrorCode implements BaseErrorCode {
 
   PAYMENT_RESERVATION_NOT_FOUND(HttpStatus.NOT_FOUND, "PAYMENT_RESERVATION_NOT_FOUND", "예약이 존재하지 않습니다."),
   PAYMENT_INVALID_RESERVATION_STATUS(HttpStatus.BAD_REQUEST, "PAYMENT_INVALID_RESERVATION_STATUS", "예약 상태가 MATCHED 일 때만 결제할 수 있습니다."),

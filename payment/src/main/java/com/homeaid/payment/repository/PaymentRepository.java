@@ -1,6 +1,6 @@
-package com.homeaid.repository;
+package com.homeaid.payment.repository;
 
-import com.homeaid.domain.Payment;
+import com.homeaid.payment.domain.Payment;
 import java.time.LocalDateTime;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;

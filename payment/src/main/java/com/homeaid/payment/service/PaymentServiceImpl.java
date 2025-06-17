@@ -1,14 +1,14 @@
-package com.homeaid.service;
+package com.homeaid.payment.service;
 
-import com.homeaid.domain.Payment;
-import com.homeaid.domain.PaymentStatus;
+import com.homeaid.payment.domain.Payment;
+import com.homeaid.payment.domain.PaymentStatus;
 import com.homeaid.domain.Reservation;
 import com.homeaid.domain.enumerate.ReservationStatus;
-import com.homeaid.dto.request.PaymentRequestDto;
-import com.homeaid.dto.response.PaymentResponseDto;
+import com.homeaid.payment.dto.request.PaymentRequestDto;
+import com.homeaid.payment.dto.response.PaymentResponseDto;
 import com.homeaid.exception.CustomException;
-import com.homeaid.exception.PaymentErrorCode;
-import com.homeaid.repository.PaymentRepository;
+import com.homeaid.payment.exception.PaymentErrorCode;
+import com.homeaid.payment.repository.PaymentRepository;
 import com.homeaid.repository.ReservationRepository;
 import jakarta.transaction.Transactional;
 import java.time.LocalDateTime;

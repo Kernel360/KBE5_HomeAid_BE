@@ -1,10 +1,10 @@
-package com.homeaid.controller;
+package com.homeaid.payment.controller;
 
 import com.homeaid.common.response.CommonApiResponse;
-import com.homeaid.dto.request.PaymentRequestDto;
-import com.homeaid.dto.response.PaymentResponseDto;
+import com.homeaid.payment.dto.request.PaymentRequestDto;
+import com.homeaid.payment.dto.response.PaymentResponseDto;
 import com.homeaid.security.user.CustomUserDetails;
-import com.homeaid.service.PaymentService;
+import com.homeaid.payment.service.PaymentService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -22,7 +22,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController

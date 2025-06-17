@@ -1,7 +1,8 @@
-package com.homeaid.domain;
+package com.homeaid.payment.domain;
 
+import com.homeaid.domain.Reservation;
 import com.homeaid.exception.CustomException;
-import com.homeaid.exception.PaymentErrorCode;
+import com.homeaid.payment.exception.PaymentErrorCode;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;

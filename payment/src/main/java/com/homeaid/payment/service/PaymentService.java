@@ -1,7 +1,7 @@
-package com.homeaid.service;
+package com.homeaid.payment.service;
 
-import com.homeaid.dto.request.PaymentRequestDto;
-import com.homeaid.dto.response.PaymentResponseDto;
+import com.homeaid.payment.dto.request.PaymentRequestDto;
+import com.homeaid.payment.dto.response.PaymentResponseDto;
 import java.util.List;
 
 public interface PaymentService {

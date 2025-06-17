@@ -1,8 +1,8 @@
-package com.homeaid.dto.response;
+package com.homeaid.payment.dto.response;
 
-import com.homeaid.domain.Payment;
-import com.homeaid.domain.PaymentMethod;
-import com.homeaid.domain.PaymentStatus;
+import com.homeaid.payment.domain.Payment;
+import com.homeaid.payment.domain.PaymentMethod;
+import com.homeaid.payment.domain.PaymentStatus;
 import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
