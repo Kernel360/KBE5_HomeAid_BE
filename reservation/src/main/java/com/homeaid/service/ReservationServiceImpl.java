@@ -17,7 +17,6 @@ import com.homeaid.repository.ManagerRepository;
 import com.homeaid.repository.MatchingRepository;
 import com.homeaid.repository.ReservationRepository;
 import com.homeaid.serviceoption.domain.ServiceOption;
-import com.homeaid.serviceoption.domain.ServiceSubOption;
 import com.homeaid.serviceoption.repository.ServiceOptionRepository;
 import java.util.List;
 import java.util.Map;
@@ -72,7 +71,7 @@ public class ReservationServiceImpl implements ReservationService {
   @Override
   @Transactional
   public Reservation updateReservation(Long reservationId, Long userId, Reservation newReservation,
-      Long serviceSubOptionId) {
+      Long serviceOptionId) {
     Reservation originReservation = reservationRepository.findById(reservationId)
         .orElseThrow(() -> new CustomException(ReservationErrorCode.RESERVATION_NOT_FOUND));
 
@@ -84,14 +83,14 @@ public class ReservationServiceImpl implements ReservationService {
       throw new CustomException(ReservationErrorCode.RESERVATION_CANNOT_UPDATE);
     }
 
-    ServiceSubOption serviceSubOption = serviceSubOptionRepository.findById(serviceSubOptionId)
+    ServiceOption serviceOption = serviceOptionRepository.findById(serviceOptionId)
         .orElseThrow(() -> new CustomException(ReservationErrorCode.SERVICE_OPTION_NOT_FOUND));
 
-    originReservation.updateReservation(newReservation, serviceSubOption.getBasePrice(),
-        serviceSubOption.getDurationMinutes());
+    originReservation.updateReservation(newReservation, serviceOption.getPrice(),
+        newReservation.getDuration());
 
     ReservationItem item = originReservation.getItem();
-    item.updateItem(serviceSubOption);
+    item.updateItem(serviceOption);
 
     return originReservation;
   }

@@ -94,8 +94,7 @@ public class ReservationController {
     Reservation updated = reservationService.updateReservation(
         user.getUserId(),
         reservationId,
-        ReservationRequestDto.toEntity(reservationRequestDto),
-        reservationRequestDto.getSubOptionId());
+        ReservationRequestDto.toEntity(reservationRequestDto), reservationRequestDto.getOptionId());
 
     return ResponseEntity.ok(CommonApiResponse.success(ReservationResponseDto.toDto(updated)));
   }

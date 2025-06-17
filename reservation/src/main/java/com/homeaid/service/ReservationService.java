@@ -14,7 +14,7 @@ public interface ReservationService {
 
   ReservationResponseDto getReservation(Long reservationId);
 
-  Reservation updateReservation(Long reservationId, Long userId, Reservation reservation, Long serviceSubOptionId);
+  Reservation updateReservation(Long reservationId, Long userId, Reservation reservation, Long serviceOptionId);
 
   Page<ReservationResponseDto> getReservations(Pageable pageable, ReservationStatus status);
 
