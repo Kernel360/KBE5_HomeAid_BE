@@ -30,7 +30,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-  private final CustomUserDetailsService customUserDetailsService;
+
   private final JwtTokenProvider jwtTokenProvider;
   private final RefreshTokenService refreshTokenService;
   private final TokenBlacklistService tokenBlacklistService;
@@ -72,9 +72,14 @@ public class SecurityConfig {
 
     http
         .addFilterAt(signinFilter, UsernamePasswordAuthenticationFilter.class)
+<<<<<<< feat/117-managing-rt
         .addFilterBefore(new AccessTokenFilter(jwtTokenProvider, customUserDetailsService,
                 tokenBlacklistService),
             UsernamePasswordAuthenticationFilter.class);
+=======
+        .addFilterBefore(refreshTokenFilter, UsernamePasswordAuthenticationFilter.class)
+        .addFilterBefore(new AccessTokenFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class);
+>>>>>>> dev
 
     return http.build();
   }

@@ -1,13 +1,13 @@
 package com.homeaid.serviceoption.domain;
 
-import jakarta.persistence.CascadeType;
+import com.homeaid.serviceoption.converter.FeatureListConverter;
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -34,8 +34,12 @@ public class ServiceOption {
   @Column(length = 100, nullable = false)
   private String name;
 
+  @Convert(converter = FeatureListConverter.class)
   @Column(columnDefinition = "TEXT")
-  private String description;
+  private List<String> features = new ArrayList<>();
+
+  @Column(nullable = false)
+  private Integer price;
 
   @CreatedDate
   @Column(updatable = false)
@@ -44,26 +48,20 @@ public class ServiceOption {
   @LastModifiedDate
   private LocalDateTime updatedAt;
 
-  @OneToMany(mappedBy = "option", cascade = CascadeType.ALL, orphanRemoval = true)
-  private List<ServiceSubOption> subOptions = new ArrayList<>();
-
   @Builder
-  public ServiceOption(String name, String description) {
+  public ServiceOption(String name, List<String> features, Integer price) {
     this.name = name;
-    this.description = description;
+    this.features = features;
+    this.price = price;
   }
 
-  public void addSubOption(ServiceSubOption subOption) {
-    subOptions.add(subOption);
-    subOption.setOption(this);
-  }
 
-  public void update(String name, String description) {
+  public void update(String name, Integer price) {
     if (name != null && !name.isBlank()) {
       this.name = name;
     }
-    if (description != null) {
-      this.description = description;
+    if (price != null) {
+      this.price = price;
     }
   }
 }

@@ -12,23 +12,23 @@ import org.springframework.data.repository.query.Param;
 public interface ManagerRepository extends JpaRepository<Manager, Long> {
 
   @Query(value = """
-    SELECT DISTINCT m.*, u.*
-    FROM manager m
-    JOIN user u ON m.id = u.id
-    JOIN manager_availability a ON a.manager_id = m.id
-    JOIN manager_service_option s ON s.manager_id = m.id
-    JOIN service_sub_option sub ON sub.name = :subOptionName
-    WHERE a.weekday = :reservationWeekday
-      AND a.start_time <= :startTime
-      AND a.end_time >= :endTime
-      AND s.service_option_id = sub.option_id
-    LIMIT 10
-    """, nativeQuery = true)
+  SELECT DISTINCT m.*, u.*
+  FROM manager m
+  JOIN user u ON m.id = u.id
+  JOIN manager_availability a ON a.manager_id = m.id
+  JOIN manager_service_option s ON s.manager_id = m.id
+  JOIN service_option o ON s.service_option_id = o.id
+  WHERE a.weekday = :reservationWeekday
+    AND a.start_time <= :startTime
+    AND a.end_time >= :endTime
+    AND o.name = :optionName
+  LIMIT 10
+  """, nativeQuery = true)
   List<Manager> findMatchingManagers(
       @Param("reservationWeekday") Weekday reservationWeekday,
       @Param("startTime") LocalTime startTime,
       @Param("endTime") LocalTime endTime,
-      @Param("subOptionName") String subOptionName
+      @Param("optionName") String optionName
   );
 
   @Query("SELECT COUNT(m) FROM Manager m WHERE m.verified = true")

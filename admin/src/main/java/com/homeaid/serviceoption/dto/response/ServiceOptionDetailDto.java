@@ -19,14 +19,12 @@ public class ServiceOptionDetailDto {
   @Schema(description = "옵션 이름", example = "청소")
   private String name;
 
-  @Schema(description = "옵션 설명", example = "기본 청소 옵션")
-  private String description;
+
+
+
 
   @Schema(description = "등록일시", example = "2025-06-01T15:00:00")
   private LocalDateTime createdAt;
-
-  @Schema(description = "하위 옵션 목록")
-  private List<ServiceSubOptionResponseDto> subOptions;
 
   public static List<ServiceOptionDetailDto> toDto(List<ServiceOption> serviceOptionList) {
     return serviceOptionList.stream()
@@ -38,11 +36,7 @@ public class ServiceOptionDetailDto {
     return ServiceOptionDetailDto.builder()
         .id(option.getId())
         .name(option.getName())
-        .description(option.getDescription())
         .createdAt(option.getCreatedAt())
-        .subOptions(option.getSubOptions().stream()
-            .map(ServiceSubOptionResponseDto::toDto)
-            .collect(Collectors.toList()))
         .build();
   }
 }
