@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -29,7 +30,12 @@ public class AdminWithdrawalRequestController {
   @GetMapping
   @Operation(summary = "탈퇴 요청 목록 조회", description = "보류 상태(PENDING)의 탈퇴 요청들을 조회합니다.")
   @ApiResponse(responseCode = "200", description = "조회 성공")
-  public ResponseEntity<CommonApiResponse<List<UserWithdrawalResponseDto>>> getPendingRequests() {
+  public ResponseEntity<CommonApiResponse<List<UserWithdrawalResponseDto>>> getPendingRequests(
+      @Parameter(description = "페이지 번호 (0부터 시작)", example = "0")
+      @RequestParam(value = "page", defaultValue = "0") int page,
+      @Parameter(description = "페이지 크기", example = "10")
+      @RequestParam(value = "size", defaultValue = "10") int size
+  ) {
     List<UserWithdrawalRequest> requests = adminWithdrawalRequestService.getPendingRequests();
     List<UserWithdrawalResponseDto> response = requests.stream()
         .map(UserWithdrawalResponseDto::from)
