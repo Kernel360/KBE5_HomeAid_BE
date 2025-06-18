@@ -48,6 +48,9 @@ subprojects {
 		testImplementation("org.springframework.boot:spring-boot-starter-test")
 		testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 
+		// redis
+		implementation ("org.springframework.boot:spring-boot-starter-data-redis")
+
 		implementation ("org.springframework.boot:spring-boot-starter-security")
 		testImplementation ("org.springframework.security:spring-security-test")
 
