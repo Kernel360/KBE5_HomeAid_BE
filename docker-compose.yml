@@ -49,6 +49,7 @@ services:
 
 volumes:
   jenkins_home:
+  redis_data:
 
 networks:
   ci-network:
