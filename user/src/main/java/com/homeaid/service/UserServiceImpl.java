@@ -8,7 +8,7 @@ import com.homeaid.dto.request.UserUpdateRequestDto;
 import com.homeaid.exception.CustomException;
 import com.homeaid.exception.UserErrorCode;
 import com.homeaid.repository.UserRepository;
-import com.homeaid.security.token.JwtTokenProvider;
+import com.homeaid.security.jwt.JwtTokenProvider;
 import org.springframework.transaction.annotation.Transactional;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -64,7 +64,7 @@ public class UserServiceImpl implements UserService {
             throw new CustomException(UserErrorCode.LOGIN_FAILED);
         }
 
-        return jwtTokenProvider.createJwt(user.get().getId(), user.get().getRole().name());
+        return jwtTokenProvider.createAccessToken(user.get().getId(), user.get().getRole().name());
     }
 
     @Transactional
