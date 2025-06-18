@@ -7,7 +7,7 @@ import com.homeaid.payment.dto.response.PaymentResponseDto;
 import com.homeaid.exception.CustomException;
 import com.homeaid.payment.exception.PaymentErrorCode;
 import com.homeaid.payment.repository.PaymentRepository;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +20,7 @@ public class AdminPaymentServiceImpl implements AdminPaymentService {
   private final PaymentRepository paymentRepository;
 
   @Override
+  @Transactional(readOnly = true)
   public PaymentResponseDto getPayment(Long paymentId) {
     Payment payment = paymentRepository.findById(paymentId)
         .orElseThrow(() -> new CustomException(PaymentErrorCode.PAYMENT_NOT_FOUND));
@@ -65,12 +66,14 @@ public class AdminPaymentServiceImpl implements AdminPaymentService {
   }
 
   @Override
+  @Transactional(readOnly = true)
   public List<PaymentResponseDto> getAllPayments() {
     return paymentRepository.findAll().stream()
         .map(PaymentResponseDto::toDto).collect(Collectors.toList());
   }
 
   @Override
+  @Transactional(readOnly = true)
   public List<PaymentResponseDto> getAllPaymentsByCustomer(Long customerId) {
     return paymentRepository.findByCustomerId(customerId)
         .stream().map(PaymentResponseDto::toDto).collect(Collectors.toList());

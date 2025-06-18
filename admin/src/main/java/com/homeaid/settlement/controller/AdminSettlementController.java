@@ -5,6 +5,7 @@ import com.homeaid.settlement.domain.Settlement;
 import com.homeaid.settlement.dto.response.SettlementResponseDto;
 import com.homeaid.settlement.service.AdminSettlementService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -59,7 +60,11 @@ public class AdminSettlementController {
   public ResponseEntity<CommonApiResponse<List<SettlementResponseDto>>> getAllSettlements(
       @RequestParam(required = false) String status,
       @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate start,
-      @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate end) {
+      @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate end,
+      @Parameter(description = "페이지 번호 (0부터 시작)", example = "0")
+      @RequestParam(value = "page", defaultValue = "0") int page,
+      @Parameter(description = "페이지 크기", example = "10")
+      @RequestParam(value = "size", defaultValue = "10") int size) {
 
     List<Settlement> settlements = adminSettlementService.findAll(status, start, end);
     List<SettlementResponseDto> response = settlements.stream()
@@ -76,7 +81,11 @@ public class AdminSettlementController {
           content = @Content(schema = @Schema(implementation = SettlementResponseDto.class)))
   })
   public ResponseEntity<CommonApiResponse<List<SettlementResponseDto>>> getSettlementsByManager(
-      @PathVariable Long managerId) {
+      @PathVariable Long managerId,
+      @Parameter(description = "페이지 번호 (0부터 시작)", example = "0")
+      @RequestParam(value = "page", defaultValue = "0") int page,
+      @Parameter(description = "페이지 크기", example = "10")
+      @RequestParam(value = "size", defaultValue = "10") int size) {
 
     List<Settlement> settlements = adminSettlementService.findByManagerId(managerId);
     List<SettlementResponseDto> response = settlements.stream()

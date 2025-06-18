@@ -25,42 +25,48 @@ public class AdminSettlementServiceImpl implements AdminSettlementService {
 
   @Override
   public Settlement createWeeklySettlementForManager(Long managerId, LocalDate weekStart, LocalDate weekEnd) {
-
-    if (!managerRepository.existsById(managerId)) {
-      throw new CustomException(SettlementErrorCode.MANAGER_NOT_FOUND);
-    }
-
-    LocalDateTime start = weekStart.atStartOfDay();
-    LocalDateTime end = weekEnd.plusDays(1).atStartOfDay();
-
-    // 결제내역 조회
-    List<Payment> payments = paymentRepository.findAllByReservation_ManagerIdAndPaidAtBetween(managerId, start, end);
-
-    // TODO : 정산 가능한 결제만 필터링 (결제완료 + 서비스완료) 수정 필요
-    List<Payment> validPayments = payments.stream()
-        .filter(payment ->
-            payment.getStatus() == PaymentStatus.PAID &&
-                payment.getReservation().getStatus() == ReservationStatus.COMPLETED
-        ).toList();
+    validateManagerExists(managerId);
+    List<Payment> validPayments = getValidPaymentsForWeek(managerId, weekStart, weekEnd);
 
     if (validPayments.isEmpty()) {
       throw new CustomException(SettlementErrorCode.NO_PAYMENTS_FOUND);
     }
 
-    // 결제 금액 합산 (유효한 결제만)
+    return saveSettlement(validPayments, weekStart, weekEnd);
+  }
+
+  private void validateManagerExists(Long managerId) {
+    if (!managerRepository.existsById(managerId)) {
+      throw new CustomException(SettlementErrorCode.MANAGER_NOT_FOUND);
+    }
+  }
+
+  private List<Payment> getValidPaymentsForWeek(Long managerId, LocalDate weekStart, LocalDate weekEnd) {
+    LocalDateTime start = weekStart.atStartOfDay();
+    LocalDateTime end = weekEnd.plusDays(1).atStartOfDay();
+
+    List<Payment> payments = paymentRepository.findAllByReservation_ManagerIdAndPaidAtBetween(managerId, start, end);
+
+    // TODO : 정산 가능한 결제만 필터링 (결제완료 + 서비스완료) 수정 필요
+    return payments.stream()
+        .filter(payment ->
+            payment.getStatus() == PaymentStatus.PAID &&
+                payment.getReservation().getStatus() == ReservationStatus.COMPLETED
+        ).toList();
+  }
+
+  private Settlement saveSettlement(List<Payment> validPayments, LocalDate weekStart, LocalDate weekEnd) {
     int totalPaid = validPayments.stream()
         .mapToInt(Payment::getAmount)
         .sum();
 
-    // 매니저 몫(80%)만 계산해서 저장
     int managerAmount = (int) Math.round(totalPaid * 0.8);
-
-    Long extractedManagerId = validPayments.get(0).getReservation().getManagerId();
+    Long managerId = validPayments.get(0).getReservation().getManagerId();
 
     Settlement settlement = Settlement.builder()
-        .managerId(extractedManagerId)
+        .managerId(managerId)
         .totalAmount(totalPaid)
-        .managerSettlementPrice(managerAmount) // DB 에는 80%만 저장!
+        .managerSettlementPrice(managerAmount)
         .settlementWeekStart(weekStart)
         .settlementWeekEnd(weekEnd)
         .settledAt(LocalDateTime.now())

@@ -144,7 +144,7 @@ public class SwaggerConfig {
         .pathsToMatch("/api/v1/admin/**")
         .build();
   }
-
+  
   @Bean
   public GroupedOpenApi withdrawalAPI() {
     return GroupedOpenApi.builder()
