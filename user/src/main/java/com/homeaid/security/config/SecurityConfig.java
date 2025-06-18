@@ -5,7 +5,6 @@ import com.homeaid.auth.service.TokenBlacklistService;
 import com.homeaid.security.filter.AccessTokenFilter;
 import com.homeaid.security.filter.JwtAuthenticationFilter;
 import com.homeaid.security.jwt.JwtTokenProvider;
-import com.homeaid.security.user.CustomUserDetailsService;
 import java.util.Arrays;
 import java.util.Collections;
 import lombok.RequiredArgsConstructor;
@@ -29,7 +28,6 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
-
 
   private final JwtTokenProvider jwtTokenProvider;
   private final RefreshTokenService refreshTokenService;
@@ -72,14 +70,7 @@ public class SecurityConfig {
 
     http
         .addFilterAt(signinFilter, UsernamePasswordAuthenticationFilter.class)
-<<<<<<< feat/117-managing-rt
-        .addFilterBefore(new AccessTokenFilter(jwtTokenProvider, customUserDetailsService,
-                tokenBlacklistService),
-            UsernamePasswordAuthenticationFilter.class);
-=======
-        .addFilterBefore(refreshTokenFilter, UsernamePasswordAuthenticationFilter.class)
-        .addFilterBefore(new AccessTokenFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class);
->>>>>>> dev
+        .addFilterBefore(new AccessTokenFilter(jwtTokenProvider, tokenBlacklistService), UsernamePasswordAuthenticationFilter.class);
 
     return http.build();
   }
