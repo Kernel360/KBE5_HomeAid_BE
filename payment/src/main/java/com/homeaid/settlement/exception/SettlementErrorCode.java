@@ -1,5 +1,6 @@
-package com.homeaid.exception;
+package com.homeaid.settlement.exception;
 
+import com.homeaid.exception.BaseErrorCode;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

@@ -1,4 +1,4 @@
-package com.homeaid.domain;
+package com.homeaid.settlement.domain;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

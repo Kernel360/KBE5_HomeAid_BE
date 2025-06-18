@@ -1,7 +1,6 @@
-package com.homeaid.service;
+package com.homeaid.settlement.service;
 
-import com.homeaid.domain.Settlement;
-import com.homeaid.dto.response.SettlementResponseDto;
+import com.homeaid.settlement.domain.Settlement;
 import java.time.LocalDate;
 import java.util.List;
 

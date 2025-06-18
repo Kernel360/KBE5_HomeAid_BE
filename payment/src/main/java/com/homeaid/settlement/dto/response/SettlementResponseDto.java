@@ -1,6 +1,6 @@
-package com.homeaid.dto.response;
+package com.homeaid.settlement.dto.response;
 
-import com.homeaid.domain.Settlement;
+import com.homeaid.settlement.domain.Settlement;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import lombok.Builder;

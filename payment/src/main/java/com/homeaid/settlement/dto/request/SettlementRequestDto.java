@@ -1,4 +1,4 @@
-package com.homeaid.dto.request;
+package com.homeaid.settlement.dto.request;
 
 import java.time.LocalDate;
 import lombok.Builder;

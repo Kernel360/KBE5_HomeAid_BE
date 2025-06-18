@@ -1,12 +1,12 @@
-package com.homeaid.service;
+package com.homeaid.settlement.service;
 
-import com.homeaid.domain.Payment;
-import com.homeaid.domain.Settlement;
+import com.homeaid.payment.domain.Payment;
+import com.homeaid.payment.repository.PaymentRepository;
+import com.homeaid.settlement.domain.Settlement;
 import com.homeaid.exception.CustomException;
-import com.homeaid.exception.SettlementErrorCode;
+import com.homeaid.settlement.exception.SettlementErrorCode;
 import com.homeaid.repository.ManagerRepository;
-import com.homeaid.repository.PaymentRepository;
-import com.homeaid.repository.SettlementRepository;
+import com.homeaid.settlement.repository.SettlementRepository;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;

@@ -1,10 +1,10 @@
-package com.homeaid.controller;
+package com.homeaid.settlement.controller;
 
 import com.homeaid.common.response.CommonApiResponse;
-import com.homeaid.domain.Settlement;
-import com.homeaid.dto.request.SettlementRequestDto;
-import com.homeaid.dto.response.SettlementResponseDto;
-import com.homeaid.service.SettlementService;
+import com.homeaid.settlement.domain.Settlement;
+import com.homeaid.settlement.dto.request.SettlementRequestDto;
+import com.homeaid.settlement.dto.response.SettlementResponseDto;
+import com.homeaid.settlement.service.SettlementService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;

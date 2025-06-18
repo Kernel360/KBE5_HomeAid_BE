@@ -1,6 +1,6 @@
 package com.homeaid.settlement.controller;
 
-import com.homeaid.service.SettlementService;
+import com.homeaid.settlement.service.SettlementService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.time.LocalDate;
 import lombok.RequiredArgsConstructor;
