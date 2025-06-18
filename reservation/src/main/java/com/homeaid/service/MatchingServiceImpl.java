@@ -111,13 +111,13 @@ public class MatchingServiceImpl implements MatchingService {
     Weekday reservationWeekday = Weekday.from(reservation.getRequestedDate());
 
     LocalTime startTime = reservation.getRequestedTime();
-    Integer durationMinutes = reservation.getItem().getDuration();
-    LocalTime endTime = startTime.plusMinutes(durationMinutes);
+    Integer duration = reservation.getDuration();
+    LocalTime endTime = startTime.plusHours(duration);
 
-    String subOptionName = reservation.getItem().getSubOptionName();
+    String optionName = reservation.getItem().getServiceOptionName();
 
     // Todo: 매니저 통계 테이블 만든 후에 조회된 매니저의 리뷰 수, 별점 등도 같이 조회
-    return managerRepository.findMatchingManagers(reservationWeekday, startTime, endTime, subOptionName);
+    return managerRepository.findMatchingManagers(reservationWeekday, startTime, endTime, optionName);
 
   }
 
