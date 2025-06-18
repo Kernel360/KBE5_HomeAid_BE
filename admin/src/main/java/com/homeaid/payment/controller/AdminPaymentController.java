@@ -4,6 +4,7 @@ import com.homeaid.common.response.CommonApiResponse;
 import com.homeaid.payment.dto.response.PaymentResponseDto;
 import com.homeaid.payment.service.AdminPaymentService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -77,7 +78,12 @@ public class AdminPaymentController {
       @ApiResponse(responseCode = "200", description = "전체 결제 내역 조회 성공",
           content = @Content(schema = @Schema(implementation = PaymentResponseDto.class)))
   })
-  public ResponseEntity<CommonApiResponse<List<PaymentResponseDto>>> getAllPayments() {
+  public ResponseEntity<CommonApiResponse<List<PaymentResponseDto>>> getAllPayments(
+      @Parameter(description = "페이지 번호 (0부터 시작)", example = "0")
+      @RequestParam(value = "page", defaultValue = "0") int page,
+      @Parameter(description = "페이지 크기", example = "10")
+      @RequestParam(value = "size", defaultValue = "10") int size
+  ) {
     return ResponseEntity.ok(CommonApiResponse.success(adminPaymentService.getAllPayments()));
   }
 
