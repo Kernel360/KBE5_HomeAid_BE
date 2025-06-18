@@ -1,9 +1,9 @@
 package com.homeaid.util;
 
 import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
+import com.homeaid.common.response.S3UploadResponseDto;
 import com.homeaid.exception.CustomException;
 import com.homeaid.exception.ErrorCode;
 import java.io.IOException;
@@ -46,9 +46,9 @@ public class S3Service {
   }
 
   // 다중 파일 업로드
-  public List<String> uploadMultiFile(List<MultipartFile> multipartFile) {
+  public List<S3UploadResponseDto> uploadMultiFile(List<MultipartFile> multipartFile) {
 
-    List<String> fileNameList = new ArrayList<>();
+    List<S3UploadResponseDto> fileList = new ArrayList<>();
 
     multipartFile.forEach(file -> {
       String fileName = createFileName(file);
@@ -58,23 +58,25 @@ public class S3Service {
 
       try(InputStream inputStream = file.getInputStream()) {
         amazonS3.putObject(new PutObjectRequest(bucket, fileName, inputStream, objectMetadata)
-            .withCannedAcl(CannedAccessControlList.PublicRead));
+);
       } catch(IOException e) {
         throw new CustomException(ErrorCode.FILE_UPLOAD_ERROR);
       }
 
-      fileNameList.add(getPublicUrl(fileName));
+      fileList.add(new S3UploadResponseDto(fileName, getPublicUrl(fileName)));
+
     });
 
-    return fileNameList;
+    return fileList;
   }
 
 
   private String getPublicUrl(String fileName) {
-    return String.format("https://s3-%s.amazonaws.com/%s", bucket, amazonS3.getRegionName(), fileName);
+    return String.format("https://%s.s3.%s.amazonaws.com/%s", bucket, amazonS3.getRegionName(), fileName);
+
   }
 
   private String createFileName(MultipartFile file) {
-    return UUID.randomUUID()+ "/" + file.getOriginalFilename();
+    return UUID.randomUUID()+ "_" + file.getOriginalFilename();
   }
 }
