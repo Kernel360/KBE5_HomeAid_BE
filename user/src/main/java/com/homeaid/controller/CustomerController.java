@@ -34,7 +34,6 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/v1/customers")
 public class CustomerController {
 
-  private final CustomerService customerService;
   private final CustomerAddressService customerAddressService;
 
   @Operation(
@@ -143,33 +142,5 @@ public class CustomerController {
   }
 
   // TODO admin 옮겨야 하는지?
-  @Operation(
-      summary = "고객 전체 목록 조회",
-      description = "관리자가 모든 고객을 페이징하여 조회합니다."
-  )
-  @ApiResponses({
-      @ApiResponse(responseCode = "200", description = "조회 성공",
-          content = @Content(schema = @Schema(implementation = CustomerResponseDto.class))),
-      @ApiResponse(responseCode = "401", description = "인증 실패",
-          content = @Content(schema = @Schema(implementation = CommonApiResponse.class)))
-  })
-  @GetMapping
-  @PreAuthorize("hasRole('ADMIN')")
-  public ResponseEntity<CommonApiResponse<PagedResponseDto<CustomerResponseDto>>> getCustomers(
-      @Parameter(description = "페이지 번호 (0부터 시작)", example = "0")
-      @RequestParam(value = "page", defaultValue = "0") int page,
-      @Parameter(description = "페이지 크기", example = "10")
-      @RequestParam(value = "size", defaultValue = "10") int size
-  ) {
-    Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
 
-    return ResponseEntity.ok(
-        CommonApiResponse.success(
-            PagedResponseDto.fromPage(
-                customerService.getAllCustomers(pageable),
-                CustomerResponseDto::toDto
-            )
-        )
-    );
-  }
 }

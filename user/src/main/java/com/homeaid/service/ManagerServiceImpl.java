@@ -56,22 +56,6 @@ public class ManagerServiceImpl implements ManagerService {
     managerAvailabilityRepository.saveAll(availableConditions);
   }
 
-  @Override
-  @Transactional(readOnly = true)
-  public Page<Manager> getAllManagers(Pageable pageable) {
-    return managerRepository.findAll(pageable);
-
-  }
-
-  @Override
-  @Transactional
-  public void updateStatus(Long id, ManagerStatus status) {
-    Manager manager = managerRepository.findById(id)
-        .orElseThrow(() -> new CustomException(UserErrorCode.MANAGER_NOT_FOUND));
-
-    manager.changeStatus(status);
-  }
-
   private Weekday convertToWeekday(int day) {
     return Weekday.values()[day - 1]; // 1~7 → 0~6
   }

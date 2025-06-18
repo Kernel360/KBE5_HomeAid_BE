@@ -1,8 +1,10 @@
 package com.homeaid.domain;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.homeaid.domain.enumerate.GenderType;
 import com.homeaid.domain.enumerate.UserRole;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
@@ -13,6 +15,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Inheritance;
 import jakarta.persistence.InheritanceType;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -62,6 +65,16 @@ public class User {
   @LastModifiedDate
   private LocalDateTime updatedAt;
 
+  @Column(nullable = false)
+  private Boolean deleted = false;
+
+  public void delete() {
+    this.deleted = true;
+  }
+
+  @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+  private UserWithdrawalRequest withdrawalRequest;
+
   public User(String email, String password, String name, String phone, LocalDate birth,
       GenderType gender, UserRole role) {
 
@@ -90,6 +103,10 @@ public class User {
   public void updateInfo(String name, String email, String phone) {
     this.name = name;
     this.email = email;
+  }
+
+  public void setWithdrawalRequest(UserWithdrawalRequest request) {
+    this.withdrawalRequest = request;
   }
 
 }

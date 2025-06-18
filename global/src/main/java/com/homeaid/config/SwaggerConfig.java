@@ -144,4 +144,13 @@ public class SwaggerConfig {
         .pathsToMatch("/api/v1/admin/**")
         .build();
   }
+
+  @Bean
+  public GroupedOpenApi withdrawalAPI() {
+    return GroupedOpenApi.builder()
+        .group("withdrawals")
+        .displayName("회원 탈퇴")
+        .pathsToMatch("/api/v1/my/withdrawal/**")
+        .build();
+  }
 }
