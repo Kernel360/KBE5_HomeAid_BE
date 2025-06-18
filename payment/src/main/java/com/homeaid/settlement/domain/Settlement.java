@@ -48,4 +48,18 @@ public class Settlement {
   @Column(nullable = false)
   private Long managerId;
 
+  @Column
+  private LocalDateTime confirmedAt; // 승인일
+
+  @Column
+  private LocalDateTime paidAt; // 지급일
+
+  public void setConfirmedAt(LocalDateTime confirmedAt) {
+    this.confirmedAt = confirmedAt;
+  }
+
+  public void setPaidAt(LocalDateTime paidAt) {
+    this.paidAt = paidAt;
+  }
+
 }
