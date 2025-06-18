@@ -1,15 +1,12 @@
 package com.homeaid.controller;
 
 import com.homeaid.common.response.CommonApiResponse;
-import com.homeaid.common.response.PagedResponseDto;
 import com.homeaid.domain.CustomerAddress;
 import com.homeaid.dto.request.CustomerAddressUpdateRequestDto;
 import com.homeaid.dto.request.CustomerAddressSaveRequestDto;
-import com.homeaid.dto.request.CustomerResponseDto;
 import com.homeaid.dto.response.CustomerAddressResponseDto;
 import com.homeaid.security.user.CustomUserDetails;
 import com.homeaid.service.CustomerAddressService;
-import com.homeaid.service.CustomerService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -20,11 +17,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -140,7 +133,5 @@ public class CustomerController {
 
     return ResponseEntity.ok(CommonApiResponse.success(null));
   }
-
-  // TODO admin 옮겨야 하는지?
 
 }
