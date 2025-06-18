@@ -25,15 +25,15 @@ public class ReservationRequestDto {
   private LocalTime requestedTime;
 
   @NotNull
-  @Schema(description = "선택한 서비스 하위 옵션 ID", example = "3")
-  private Long subOptionId;
+  @Schema(description = "선택한 서비스 옵션 ID", example = "3")
+  private Long optionId;
+
+//  @NotNull
+//  @Schema(description = "선택한 서비스 총액", example = "30000")
+//  private Integer totalPrice;
 
   @NotNull
-  @Schema(description = "선택한 서비스 총액", example = "30000")
-  private Integer totalPrice;
-
-  @NotNull
-  @Schema(description = "선택한 서비스 소요 시간(분)", example = "80")
+  @Schema(description = "선택한 서비스 소요 시간(시간)", example = "3")
   private Integer totalDuration;
 
   private Double latitude;
@@ -47,8 +47,7 @@ public class ReservationRequestDto {
         .requestedTime(reservationRequestDto.getRequestedTime())
         .latitude(reservationRequestDto.getLatitude())
         .longitude(reservationRequestDto.getLongitude())
-        .totalPrice(reservationRequestDto.getTotalPrice())
-        .totalDuration(reservationRequestDto.getTotalDuration())
+        .duration(reservationRequestDto.getTotalDuration())
         .build();
   }
 

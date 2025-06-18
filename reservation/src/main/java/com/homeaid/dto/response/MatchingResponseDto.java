@@ -50,10 +50,10 @@ public class MatchingResponseDto {
   public static MatchingResponseDto toDto(Matching matching) {
     return MatchingResponseDto.builder()
         .matchingId(matching.getId())
-        .serviceType(matching.getReservation().getItem().getSubOptionName())
+        .serviceType(matching.getReservation().getItem().getServiceOptionName())
         .reservedDate(matching.getReservation().getRequestedDate())
         .reservedTime(matching.getReservation().getRequestedTime())
-        .estimatedDuration(matching.getReservation().getTotalDuration())
+        .estimatedDuration(matching.getReservation().getDuration())
         .latitude(matching.getReservation().getLatitude())
         .longitude(matching.getReservation().getLongitude())
         .customerRequest(matching.getReservation().getCustomerMemo())

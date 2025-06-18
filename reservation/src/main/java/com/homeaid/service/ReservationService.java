@@ -10,11 +10,11 @@ import org.springframework.data.domain.Pageable;
 public interface ReservationService {
 
 
-  Reservation createReservation(Reservation reservation, Long serviceSubOptionId);
+  Reservation createReservation(Reservation reservation, Long serviceOptionId);
 
   ReservationResponseDto getReservation(Long reservationId);
 
-  Reservation updateReservation(Long reservationId, Long userId, Reservation reservation, Long serviceSubOptionId);
+  Reservation updateReservation(Long reservationId, Long userId, Reservation reservation, Long serviceOptionId);
 
   Page<ReservationResponseDto> getReservations(Pageable pageable, ReservationStatus status);
 
