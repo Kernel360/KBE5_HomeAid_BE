@@ -1,7 +1,9 @@
 package com.homeaid.service;
 
+import com.homeaid.common.response.S3UploadResponseDto;
 import com.homeaid.domain.Customer;
 import com.homeaid.domain.Manager;
+import com.homeaid.domain.ManagerDocument;
 import com.homeaid.domain.User;
 import com.homeaid.dto.request.SignInRequestDto;
 import com.homeaid.dto.request.UserUpdateRequestDto;
@@ -10,7 +12,7 @@ import com.homeaid.exception.UserErrorCode;
 import com.homeaid.repository.ManagerDocumentRepository;
 import com.homeaid.repository.UserRepository;
 import com.homeaid.security.jwt.JwtTokenProvider;
-import org.springframework.transaction.annotation.Transactional;
+import com.homeaid.util.S3Service;
 import jakarta.validation.Valid;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -72,9 +74,6 @@ public class UserServiceImpl implements UserService {
       log.warn("Login failed - Invalid password: email={}", request.getPhone());
       throw new CustomException(UserErrorCode.LOGIN_FAILED);
     }
-
-    return jwtTokenProvider.createJwt(user.get().getId(), user.get().getRole().name());
-  }
         return jwtTokenProvider.createAccessToken(user.get().getId(), user.get().getRole().name());
     }
 
@@ -93,9 +92,9 @@ public class UserServiceImpl implements UserService {
 
     List<ManagerDocument> documents = managerDocuments.stream()
         .map(result -> ManagerDocument.builder()
+            .manager(manager)
             .documentUrl(result.getUrl())
             .documentS3Key(result.getS3Key())
-            .manager(manager)
             .build())
         .collect(Collectors.toList());
 
