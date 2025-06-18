@@ -1,4 +1,4 @@
-package com.homeaid.manager.dto;
+package com.homeaid.dashboard.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

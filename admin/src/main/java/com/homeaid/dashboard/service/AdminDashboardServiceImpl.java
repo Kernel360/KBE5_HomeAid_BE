@@ -1,7 +1,7 @@
-package com.homeaid.manager.service;
+package com.homeaid.dashboard.service;
 
 
-import com.homeaid.manager.dto.AdminDashboardStatsDto;
+import com.homeaid.dashboard.dto.AdminDashboardStatsDto;
 import com.homeaid.repository.ManagerRepository;
 import com.homeaid.repository.ReservationRepository;
 import com.homeaid.repository.UserRepository;

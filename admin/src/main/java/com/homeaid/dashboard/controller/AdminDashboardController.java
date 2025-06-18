@@ -1,8 +1,8 @@
-package com.homeaid.manager.controller;
+package com.homeaid.dashboard.controller;
 
 import com.homeaid.common.response.CommonApiResponse;
-import com.homeaid.manager.dto.AdminDashboardStatsDto;
-import com.homeaid.manager.service.AdminDashboardService;
+import com.homeaid.dashboard.dto.AdminDashboardStatsDto;
+import com.homeaid.dashboard.service.AdminDashboardService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
