@@ -70,8 +70,7 @@ class MatchingServiceTest {
         LocalDate.of(1990, 1, 1),
         GenderType.MALE,
         "경력사항",
-        "소개",
-        "image.jpg"
+        "소개"
     );
 
     Reservation reservation = Reservation.builder()
@@ -129,8 +128,7 @@ class MatchingServiceTest {
             LocalDate.of(1990, 1, 1),
             GenderType.MALE,
             "career",
-            "experience",
-            "profileImage"
+            "experience"
         ),
         new Manager(
             "manager2@example.com",
@@ -140,8 +138,7 @@ class MatchingServiceTest {
             LocalDate.of(1988, 5, 12),
             GenderType.FEMALE,
             "career",
-            "experience",
-            "profileImage"
+            "experience"
         ),
         new Manager(
             "manager3@example.com",
@@ -151,8 +148,7 @@ class MatchingServiceTest {
             LocalDate.of(1995, 10, 20),
             GenderType.MALE,
             "career",
-            "experience",
-            "profileImage"
+            "experience"
         )
     );
 

@@ -8,12 +8,11 @@ import jakarta.validation.Valid;
 
 public interface UserService {
 
-    Manager signUpManager(@Valid Manager manager);
+  Manager signUpManager(@Valid Manager manager);
 
-    Customer signUpCustomer(@Valid Customer customer);
+  Customer signUpCustomer(@Valid Customer customer);
 
-    User getUserById(Long id);
+  User getUserById(Long id);
 
-    void updateUserInfo(Long userId, UserUpdateRequestDto dto);
-
+  void updateUserInfo(Long userId, UserUpdateRequestDto dto);
 }
