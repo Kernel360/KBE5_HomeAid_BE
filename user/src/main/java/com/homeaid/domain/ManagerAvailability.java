@@ -45,18 +45,16 @@ public class ManagerAvailability {
 
   private LocalTime endTime;
 
-  @OneToMany(mappedBy = "managerAvailability", cascade = CascadeType.ALL, orphanRemoval = true)
+  @OneToMany(mappedBy = "availability", cascade = CascadeType.ALL, orphanRemoval = true)
   private List<ManagerPreferRegion> preferRegions = new ArrayList<>();
 
   @Builder
   public ManagerAvailability(Manager manager, Weekday weekday,
-      LocalTime startTime, LocalTime endTime, String sido, String sigungu) {
+      LocalTime startTime, LocalTime endTime) {
     this.manager = manager;
     this.weekday = weekday;
     this.startTime = startTime;
     this.endTime = endTime;
-
-    addPreferRegion(ManagerPreferRegion.builder().sido(sido).sigungu(sigungu).build());
   }
 
   public void addPreferRegion(ManagerPreferRegion region) {
