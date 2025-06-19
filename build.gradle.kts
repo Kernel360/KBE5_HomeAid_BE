@@ -37,6 +37,7 @@ dependencies {
 	implementation(project(":admin"))
 	implementation(project(":review"))
 	implementation(project(":common-domain"))
+	implementation(project(":notification"))
 }
 
 subprojects {

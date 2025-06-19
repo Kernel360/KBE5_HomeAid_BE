@@ -1,0 +1,28 @@
+package com.homeaid.domain.enumerate;
+
+import lombok.RequiredArgsConstructor;
+
+@RequiredArgsConstructor
+public enum NotificationEventType {
+    // 예약 관련
+    RESERVATION_CREATED("예약이 신청되었습니다"),
+    RESERVATION_CANCELLED("예약이 취소되었습니다"),
+
+    // 매칭 관련
+    MATCHING_CREATED("새로운 매칭이 생성되었습니다"),
+    MATCHING_ACCEPTED("매칭이 수락되었습니다"),
+    MATCHING_REJECTED("매칭이 거절되었습니다"),
+    MATCHING_CONFIRMED("매칭이 최종 확정되었습니다"),
+
+    // 작업 관련
+    WORK_REMINDER("작업 예정 알림"),
+    WORK_CHECKIN("체크인 알림"),
+    WORK_CHECKOUT("체크아웃 알림"),
+    WORK_COMPLETED("작업 완료 알림"),
+
+    // 시스템 관련
+    PAYMENT_COMPLETED("결제가 완료되었습니다"),
+    REVIEW_REQUESTED("리뷰 작성 요청");
+
+    private final String defaultMessage;
+}
