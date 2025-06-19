@@ -1,20 +1,40 @@
 package com.homeaid.controller;
 
 import com.homeaid.common.response.CommonApiResponse;
+import com.homeaid.common.response.PagedResponseDto;
 import com.homeaid.dto.request.ManagerDetailInfoRequestDto;
+import com.homeaid.dto.request.StatusChangeRequest;
+import com.homeaid.dto.response.ManagerResponseDto;
+import com.homeaid.exception.CustomException;
+import com.homeaid.exception.ErrorCode;
 import com.homeaid.security.user.CustomUserDetails;
 import com.homeaid.service.ManagerService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import java.io.IOException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 @Tag(name = "Manager Controller", description = "매니저 API")
 @RestController
@@ -35,6 +55,81 @@ public class ManagerController {
 
     return ResponseEntity.status(HttpStatus.CREATED)
         .body(CommonApiResponse.success());
+  }
+
+  @Operation(
+      summary = "매니저 전체 목록 조회",
+      description = "관리자가 모든 매니저를 페이징하여 조회합니다."
+  )
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "조회 성공"),
+      @ApiResponse(responseCode = "401", description = "인증 실패")
+  })
+  @GetMapping
+  @PreAuthorize("hasRole('ADMIN')")
+  public ResponseEntity<CommonApiResponse<PagedResponseDto<ManagerResponseDto>>> getManagers(
+      @Parameter(description = "페이지 번호 (0부터 시작)", example = "0")
+      @RequestParam(value = "page", defaultValue = "0") int page,
+      @Parameter(description = "페이지 크기", example = "10")
+      @RequestParam(value = "size", defaultValue = "10") int size
+  ) {
+    Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
+    return ResponseEntity.ok(
+        CommonApiResponse.success(
+            PagedResponseDto.fromPage(managerService.getAllManagers(pageable),
+                ManagerResponseDto::toDto)
+        )
+    );
+  }
+
+
+  @Operation(
+      summary = "매니저 상태 변환",
+      description = "매니저의 상태를 변경합니다. (PENDING, REVIEW, ACTIVE, REJECTED)"
+  )
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "상태 변경 성공"),
+      @ApiResponse(responseCode = "400", description = "유효성 검증 실패"),
+      @ApiResponse(responseCode = "404", description = "대상 매니저를 찾을 수 없음")
+  })
+  @PatchMapping("/{id}/status")
+  public ResponseEntity<CommonApiResponse<Void>> updateStatus(
+      @Parameter(description = "상태를 변경할 매니저 ID", example = "1")
+      @PathVariable Long id,
+      @RequestBody @Valid StatusChangeRequest request
+  ) {
+    managerService.updateStatus(id, request.getStatus());
+    return ResponseEntity.ok(CommonApiResponse.success());
+  }
+
+
+  @Operation(
+      summary = "매니저 신분 및 자격 증빙서류 제출",
+      description = "매니저의 신분 및 자격을 증빙하기 위한 서류를 제출합니다. (신분증, 범죄경력조회서, 건강검진서)"
+  )
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "증빙서류 첨부 성공"),
+      @ApiResponse(responseCode = "400", description = "필수 첨부 파일 누락"),
+      @ApiResponse(responseCode = "404", description = "매니저를 찾을 수 없음")
+  })
+  @PostMapping(value = "/certifications", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+  public ResponseEntity<CommonApiResponse<Void>> uploadCertifications(
+      @RequestPart MultipartFile idFile,
+      @RequestPart MultipartFile criminalRecordFile,
+      @RequestPart MultipartFile healthCertificateFile,
+      @AuthenticationPrincipal CustomUserDetails user
+  ) throws IOException {
+
+    if (idFile.isEmpty() || criminalRecordFile.isEmpty() || healthCertificateFile.isEmpty()) {
+      throw new CustomException(ErrorCode.FILE_EMPTY);
+    }
+
+    Long managerId = user.getUserId();
+
+    managerService.uploadManagerFiles(managerId, idFile, criminalRecordFile, healthCertificateFile);
+
+    return ResponseEntity.status(HttpStatus.CREATED)
+        .body(CommonApiResponse.success(null));
   }
 
 }
