@@ -44,6 +44,7 @@ public class AdminCustomerController {
       @ApiResponse(responseCode = "401", description = "인증 실패",
           content = @Content(schema = @Schema(implementation = CommonApiResponse.class)))
   })
+
   @GetMapping
   @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<CommonApiResponse<PagedResponseDto<CustomerResponseDto>>> getCustomers(
@@ -54,10 +55,12 @@ public class AdminCustomerController {
   ) {
     Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
 
+    AdminCustomerSearchRequestDto emptyDto = new AdminCustomerSearchRequestDto(); // 조건 없는 빈 dto
+
     return ResponseEntity.ok(
         CommonApiResponse.success(
             PagedResponseDto.fromPage(
-                adminCustomerService.getAllCustomers(pageable),
+                adminCustomerService.searchCustomers(emptyDto, pageable),
                 CustomerResponseDto::toDto
             )
         )
