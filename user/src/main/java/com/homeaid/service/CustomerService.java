@@ -6,5 +6,5 @@ import org.springframework.data.domain.Pageable;
 
 public interface CustomerService {
 
-  Page<Customer> getAllCustomers(Pageable pageable);
+
 }

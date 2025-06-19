@@ -52,6 +52,7 @@ public class Payment {
   @JoinColumn(name = "reservation_id")
   private Reservation reservation;
 
+  @Builder.Default
   @Column(nullable = false)
   private Integer refundedAmount = 0;  // 부분환불 누적 금액
 
