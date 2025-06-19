@@ -44,8 +44,6 @@ public class ManagerServiceImpl implements ManagerService {
         .collect(Collectors.toList());
     managerServiceOptionRepository.saveAll(preferences);
 
-    // Todo: 시작시간 종료시간 설정
-
 
     // 2. 가능한 요일 조건 및 선호 지역 저장
     List<ManagerAvailability> availabilities = dto.getAvailabilities().stream()
