@@ -10,12 +10,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 public interface ManagerService {
 
-
   void saveManagerDetailInfo(Long managerId, ManagerDetailInfoRequestDto requestDto);
-
-  Page<Manager> getAllManagers(Pageable pageable);
-
-  void updateStatus(Long id, ManagerStatus status);
 
   void uploadManagerFiles(Long managerId, MultipartFile idFile, MultipartFile criminalFile,
       MultipartFile healthFile)
