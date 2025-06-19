@@ -70,7 +70,7 @@ public class UserServiceImpl implements UserService {
   @Transactional
   public void updateUserInfo(Long userId, UserUpdateRequestDto dto) {
     User user = userRepository.findById(userId)
-        .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
+        .orElseThrow(() -> new CustomException(UserErrorCode.USER_NOT_FOUND));
 
     user.updateInfo(dto.getName(), dto.getEmail(), dto.getPhone());
   }
