@@ -1,6 +1,7 @@
 package com.homeaid.domain;
 
 import com.homeaid.domain.enumerate.Weekday;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -11,9 +12,11 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -38,26 +41,25 @@ public class ManagerAvailability {
   @JoinColumn(name = "manager_id")
   private Manager manager;
 
-  private LocalDate date;
-
   private LocalTime startTime;
 
   private LocalTime endTime;
 
-  private Double latitude;
-
-  private Double longitude;
+  @OneToMany(mappedBy = "availability", cascade = CascadeType.ALL, orphanRemoval = true)
+  private List<ManagerPreferRegion> preferRegions = new ArrayList<>();
 
   @Builder
   public ManagerAvailability(Manager manager, Weekday weekday,
-      Double latitude, Double longitude,
       LocalTime startTime, LocalTime endTime) {
     this.manager = manager;
     this.weekday = weekday;
-    this.latitude = latitude;
-    this.longitude = longitude;
     this.startTime = startTime;
     this.endTime = endTime;
+  }
+
+  public void addPreferRegion(ManagerPreferRegion region) {
+    region.setAvailability(this);
+    this.preferRegions.add(region);
   }
 
 }
