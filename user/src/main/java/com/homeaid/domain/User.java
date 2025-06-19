@@ -72,6 +72,10 @@ public class User {
     this.deleted = true;
   }
 
+  public boolean isDeleted() {
+    return Boolean.TRUE.equals(this.deleted);
+  }
+
   @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
   private UserWithdrawalRequest withdrawalRequest;
 

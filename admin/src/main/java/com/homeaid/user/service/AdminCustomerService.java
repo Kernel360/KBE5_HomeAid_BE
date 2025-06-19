@@ -7,8 +7,6 @@ import org.springframework.data.domain.Pageable;
 
 public interface AdminCustomerService {
 
-  Page<Customer> getAllCustomers(Pageable pageable);
-
   Page<Customer> searchCustomers(AdminCustomerSearchRequestDto dto, Pageable pageable);
 
 }
