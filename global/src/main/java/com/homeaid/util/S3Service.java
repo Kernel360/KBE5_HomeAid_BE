@@ -3,7 +3,8 @@ package com.homeaid.util;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
-import com.homeaid.common.response.S3UploadResponseDto;
+import com.homeaid.common.enumerate.DocumentType;
+import com.homeaid.common.response.FileUploadResult;
 import com.homeaid.exception.CustomException;
 import com.homeaid.exception.ErrorCode;
 import java.io.IOException;
@@ -28,8 +29,9 @@ public class S3Service {
   }
 
   // 단일 파일 업로드
-  public String uploadFile(MultipartFile file) throws IOException {
-    String fileName = createFileName(file);
+  public FileUploadResult uploadFile(DocumentType documentType, String packageName, MultipartFile file) throws IOException {
+
+    String fileName = packageName + createFileName(file);
 
     // 메타데이터 설정
     ObjectMetadata metadata = new ObjectMetadata();
@@ -42,16 +44,16 @@ public class S3Service {
     // S3에 파일 업로드
     amazonS3.putObject(putObjectRequest);
 
-    return getPublicUrl(fileName);
+    return new FileUploadResult(documentType, fileName, getPublicUrl(fileName));
   }
 
   // 다중 파일 업로드
-  public List<S3UploadResponseDto> uploadMultiFile(List<MultipartFile> multipartFile) {
+  public List<FileUploadResult> uploadMultiFile(DocumentType documentType, String packageName, List<MultipartFile> multipartFile) {
 
-    List<S3UploadResponseDto> fileList = new ArrayList<>();
+    List<FileUploadResult> fileList = new ArrayList<>();
 
     multipartFile.forEach(file -> {
-      String fileName = createFileName(file);
+      String fileName = packageName + createFileName(file);
       ObjectMetadata objectMetadata = new ObjectMetadata();
       objectMetadata.setContentLength(file.getSize());
       objectMetadata.setContentType(file.getContentType());
@@ -63,7 +65,7 @@ public class S3Service {
         throw new CustomException(ErrorCode.FILE_UPLOAD_ERROR);
       }
 
-      fileList.add(new S3UploadResponseDto(fileName, getPublicUrl(fileName)));
+      fileList.add(new FileUploadResult(documentType, fileName, getPublicUrl(fileName)));
 
     });
 

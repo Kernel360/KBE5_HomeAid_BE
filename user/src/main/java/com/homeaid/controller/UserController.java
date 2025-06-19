@@ -7,10 +7,12 @@ import com.homeaid.dto.request.CustomerSignUpRequestDto;
 import com.homeaid.dto.request.ManagerSignUpRequestDto;
 import com.homeaid.dto.request.UserUpdateRequestDto;
 import com.homeaid.dto.response.SignUpResponseDto;
+import com.homeaid.exception.CustomException;
+import com.homeaid.exception.ErrorCode;
 import com.homeaid.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
-import java.util.List;
+import java.io.IOException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -36,15 +38,20 @@ public class UserController {
   @PostMapping(value = "/signup/manager", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   public ResponseEntity<CommonApiResponse<Void>> signUpManager(
       @RequestPart(value = "managerSignUpRequestDto") @Valid ManagerSignUpRequestDto managerSignUpRequestDto,
-      @RequestPart(required = false) List<MultipartFile> files
-  ) {
+      @RequestPart MultipartFile idFile,
+      @RequestPart MultipartFile criminalRecordFile,
+      @RequestPart MultipartFile healthCertificateFile
+  ) throws IOException {
 
     String password = passwordEncoder.encode(managerSignUpRequestDto.getPassword());
-    Manager manager = userService.signUpManager(ManagerSignUpRequestDto.toEntity(managerSignUpRequestDto, password));
+    Manager manager = userService.signUpManager(
+        ManagerSignUpRequestDto.toEntity(managerSignUpRequestDto, password));
 
-    if(files != null && !files.isEmpty()) {
-      userService.uploadManagerFiles(manager, files);
+    if (idFile.isEmpty() || criminalRecordFile.isEmpty() || healthCertificateFile.isEmpty()) {
+      throw new CustomException(ErrorCode.FILE_EMPTY);
     }
+
+    userService.uploadManagerFiles(manager, idFile, criminalRecordFile, healthCertificateFile);
 
     return ResponseEntity.status(HttpStatus.CREATED)
         .body(CommonApiResponse.success(null));

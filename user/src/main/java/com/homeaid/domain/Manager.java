@@ -32,12 +32,6 @@ public class Manager extends User {
 
   private String experience;
 
-  @Column(name = "profile_image_url")
-  private String profileImageUrl;
-
-  @Column(name = "profile_image_s3_key") // 삭제를 위한 S3 키
-  private String profileImageS3Key;
-
   @OneToMany(mappedBy = "manager", cascade = CascadeType.ALL, orphanRemoval = true)
   private List<ManagerDocument> documents = new ArrayList<>();
 
@@ -53,12 +47,10 @@ public class Manager extends User {
 
   @Builder
   public Manager(String email, String password, String name, String phone, LocalDate birth,
-      GenderType gender, String career, String experience, String profileImageUrl, String profileImageS3Key) {
+      GenderType gender, String career, String experience) {
     super(email, password, name, phone, birth, gender, UserRole.MANAGER);
     this.career = career;
     this.experience = experience;
-    this.profileImageUrl = profileImageUrl;
-    this.profileImageS3Key = profileImageS3Key;
   }
 
   public void approve() {
@@ -68,10 +60,5 @@ public class Manager extends User {
 
   public void changeStatus(ManagerStatus newStatus) {
     this.status = newStatus;
-  }
-
-  public void updateProfileImage(String imageUrl, String s3Key) {
-    this.profileImageUrl = imageUrl;
-    this.profileImageS3Key = s3Key;
   }
 }

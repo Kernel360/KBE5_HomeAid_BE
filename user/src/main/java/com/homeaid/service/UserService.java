@@ -5,7 +5,7 @@ import com.homeaid.domain.Manager;
 import com.homeaid.domain.User;
 import com.homeaid.dto.request.UserUpdateRequestDto;
 import jakarta.validation.Valid;
-import java.util.List;
+import java.io.IOException;
 import org.springframework.web.multipart.MultipartFile;
 
 public interface UserService {
@@ -18,5 +18,6 @@ public interface UserService {
 
     void updateUserInfo(Long userId, UserUpdateRequestDto dto);
 
-    void uploadManagerFiles(Manager manager, List<MultipartFile> documents);
+    void uploadManagerFiles(Manager manager, MultipartFile idFile, MultipartFile criminalFile, MultipartFile healthFile)
+        throws IOException;
 }

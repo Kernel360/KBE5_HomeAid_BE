@@ -1,7 +1,6 @@
 package com.homeaid.domain;
 
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.homeaid.domain.enumerate.GenderType;
 import com.homeaid.domain.enumerate.UserRole;
 import jakarta.persistence.CascadeType;
@@ -65,6 +64,12 @@ public class User {
   @LastModifiedDate
   private LocalDateTime updatedAt;
 
+  @Column(name = "profile_image_url")
+  private String profileImageUrl;
+
+  @Column(name = "profile_image_s3_key") // 삭제를 위한 S3 키
+  private String profileImageS3Key;
+
   @Column(nullable = false)
   private Boolean deleted = false;
 
@@ -107,6 +112,11 @@ public class User {
   public void updateInfo(String name, String email, String phone) {
     this.name = name;
     this.email = email;
+  }
+
+  public void updateProfileImage(String imageUrl, String s3Key) {
+    this.profileImageUrl = imageUrl;
+    this.profileImageS3Key = s3Key;
   }
 
   public void setWithdrawalRequest(UserWithdrawalRequest request) {
