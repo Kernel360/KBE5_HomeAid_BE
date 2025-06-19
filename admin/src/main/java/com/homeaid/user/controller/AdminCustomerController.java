@@ -49,29 +49,7 @@ public class AdminCustomerController {
   @GetMapping
   @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<CommonApiResponse<PagedResponseDto<CustomerResponseDto>>> getCustomers(
-      @Parameter(description = "페이지 번호 (0부터 시작)", example = "0")
-      @RequestParam(value = "page", defaultValue = "0") int page,
-      @Parameter(description = "페이지 크기", example = "10")
-      @RequestParam(value = "size", defaultValue = "10") int size
-  ) {
-    Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
-
-    AdminCustomerSearchRequestDto emptyDto = new AdminCustomerSearchRequestDto(); // 조건 없는 빈 dto
-
-    return ResponseEntity.ok(
-        CommonApiResponse.success(
-            PagedResponseDto.fromPage(
-                adminCustomerService.searchCustomers(emptyDto, pageable),
-                CustomerResponseDto::toDto
-            )
-        )
-    );
-  }
-
-  @GetMapping("/search")
-  @PreAuthorize("hasRole('ADMIN')")
-  public ResponseEntity<CommonApiResponse<PagedResponseDto<CustomerResponseDto>>> getCustomers(
-      @ModelAttribute AdminCustomerSearchRequestDto dto, // 👈 dto 자동 주입
+      @ModelAttribute AdminCustomerSearchRequestDto dto,
       @RequestParam(value = "page", defaultValue = "0") int page,
       @RequestParam(value = "size", defaultValue = "10") int size
   ) {
