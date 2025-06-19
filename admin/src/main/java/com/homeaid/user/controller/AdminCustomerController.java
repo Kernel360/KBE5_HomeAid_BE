@@ -22,6 +22,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -70,19 +71,11 @@ public class AdminCustomerController {
   @GetMapping("/search")
   @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<CommonApiResponse<PagedResponseDto<CustomerResponseDto>>> getCustomers(
+      @ModelAttribute AdminCustomerSearchRequestDto dto, // 👈 dto 자동 주입
       @RequestParam(value = "page", defaultValue = "0") int page,
-      @RequestParam(value = "size", defaultValue = "10") int size,
-      @RequestParam(value = "userId", required = false) Long userId,
-      @RequestParam(value = "name", required = false) String name,
-      @RequestParam(value = "phone", required = false) String phone
+      @RequestParam(value = "size", defaultValue = "10") int size
   ) {
     Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdAt"));
-
-    AdminCustomerSearchRequestDto dto = AdminCustomerSearchRequestDto.builder()
-        .userId(userId)
-        .name(name)
-        .phone(phone)
-        .build();
 
     Page<Customer> result = adminCustomerService.searchCustomers(dto, pageable);
 
