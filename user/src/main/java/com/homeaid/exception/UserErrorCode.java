@@ -37,7 +37,8 @@ public enum UserErrorCode implements BaseErrorCode {
   USER_ALREADY_EXISTS(HttpStatus.CONFLICT, "USER_ALREADY_EXISTS", "이미 가입된 회원입니다."),
   SOCIAL_ACCOUNT_ALREADY_LINKED(HttpStatus.CONFLICT, "SOCIAL_ACCOUNT_ALREADY_LINKED", "이미 연동된 소셜 계정입니다."),
   PHONE_NUMBER_ALREADY_USED(HttpStatus.CONFLICT, "PHONE_NUMBER_ALREADY_USED", "이미 사용 중인 전화번호입니다."),
-  DUPLICATE_ADDRESS(HttpStatus.CONFLICT, "ADDRESS_002", "이미 등록된 주소입니다.");
+  DUPLICATE_ADDRESS(HttpStatus.CONFLICT, "ADDRESS_002", "이미 등록된 주소입니다."),
+  DUPLICATE_ADDRESS_ALIAS(HttpStatus.CONFLICT, "DUPLICATE_ADDRESS_ALIAS", "이미 사용 중인 주소 별칭입니다.");
 
 
   private final HttpStatus status;

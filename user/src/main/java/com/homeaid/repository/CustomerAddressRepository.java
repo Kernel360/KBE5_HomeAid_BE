@@ -19,5 +19,6 @@ public interface CustomerAddressRepository extends JpaRepository<CustomerAddress
   @Query("SELECT ca FROM CustomerAddress ca WHERE ca.customer.id = :customerId AND ca.id = :addressId")
   CustomerAddress findByCustomerIdAndAddressId(@Param("customerId") Long customerId, @Param("addressId") Long addressId);
 
+  boolean existsByCustomerIdAndAlias(Long customerId, String alias);
 }
 

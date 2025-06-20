@@ -38,22 +38,18 @@ public class CustomerAddressServiceImpl implements CustomerAddressService {
         .collect(Collectors.toList());
   }
 
-  // 새 주소 저장
+
   @Transactional
   @Override
   public CustomerAddress saveAddress(Long customerId, CustomerAddress customerAddress) {
 
-    // 고객 존재 여부 확인
     Customer customer = customerRepository.findById(customerId)
         .orElseThrow(() -> new CustomException(UserErrorCode.CUSTOMER_NOT_FOUND));
-
-    // 중복 주소 확인 (선택사항)
-    validateDuplicateAddress(customerId, customerAddress);
+    validateDuplicateAddressAlias(customerId, customerAddress.getAlias());
 
     customer.addAddress(customerAddress);
 
     return customerAddressRepository.save(customerAddress);
-
   }
 
   /**
@@ -100,16 +96,10 @@ public class CustomerAddressServiceImpl implements CustomerAddressService {
     customerAddressRepository.delete(address);
   }
 
-  // 중복 주소 검증
-  private void validateDuplicateAddress(Long customerId, CustomerAddress customerAddress) {
-    List<CustomerAddress> existingAddresses = customerAddressRepository.findByCustomerIdOrderByIdDesc(customerId);
 
-    boolean isDuplicate = existingAddresses.stream()
-        .anyMatch(addr -> addr.getAddress().equals(customerAddress.getAddress())
-            && (addr.getAddressDetail() != null ? addr.getAddressDetail().equals(customerAddress.getAddressDetail()) : customerAddress.getAddressDetail() == null));
-
-    if (isDuplicate) {
-      throw new CustomException(UserErrorCode.DUPLICATE_ADDRESS);
+  private void validateDuplicateAddressAlias(Long customerId, String alias) {
+    if (customerAddressRepository.existsByCustomerIdAndAlias(customerId, alias)) {
+      throw new CustomException(UserErrorCode.DUPLICATE_ADDRESS_ALIAS);
     }
   }
 
