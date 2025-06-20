@@ -112,12 +112,17 @@ public class UserServiceImpl implements UserService {
 
     String profileImageS3Key = user.getProfileImageS3Key();
 
-    // 이미 이미지가 없는 경우 예외 처리
+    // 이미지가 없으면 아무 동작 없이 종료
     if (profileImageS3Key == null || profileImageS3Key.isBlank()) {
-      throw new CustomException(UserErrorCode.PROFILE_IMAGE_NOT_FOUND);
+      return;
     }
 
-    s3Service.deleteFile(profileImageS3Key);
+    try {
+      s3Service.deleteFile(profileImageS3Key);
+    } catch (Exception e) {
+      log.error("파일 삭제 실패 - key: {}", profileImageS3Key, e);
+      // 필요 시 예외 처리 로직 추가
+    }
 
     user.profileImage(null, null);
     userRepository.save(user);
