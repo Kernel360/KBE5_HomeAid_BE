@@ -31,12 +31,28 @@ services:
       JWT_SECRET: ${JWT_SECRET}
       ACCESS_TOKEN_EXPIRE_TIME: ${ACCESS_TOKEN_EXPIRE_TIME}
       REFRESH_TOKEN_EXPIRE_TIME: ${REFRESH_TOKEN_EXPIRE_TIME}
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: homeaidpassword
     restart: always
     networks:
       - ci-network
 
+  redis:
+    image: redis:7-alpine
+    container_name: redis
+    command: [ "redis-server", "--requirepass", "homeaidpassword" ]
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - ci-network
+    restart: always
+
 volumes:
   jenkins_home:
+  redis_data:
 
 networks:
   ci-network:
