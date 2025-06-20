@@ -12,10 +12,12 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+@Slf4j
 @Service
 public class S3Service {
 
@@ -48,7 +50,7 @@ public class S3Service {
       // S3에 파일 업로드
       amazonS3.putObject(putObjectRequest);
     }
-
+    log.debug("파일 업로드 성공 - key: {}, url: {}", fileName, getPublicUrl(fileName));
     return new FileUploadResult(documentType, fileName, getPublicUrl(fileName));
   }
 
@@ -82,6 +84,23 @@ public class S3Service {
     return fileList;
   }
 
+  // 파일 삭제
+  public void deleteFile(String fileKey) {
+    try {
+      boolean isObjectExist = amazonS3.doesObjectExist(bucket, fileKey);
+
+      if (isObjectExist) {
+
+        amazonS3.deleteObject(bucket, fileKey);
+      } else {
+        log.error(fileKey + " 를 찾을 수 없음");
+      }
+    } catch (Exception e) {
+      log.error("파일 삭제 실패 - key: {}", fileKey, e);
+      throw new CustomException(ErrorCode.FILE_DELETE_ERROR);
+    }
+  }
+
   // 파일명 생성
   private String createFileName(MultipartFile file) {
     String originalName = file.getOriginalFilename();
@@ -98,6 +117,7 @@ public class S3Service {
   // 공용 파일 유효성 검증
   private void validateFile(MultipartFile file) {
     if (file == null || file.isEmpty()) {
+      log.error("파일이 존재하지 않음 - file: {}", file);
       throw new CustomException(ErrorCode.FILE_EMPTY);
     }
   }
