@@ -44,6 +44,7 @@ public class CustomerAddressResponseDto {
         .latitude(address.getLatitude())
         .longitude(address.getLongitude())
         .fullAddress(fullAddress)
+        .alias(address.getAlias())
         .build();
   }
 }

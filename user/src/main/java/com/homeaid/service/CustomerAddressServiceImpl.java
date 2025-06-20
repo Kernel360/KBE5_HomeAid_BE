@@ -88,7 +88,7 @@ public class CustomerAddressServiceImpl implements CustomerAddressService {
 
 
   private void validateAddressLimit(Long customerId) {
-    if (customerAddressRepository.countByCustomerId(customerId) > MAX_ADDRESS_COUNT) {
+    if (customerAddressRepository.countByCustomerId(customerId) >= MAX_ADDRESS_COUNT) {
       throw new CustomException(UserErrorCode.ADDRESS_LIMIT_EXCEEDED);
     }
   }
