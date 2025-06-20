@@ -9,11 +9,10 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
 
-    boolean existsByPhone(String phone);
+  boolean existsByPhone(String phone);
 
-    Optional<User> findByPhone(String phone);
+  Optional<User> findByPhone(String phone);
 
-    @Query("SELECT COUNT(u) FROM User u")
-    long countAllUsers();
-
+  @Query("SELECT COUNT(u) FROM User u")
+  long countAllUsers();
 }
