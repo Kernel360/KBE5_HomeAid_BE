@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 public class AdminDashboardStatsDto {
   private long totalUsers;
   private long activeManagers;
+  private long totalPayments;
   private long todayReservations;
   private long pendingApprovals;
 }
