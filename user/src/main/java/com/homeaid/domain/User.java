@@ -114,7 +114,7 @@ public class User {
     this.email = email;
   }
 
-  public void updateProfileImage(String imageUrl, String s3Key) {
+  public void profileImage(String imageUrl, String s3Key) {
     this.profileImageUrl = imageUrl;
     this.profileImageS3Key = s3Key;
   }
