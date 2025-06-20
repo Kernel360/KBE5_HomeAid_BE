@@ -41,28 +41,19 @@ public class CustomerAddressServiceImpl implements CustomerAddressService {
   // 새 주소 저장
   @Transactional
   @Override
-  public CustomerAddress saveAddress(Long customerId, CustomerAddress requestDto) {
+  public CustomerAddress saveAddress(Long customerId, CustomerAddress customerAddress) {
 
     // 고객 존재 여부 확인
     Customer customer = customerRepository.findById(customerId)
         .orElseThrow(() -> new CustomException(UserErrorCode.CUSTOMER_NOT_FOUND));
 
     // 중복 주소 확인 (선택사항)
-    validateDuplicateAddress(customerId, requestDto);
+    validateDuplicateAddress(customerId, customerAddress);
 
-    // 주소 엔티티 생성
-    CustomerAddress address = CustomerAddress.builder()
-        .address(requestDto.getAddress())
-        .addressDetail(requestDto.getAddressDetail())
-        .latitude(requestDto.getLatitude())
-        .longitude(requestDto.getLongitude())
-        .build();
+    customer.addAddress(customerAddress);
 
-    address.setCustomer(customer);
+    return customerAddressRepository.save(customerAddress);
 
-    CustomerAddress savedAddress = customerAddressRepository.save(address);
-
-    return savedAddress;
   }
 
   /**
@@ -110,12 +101,12 @@ public class CustomerAddressServiceImpl implements CustomerAddressService {
   }
 
   // 중복 주소 검증
-  private void validateDuplicateAddress(Long customerId, CustomerAddress requestDto) {
+  private void validateDuplicateAddress(Long customerId, CustomerAddress customerAddress) {
     List<CustomerAddress> existingAddresses = customerAddressRepository.findByCustomerIdOrderByIdDesc(customerId);
 
     boolean isDuplicate = existingAddresses.stream()
-        .anyMatch(addr -> addr.getAddress().equals(requestDto.getAddress())
-            && (addr.getAddressDetail() != null ? addr.getAddressDetail().equals(requestDto.getAddressDetail()) : requestDto.getAddressDetail() == null));
+        .anyMatch(addr -> addr.getAddress().equals(customerAddress.getAddress())
+            && (addr.getAddressDetail() != null ? addr.getAddressDetail().equals(customerAddress.getAddressDetail()) : customerAddress.getAddressDetail() == null));
 
     if (isDuplicate) {
       throw new CustomException(UserErrorCode.DUPLICATE_ADDRESS);

@@ -39,6 +39,9 @@ public class CustomerAddress {
 
   private Double longitude;
 
+  @Setter
+  private String alias;
+
   @Builder
   public CustomerAddress(String address, String addressDetail, Double latitude, Double longitude) {
     this.address = address;
