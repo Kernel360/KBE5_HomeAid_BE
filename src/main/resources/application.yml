@@ -4,6 +4,16 @@ spring:
   server:
     port: 8080
 
+  cloud:
+    aws:
+      credentials:
+        access-key: ${AWS_S3_ACCESS}
+        secret-key: ${AWS_S3_SECRET}
+      region:
+        static: ap-northeast-2
+      s3:
+        bucket: ${BUCKET_NAME}
+
   profiles:
     active: local
 
@@ -26,6 +36,11 @@ spring:
     secret: ${JWT_SECRET}
     access-token-expire-time: ${ACCESS_TOKEN_EXPIRE_TIME}
     refresh-token-expire-time: ${REFRESH_TOKEN_EXPIRE_TIME}
+
+  servlet:
+    multipart:
+      max-file-size: 20MB
+      max-request-size: 20MB
 
   data:
     redis:
@@ -60,3 +75,4 @@ management:
     web:
       exposure:
         include: '*'
+

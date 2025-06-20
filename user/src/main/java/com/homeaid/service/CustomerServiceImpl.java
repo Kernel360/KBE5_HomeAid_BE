@@ -14,9 +14,5 @@ public class CustomerServiceImpl implements CustomerService {
 
   private final CustomerRepository customerRepository;
 
-  @Override
-  @Transactional(readOnly = true)
-  public Page<Customer> getAllCustomers(Pageable pageable) {
-    return customerRepository.findAll(pageable);
-  }
+
 }

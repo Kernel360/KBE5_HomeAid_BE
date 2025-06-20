@@ -1,5 +1,6 @@
 package com.homeaid.domain;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -27,6 +28,7 @@ public class CustomerAddress {
   @Setter
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "customer_id")
+  @JsonIgnore
   private Customer customer;
 
   private String address;

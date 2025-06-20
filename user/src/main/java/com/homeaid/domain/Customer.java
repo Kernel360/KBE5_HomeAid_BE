@@ -4,6 +4,7 @@ package com.homeaid.domain;
 import com.homeaid.domain.enumerate.GenderType;
 import com.homeaid.domain.enumerate.UserRole;
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
@@ -21,6 +22,12 @@ import lombok.NoArgsConstructor;
 @Table(name = "customer")
 public class Customer extends User {
 
+  @Column(name = "profile_image_url")
+  private String profileImageUrl;
+
+  @Column(name = "profile_image_s3_key") // 삭제를 위한 S3 키
+  private String profileImageS3Key;
+
   @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL, orphanRemoval = true)
   private List<CustomerAddress> addressList = new ArrayList<>();
 
@@ -35,7 +42,6 @@ public class Customer extends User {
       this.addressList.add(address);
     }
   }
-
 
   // 복수 주소 입력
   @Builder(builderMethodName = "addMultipleAddresses")
@@ -61,6 +67,11 @@ public class Customer extends User {
       addressList.remove(address);
       address.setCustomer(null);
     }
+  }
+
+  public void updateProfileImage(String imageUrl, String s3Key) {
+    this.profileImageUrl = imageUrl;
+    this.profileImageS3Key = s3Key;
   }
 
 }
