@@ -16,6 +16,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -47,9 +48,9 @@ public class CustomerController {
 
     Long customerId = user.getUserId();
 
-    List<CustomerAddressResponseDto> addresses = customerAddressService.getSavedAddresses(customerId);
-
-    return ResponseEntity.ok(CommonApiResponse.success(addresses));
+    return ResponseEntity.ok(CommonApiResponse.success(
+        customerAddressService.getSavedAddresses(customerId).stream()
+            .map(CustomerAddressResponseDto::toDto).collect(Collectors.toList())));
   }
 
   @Operation(
@@ -60,7 +61,7 @@ public class CustomerController {
       @ApiResponse(responseCode = "200", description = "저장 성공",
           content = @Content(schema = @Schema(implementation = CustomerAddressResponseDto.class))),
       @ApiResponse(responseCode = "400", description = "잘못된 요청",
-      content = @Content(schema = @Schema(implementation = CommonApiResponse.class))),
+          content = @Content(schema = @Schema(implementation = CommonApiResponse.class))),
       @ApiResponse(responseCode = "401", description = "인증 실패",
           content = @Content(schema = @Schema(implementation = CommonApiResponse.class))),
       @ApiResponse(responseCode = "404", description = "고객을 찾을 수 없음",
@@ -75,9 +76,11 @@ public class CustomerController {
 
     Long customerId = user.getUserId();
 
-    CustomerAddress savedAddress = customerAddressService.saveAddress(customerId, CustomerAddressSaveRequestDto.toEntity(requestDto));
+    CustomerAddress savedAddress = customerAddressService.saveAddress(customerId,
+        CustomerAddressSaveRequestDto.toEntity(requestDto));
 
-    return ResponseEntity.ok(CommonApiResponse.success(CustomerAddressResponseDto.toDto(savedAddress)));
+    return ResponseEntity.ok(
+        CommonApiResponse.success(CustomerAddressResponseDto.toDto(savedAddress)));
   }
 
 
@@ -104,9 +107,11 @@ public class CustomerController {
 
     Long customerId = user.getUserId();
 
-    CustomerAddress updatedAddress = customerAddressService.updateAddress(customerId, addressId, CustomerAddressUpdateRequestDto.toEntity(requestDto));
+    CustomerAddress updatedAddress = customerAddressService.updateAddress(customerId, addressId,
+        CustomerAddressUpdateRequestDto.toEntity(requestDto));
 
-    return ResponseEntity.ok(CommonApiResponse.success(CustomerAddressResponseDto.toDto(updatedAddress)));
+    return ResponseEntity.ok(
+        CommonApiResponse.success(CustomerAddressResponseDto.toDto(updatedAddress)));
   }
 
   @Operation(
