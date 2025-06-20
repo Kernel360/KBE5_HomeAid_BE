@@ -22,7 +22,6 @@ import com.homeaid.repository.ManagerRepository;
 import com.homeaid.repository.MatchingRepository;
 import com.homeaid.repository.ReservationRepository;
 import com.homeaid.serviceoption.domain.ServiceOption;
-import com.homeaid.serviceoption.domain.ServiceSubOption;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
@@ -71,8 +70,7 @@ class MatchingServiceTest {
         LocalDate.of(1990, 1, 1),
         GenderType.MALE,
         "경력사항",
-        "소개",
-        "image.jpg"
+        "소개"
     );
 
     Reservation reservation = Reservation.builder()
@@ -110,25 +108,16 @@ class MatchingServiceTest {
 
     ServiceOption serviceOption = ServiceOption.builder()
         .name("가사 서비스")
-        .description("집안일 전반")
+        .price(20000)
         .build();
-
-    ServiceSubOption subOption = ServiceSubOption.builder()
-        .name("청소")
-        .description("기본 청소 서비스")
-        .durationMinutes(90)
-        .basePrice(30000)
-        .option(serviceOption)
-        .build();
-
 
     Reservation reservation = Reservation.builder()
         .customerId(1L)
         .requestedDate(LocalDate.of(2025, 6, 3))  // 화요일
         .requestedTime(LocalTime.of(14, 0))
+        .duration(2)
+        .totalPrice(serviceOption.getPrice())
         .build();
-
-    reservation.addItem(subOption);
 
     List<Manager> managerList = List.of(
         new Manager(
@@ -139,8 +128,7 @@ class MatchingServiceTest {
             LocalDate.of(1990, 1, 1),
             GenderType.MALE,
             "career",
-            "experience",
-            "profileImage"
+            "experience"
         ),
         new Manager(
             "manager2@example.com",
@@ -150,8 +138,7 @@ class MatchingServiceTest {
             LocalDate.of(1988, 5, 12),
             GenderType.FEMALE,
             "career",
-            "experience",
-            "profileImage"
+            "experience"
         ),
         new Manager(
             "manager3@example.com",
@@ -161,19 +148,20 @@ class MatchingServiceTest {
             LocalDate.of(1995, 10, 20),
             GenderType.MALE,
             "career",
-            "experience",
-            "profileImage"
+            "experience"
         )
     );
 
 
     given(reservationRepository.findById(reservationId))
         .willReturn(Optional.of(reservation));
-    given(managerRepository.findMatchingManagers(eq(Weekday.TUESDAY), any(), any(), eq("청소")))
+    given(managerRepository.findMatchingManagers(eq(Weekday.TUESDAY), any(), any(), eq("가사 서비스")))
         .willReturn(managerList);
 
+    reservation.addItem(serviceOption);
+
     // when
-    List<Manager> result = matchingService.recommendManagers(reservationId);
+      List<Manager> result = matchingService.recommendManagers(reservationId);
 
     // then
     assertThat(result).hasSize(3);

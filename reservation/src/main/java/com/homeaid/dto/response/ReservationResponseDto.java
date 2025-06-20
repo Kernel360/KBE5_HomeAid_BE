@@ -27,11 +27,8 @@ public class ReservationResponseDto {
   @Schema(description = "총 가격 (단위: 원)", example = "45000")
   private Integer totalPrice;
 
-  @Schema(description = "총 소요 시간 (단위: 분)", example = "120")
+  @Schema(description = "총 소요 시간 (단위: 시간)", example = "3")
   private Integer totalDuration;
-
-  @Schema(description = "예약 서비스 명", example = "대청소")
-  private String subOptionName;
 
   @Schema(description = "고객 ID", example = "1")
   private Long customerId;
@@ -62,13 +59,17 @@ public class ReservationResponseDto {
 
   private MatchingStatus matchingStatus;
 
+  private String serviceOptionName;
+
+  private String customerMemo;
+
   public static ReservationResponseDto toDto(Reservation reservation, Customer customer, Manager manager) {
     return ReservationResponseDto.builder()
         .reservationId(reservation.getId())
         .status(reservation.getStatus())
         .totalPrice(reservation.getTotalPrice())
-        .totalDuration(reservation.getTotalDuration())
-        .subOptionName(reservation.getItem().getSubOptionName())
+        .totalDuration(reservation.getDuration())
+        .serviceOptionName(reservation.getItem().getServiceOptionName())
         .startTime(LocalDateTime.of(
             reservation.getRequestedDate(),
             reservation.getRequestedTime()
@@ -83,8 +84,8 @@ public class ReservationResponseDto {
         .reservationId(reservation.getId())
         .status(reservation.getStatus())
         .totalPrice(reservation.getTotalPrice())
-        .totalDuration(reservation.getTotalDuration())
-        .subOptionName(reservation.getItem().getSubOptionName())
+        .totalDuration(reservation.getDuration())
+        .serviceOptionName(reservation.getItem().getServiceOptionName())
         .customerId(reservation.getCustomerId())
         .managerId(reservation.getManagerId())
         .requestedDate(reservation.getRequestedDate())
@@ -93,15 +94,13 @@ public class ReservationResponseDto {
         .build();
   }
 
-  private String customerMemo;
-
   public static ReservationResponseDto toDto(Reservation reservation) {
     return ReservationResponseDto.builder()
         .reservationId(reservation.getId())
         .status(reservation.getStatus())
         .totalPrice(reservation.getTotalPrice())
-        .totalDuration(reservation.getTotalDuration())
-        .subOptionName(reservation.getItem().getSubOptionName())
+        .totalDuration(reservation.getDuration())
+        .serviceOptionName(reservation.getItem().getServiceOptionName())
         .customerId(reservation.getCustomerId())
         .managerId(reservation.getManagerId())
         .requestedDate(reservation.getRequestedDate())

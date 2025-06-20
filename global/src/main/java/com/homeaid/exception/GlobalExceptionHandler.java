@@ -4,6 +4,7 @@ package com.homeaid.exception;
 import com.homeaid.common.response.CommonApiResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -61,6 +62,14 @@ public class GlobalExceptionHandler {
 
     return ResponseEntity.badRequest()
             .body(CommonApiResponse.fail("duplicate value", "이미 처리된 요청 입니다"));
+  }
+
+  @ExceptionHandler(IllegalArgumentException.class)
+  public ResponseEntity<CommonApiResponse<Void>> handleIllegalArgumentException(IllegalArgumentException e) {
+    log.error("[IllegalArgumentException] {}", e.getMessage());
+
+    return ResponseEntity.badRequest()
+        .body(CommonApiResponse.fail("INVALID_DATA_CONVERSION", "잘못된 요청입니다."));
   }
 
 }

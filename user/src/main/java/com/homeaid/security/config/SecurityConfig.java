@@ -1,12 +1,11 @@
 package com.homeaid.security.config;
 
-import com.homeaid.security.filter.RefreshTokenFilter;
-import com.homeaid.security.user.CustomUserDetailsService;
+import com.homeaid.auth.service.RefreshTokenService;
+import com.homeaid.auth.service.TokenBlacklistService;
 import com.homeaid.security.filter.AccessTokenFilter;
 import com.homeaid.security.filter.JwtAuthenticationFilter;
-import com.homeaid.security.token.JwtTokenProvider;
+import com.homeaid.security.jwt.JwtTokenProvider;
 import java.util.Arrays;
-
 import java.util.Collections;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -30,9 +29,10 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-  private final CustomUserDetailsService customUserDetailsService;
   private final JwtTokenProvider jwtTokenProvider;
-  private final RefreshTokenFilter refreshTokenFilter;
+  private final RefreshTokenService refreshTokenService;
+  private final TokenBlacklistService tokenBlacklistService;
+
 
   private final String[] allowUrls = {
       "/", "/actuator/health",
@@ -48,8 +48,10 @@ public class SecurityConfig {
   };
 
   @Bean
-  SecurityFilterChain securityFilterChain(HttpSecurity http, AuthenticationManager authManager) throws Exception {
-    JwtAuthenticationFilter signinFilter = new JwtAuthenticationFilter(authManager, jwtTokenProvider);
+  SecurityFilterChain securityFilterChain(HttpSecurity http, AuthenticationManager authManager)
+      throws Exception {
+    JwtAuthenticationFilter signinFilter = new JwtAuthenticationFilter(authManager,
+        jwtTokenProvider, refreshTokenService);
     signinFilter.setFilterProcessesUrl("/api/v1/auth/signin");
 
     http
@@ -57,7 +59,8 @@ public class SecurityConfig {
         .formLogin(AbstractHttpConfigurer::disable)
         .httpBasic(AbstractHttpConfigurer::disable)
         .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-        .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+        .sessionManagement(
+            session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
     http.authorizeHttpRequests(auth -> auth
         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
@@ -68,14 +71,14 @@ public class SecurityConfig {
 
     http
         .addFilterAt(signinFilter, UsernamePasswordAuthenticationFilter.class)
-        .addFilterBefore(refreshTokenFilter, UsernamePasswordAuthenticationFilter.class)
-        .addFilterBefore(new AccessTokenFilter(jwtTokenProvider, customUserDetailsService), UsernamePasswordAuthenticationFilter.class);
+        .addFilterBefore(new AccessTokenFilter(jwtTokenProvider, tokenBlacklistService), UsernamePasswordAuthenticationFilter.class);
 
     return http.build();
   }
 
   @Bean
-  public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
+  public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration)
+      throws Exception {
     return configuration.getAuthenticationManager();
   }
 
@@ -95,7 +98,8 @@ public class SecurityConfig {
         "https://homeaid-service.com"
     ));
 
-    configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
+    configuration.setAllowedMethods(
+        Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
 
     configuration.setAllowedHeaders(Arrays.asList(
         "Authorization",

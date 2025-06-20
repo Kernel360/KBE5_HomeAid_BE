@@ -3,7 +3,7 @@ package com.homeaid.domain;
 import static com.homeaid.domain.enumerate.ReservationStatus.REQUESTED;
 
 import com.homeaid.domain.enumerate.ReservationStatus;
-import com.homeaid.serviceoption.domain.ServiceSubOption;
+import com.homeaid.serviceoption.domain.ServiceOption;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -42,7 +42,7 @@ public class Reservation {
 
   private Integer totalPrice;
 
-  private Integer totalDuration;
+  private Integer duration;
 
   @Enumerated(EnumType.STRING)
   @Column(name = "status", nullable = false)
@@ -81,7 +81,7 @@ public class Reservation {
   private LocalDateTime deletedDate;
 
   @Builder
-  public Reservation(LocalDate requestedDate, LocalTime requestedTime, Long customerId, Double latitude, Double longitude, String address, String addressDetail, Integer totalPrice, Integer totalDuration) {
+  public Reservation(LocalDate requestedDate, LocalTime requestedTime, Long customerId, Double latitude, Double longitude, String address, String addressDetail, Integer totalPrice, Integer duration) {
     this.requestedDate = requestedDate;
     this.requestedTime = requestedTime;
     this.customerId = customerId;
@@ -90,20 +90,21 @@ public class Reservation {
     this.address = address;
     this.addressDetail = addressDetail;
     this.totalPrice = totalPrice;
-    this.totalDuration = totalDuration;
+    this.duration = duration;
   }
 
-  public void addItem(ServiceSubOption serviceSubOption) {
-    this.item = new ReservationItem(serviceSubOption);
+  public void addItem(ServiceOption serviceOption) {
+    this.item = new ReservationItem(serviceOption);
     item.setReservation(this);
+    this.totalPrice = serviceOption.getPrice() * this.duration;
   }
 
   public void updateReservation(Reservation newReservation, int newTotalPrice,
-      int newTotalDuration) {
+      int newDuration) {
     this.requestedDate = newReservation.getRequestedDate();
     this.requestedTime = newReservation.getRequestedTime();
     this.totalPrice = newTotalPrice;
-    this.totalDuration = newTotalDuration;
+    this.duration = newDuration;
   }
 
   public void softDelete() {
