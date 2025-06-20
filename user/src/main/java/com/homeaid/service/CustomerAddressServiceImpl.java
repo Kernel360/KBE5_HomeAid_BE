@@ -24,20 +24,12 @@ public class CustomerAddressServiceImpl implements CustomerAddressService {
   private final CustomerRepository customerRepository;
   private static final int MAX_ADDRESS_COUNT = 10;
 
-  // 고객의 저장된 주소 목록 조회
+
   @Override
-  public List<CustomerAddressResponseDto> getSavedAddresses(Long customerId) {
+  public List<CustomerAddress> getSavedAddresses(Long customerId) {
 
-    // 고객 존재 여부 확인
-    Customer customer = customerRepository.findById(customerId)
-        .orElseThrow(() -> new CustomException(UserErrorCode.CUSTOMER_NOT_FOUND));
-
-    List<CustomerAddress> addresses = customerAddressRepository.findByCustomerIdOrderByIdDesc(
+    return customerAddressRepository.findByCustomerIdOrderByIdDesc(
         customerId);
-
-    return addresses.stream()
-        .map(CustomerAddressResponseDto::toDto)
-        .collect(Collectors.toList());
   }
 
 
@@ -57,9 +49,7 @@ public class CustomerAddressServiceImpl implements CustomerAddressService {
     return customerAddressRepository.save(customerAddress);
   }
 
-  /**
-   * 주소 수정
-   */
+
   @Override
   @Transactional
   public CustomerAddress updateAddress(Long customerId, Long addressId,
@@ -77,12 +67,12 @@ public class CustomerAddressServiceImpl implements CustomerAddressService {
     return originCustomerAddress;
   }
 
-  // 주소 삭제
+
   @Transactional
   @Override
   public void deleteAddress(Long customerId, Long addressId) {
 
-    CustomerAddress address = customerAddressRepository.findByCustomerIdAndAddressId(customerId,
+    CustomerAddress address = customerAddressRepository.findByCustomerIdAndId(customerId,
         addressId);
 
     if (address == null) {
