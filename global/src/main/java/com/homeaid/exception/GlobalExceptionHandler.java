@@ -7,10 +7,13 @@ import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import java.sql.SQLIntegrityConstraintViolationException;
+import java.util.HashMap;
+import java.util.Map;
 
 @Slf4j
 @RestControllerAdvice
@@ -37,6 +40,14 @@ public class GlobalExceptionHandler {
         .orElse("입력값이 올바르지 않습니다.");
 
     log.warn("[ValidationException] {}", message);
+
+    Map<String, String> errors = new HashMap<>();
+    e.getBindingResult().getAllErrors().forEach((error) -> {
+              String fieldName = ((FieldError) error).getField();
+              String errorMessage = error.getDefaultMessage();
+              errors.put(fieldName, errorMessage);
+        log.warn("유효성 검증 실패 - 필드: {}, 메시지: {}", fieldName, errorMessage);
+    });
 
     return ResponseEntity.badRequest()
         .body(CommonApiResponse.fail("VALIDATION_ERROR", message));

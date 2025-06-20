@@ -4,7 +4,11 @@ package com.homeaid.service;
 import com.homeaid.domain.Manager;
 import com.homeaid.domain.Matching;
 import com.homeaid.domain.Reservation;
+import com.homeaid.domain.enumerate.NotificationEventType;
+import com.homeaid.domain.enumerate.RelatedEntity;
+import com.homeaid.domain.enumerate.UserRole;
 import com.homeaid.domain.enumerate.Weekday;
+import com.homeaid.dto.RequestNotification;
 import com.homeaid.dto.request.MatchingCustomerResponseDto.CustomerAction;
 import com.homeaid.dto.request.MatchingManagerResponseDto.ManagerAction;
 import com.homeaid.exception.CustomException;
@@ -29,6 +33,7 @@ public class MatchingServiceImpl implements MatchingService {
   private final ManagerRepository managerRepository;
   private final ReservationRepository reservationRepository;
   private final MatchingRepository matchingRepository;
+  private final NotificationService notificationService;
 
   @Override
   @Transactional
@@ -48,7 +53,19 @@ public class MatchingServiceImpl implements MatchingService {
 
     reservation.updateStatusMatching();
     
-    return matchingRepository.save(matching).getId();
+    Long matchingId = matchingRepository.save(matching).getId();
+
+    RequestNotification requestNotification = RequestNotification.builder()
+            .notificationEventType(NotificationEventType.MATCHING_CREATED)
+            .targetId(managerId)
+            .targetRole(UserRole.MANAGER)
+            .relatedEntityId(matchingId)
+            .relatedEntityType(RelatedEntity.MATCHING)
+            .senderType(UserRole.ADMIN)
+            .build();
+    notificationService.createNotification(requestNotification);
+
+    return matchingId;
   }
 
 
@@ -72,6 +89,22 @@ public class MatchingServiceImpl implements MatchingService {
         matching.getReservation().failedMatching();
       }
     }
+    NotificationEventType notificationEventType = memo == null ? NotificationEventType.MATCHING_ACCEPTED_BY_MANAGER
+            : NotificationEventType.MATCHING_REJECTED_BY_MANAGER;
+
+    RequestNotification requestNotification = RequestNotification.builder()
+            .notificationEventType(notificationEventType)
+            .targetId(matching.getReservation().getCustomerId())
+            .targetRole(UserRole.CUSTOMER)
+            .relatedEntityId(matching.getId())
+            .relatedEntityType(RelatedEntity.MATCHING)
+            .content(memo)
+            .build();
+    notificationService.createNotification(requestNotification); //고객 알람용
+
+    requestNotification.setTargetId(-1L);
+    requestNotification.setTargetRole(UserRole.ADMIN);
+    notificationService.createNotification(requestNotification); //관리자 알람용
 
   }
 
@@ -100,6 +133,23 @@ public class MatchingServiceImpl implements MatchingService {
         matching.getReservation().failedMatching();
       }
     }
+    NotificationEventType notificationEventType = memo == null || memo.isBlank() ?
+            NotificationEventType.MATCHING_ACCEPTED_BY_CUSTOMER : NotificationEventType.MATCHING_REJECTED_BY_CUSTOMER;
+
+    RequestNotification requestNotification = RequestNotification.builder()
+            .notificationEventType(notificationEventType)
+            .targetId(matching.getManager().getId())
+            .targetRole(UserRole.MANAGER)
+            .relatedEntityId(matching.getId())
+            .relatedEntityType(RelatedEntity.MATCHING)
+            .content(memo)
+            .build();
+    notificationService.createNotification(requestNotification);//고객 알람용
+
+    requestNotification.setTargetId(-1L);
+    requestNotification.setTargetRole(UserRole.ADMIN);
+    notificationService.createNotification(requestNotification);//관리자 알람용
+
   }
 
   @Override

@@ -23,16 +23,7 @@ public class NotificationService {
     @Async
     public void createNotification(RequestNotification requestNotification) {
         try {
-            // 1. DB에 알림 저장
             notificationRepository.save(RequestNotification.toNotification(requestNotification));
-
-            // 2. 실시간 전송 (해당 사용자가 온라인이면)
-//            sseService.sendNotificationToUser(
-//                    notification.getRecipientId(),
-//                    notification.getRecipientType(),
-//                    notification
-//            );
-
         } catch (Exception e) {
             log.error("알림 생성 실패", e);
         }
@@ -40,6 +31,9 @@ public class NotificationService {
 
     // 최초 연결시 사용자의 읽지 않은 알림들
     public List<Notification> getUnreadNotifications(Long userId, UserRole userType) {
+        if (userType == UserRole.ADMIN) {
+            //관리자는 여려명에게 다보낸다하면 그중 한명이 알람을 읽고 해당 이벤트를 처리를 안한다면?..
+        }
         return notificationRepository.findByTargetIdAndStatus(userId, NotificationStatus.UNREAD);
     }
 
@@ -57,5 +51,10 @@ public class NotificationService {
     public void updateNotificationMarkSent(List<Notification> notifications) {
         notifications.forEach(Notification::markAsSent);
         log.info("✅ {} 개의 알림이 isSent=true로 업데이트됨", notifications.size());
+    }
+
+    public List<Notification> getUnreadNotificationAdmin() {
+        log.info("관리자 안읽은 알림");
+        return notificationRepository.findByTargetRoleAndStatus(UserRole.ADMIN, NotificationStatus.UNREAD);
     }
 }

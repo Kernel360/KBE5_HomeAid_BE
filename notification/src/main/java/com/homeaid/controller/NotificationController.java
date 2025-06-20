@@ -1,6 +1,7 @@
 package com.homeaid.controller;
 
 import com.homeaid.domain.Notification;
+import com.homeaid.domain.enumerate.UserRole;
 import com.homeaid.exception.CustomException;
 import com.homeaid.exception.ErrorCode;
 import com.homeaid.security.user.CustomUserDetails;
@@ -36,7 +37,13 @@ public class NotificationController {
 
         SseEmitter sseEmitterInstance = sseNotificationService.createConnection(user.getUserId(), user.getUserRole());
 
-        List<Notification> notifications = notificationService.getUnreadNotifications(user.getUserId(), user.getUserRole());
+        List<Notification> notifications = null;
+        if (user.getUserRole().equals(UserRole.ADMIN)) {
+            notifications = notificationService.getUnreadNotificationsForAdmin(user.getUserRole());
+        } else {
+            notifications = notificationService.getUnreadNotifications(user.getUserId(), user.getUserRole());
+        }
+
         SseEmitter sseEmitter = sseNotificationService.sendNotificationByConnection(notifications, sseEmitterInstance, user.getUserId());
         notificationService.updateNotificationMarkSent(notifications);
         return sseEmitter;

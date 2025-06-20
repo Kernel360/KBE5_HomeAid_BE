@@ -6,8 +6,10 @@ import com.homeaid.domain.enumerate.RelatedEntity;
 import com.homeaid.domain.enumerate.UserRole;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.Setter;
 
 @Getter
+@Setter
 @Builder
 public class RequestNotification {
 
@@ -22,6 +24,8 @@ public class RequestNotification {
     private Long senderId;
 
     private UserRole senderType;
+
+    private String content;
 
     // 관련 엔티티 정보
     private Long relatedEntityId;  // 예약 ID, 매칭 ID 등

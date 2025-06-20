@@ -28,7 +28,11 @@ public class SseNotificationService {
     private final NotificationService notificationService;
 
     public SseEmitter createConnection(Long userId, UserRole userRole) {
-        SseEmitter emitter = new SseEmitter(60_000L); // 60초 타임아웃
+        SseEmitter emitter = new SseEmitter(300_000L); // 5분 타임아웃
+
+        if (userRole == UserRole.ADMIN) {
+            adminIds.add(userId);
+        }
         // 연결 정리 이벤트 처리
         emitter.onCompletion(() -> {
             connections.remove(userId);
@@ -43,15 +47,8 @@ public class SseNotificationService {
             connections.remove(userId);
             log.info("Connection error closed");
         });
-
-        //연결 끊어졌을 때 최초에 읽지 않은 알림 보낸거 isSent 다시 false 처리해야 다음 접속시 안읽은 알림 발송 가능함
-
         connections.put(userId, emitter);
-
         log.info("connection count: {}", connections.size());
-
-        // 🎯 연결 즉시 읽지 않은 알림 전송
-//        sendUnreadNotifications(userId, userRole, emitter);
 
         return emitter;
     }
@@ -86,6 +83,7 @@ public class SseNotificationService {
         }
     }
 
+    //특정 사용자에게 알람 전송
     public SseEmitter sendNotificationByConnection(List<Notification> notifications, SseEmitter emitter, Long userId) {
         try {
             emitter.send(SseEmitter.event()
@@ -111,10 +109,12 @@ public class SseNotificationService {
         }
 
         List<Notification> onlineUserAlerts = notificationService.findByTargetIdAndUnsent(connectionIds);
+        List<Notification> onlineAdminAlerts = notificationService.getUnreadNotificationAdmin();
 
         for (Notification alert : onlineUserAlerts) {
             sendAlertToUser(alert.getTargetId(), alert);
         }
+        broadcastAdminNotification(onlineAdminAlerts);
     }
 
     @Scheduled(fixedRate = 30000) // 30초마다
@@ -138,4 +138,18 @@ public class SseNotificationService {
         zombieConnections.forEach(connections::remove);
     }
 
+    public void broadcastAdminNotification(List<Notification> notifications) {
+        connections.keySet().stream()
+                .filter(adminIds::contains)
+                .forEach(adminId -> {
+                    SseEmitter emitter = connections.get(adminId);
+                    try {
+                        emitter.send(SseEmitter.event()
+                                .name("unread-notification")
+                                .data(notifications));
+                    } catch (IOException e) {
+                        connections.remove(adminId);
+                    }
+                });
+    }
 }
