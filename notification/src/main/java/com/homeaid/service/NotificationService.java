@@ -5,6 +5,7 @@ import com.homeaid.domain.enumerate.NotificationStatus;
 import com.homeaid.domain.enumerate.UserRole;
 import com.homeaid.dto.RequestNotification;
 import com.homeaid.repository.NotificationRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
@@ -48,6 +49,13 @@ public class NotificationService {
 
 
     public List<Notification> findByTargetIdAndUnsent(Set<Long> connectionIds) {
+        log.info("스케줄러 데이터 확인할 아이디들 {}", connectionIds.toString());
         return notificationRepository.findByTargetIdAndUnsent(connectionIds);
+    }
+
+    @Transactional
+    public void updateNotificationMarkSent(List<Notification> notifications) {
+        notifications.forEach(Notification::markAsSent);
+        log.info("✅ {} 개의 알림이 isSent=true로 업데이트됨", notifications.size());
     }
 }
