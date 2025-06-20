@@ -15,6 +15,7 @@ public enum UserErrorCode implements BaseErrorCode {
   INVALID_OAUTH_PROVIDER(HttpStatus.BAD_REQUEST, "INVALID_OAUTH_PROVIDER", "지원하지 않는 소셜 로그인 제공자입니다."),
   INVALID_WORKTIME(HttpStatus.BAD_REQUEST, "INVALID_WORKTIME", "근무 가능 시간은 06:00 ~ 22:00 사이여야 합니다."),
   INVALID_WORKTIME_ORDER(HttpStatus.BAD_REQUEST, "INVALID_WORKTIME_ORDER", "시작 시간은 종료 시간보다 이전이어야 합니다."),
+  ADDRESS_LIMIT_EXCEEDED(HttpStatus.BAD_REQUEST, "ADDRESS_LIMIT_EXCEEDED", "주소는 최대 10개까지만 등록할 수 있습니다."),
 
   // 401 UNAUTHORIZED
   UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "UNAUTHORIZED", "로그인이 필요합니다."),
@@ -39,6 +40,7 @@ public enum UserErrorCode implements BaseErrorCode {
   PHONE_NUMBER_ALREADY_USED(HttpStatus.CONFLICT, "PHONE_NUMBER_ALREADY_USED", "이미 사용 중인 전화번호입니다."),
   DUPLICATE_ADDRESS(HttpStatus.CONFLICT, "ADDRESS_002", "이미 등록된 주소입니다."),
   DUPLICATE_ADDRESS_ALIAS(HttpStatus.CONFLICT, "DUPLICATE_ADDRESS_ALIAS", "이미 사용 중인 주소 별칭입니다.");
+
 
 
   private final HttpStatus status;
