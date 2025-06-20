@@ -5,6 +5,8 @@ import com.homeaid.domain.Manager;
 import com.homeaid.domain.User;
 import com.homeaid.dto.request.UserUpdateRequestDto;
 import jakarta.validation.Valid;
+import java.io.IOException;
+import org.springframework.web.multipart.MultipartFile;
 
 public interface UserService {
 
@@ -15,4 +17,8 @@ public interface UserService {
   User getUserById(Long id);
 
   void updateUserInfo(Long userId, UserUpdateRequestDto dto);
+
+  void uploadProfileImage(Long userId, MultipartFile file) throws IOException;
+
+  void deleteProfileImage(Long userId);
 }

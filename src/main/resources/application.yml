@@ -76,3 +76,7 @@ management:
       exposure:
         include: '*'
 
+logging:
+  level:
+    root: INFO
+    com.homeaid: DEBUG

@@ -31,8 +31,10 @@ public enum ErrorCode implements BaseErrorCode {
   DUPLICATE_RESOURCE(HttpStatus.CONFLICT, "DUPLICATE_RESOURCE", "중복된 리소스입니다."),
 
   // 500 INTERNAL SERVER ERROR
-  INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "INTERNAL_SERVER_ERROR", "서버 오류가 발생했습니다."),
-  FILE_UPLOAD_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "FILE_UPLOAD_ERROR", "파일 업로드 중 에러가 발생했습니다.");
+  INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "INTERNAL_SERVER_ERROR",
+      "서버 오류가 발생했습니다."),
+  FILE_UPLOAD_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "FILE_UPLOAD_ERROR", "파일 업로드 중 에러가 발생했습니다."),
+  FILE_DELETE_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "FILE_DELETE_ERROR", "파일 삭제 중 에러가 발생했습니다.");
 
   private final HttpStatus status;
   private final String code;

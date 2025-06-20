@@ -33,6 +33,7 @@ public class ManagerDocument {
   @Column(name = "document_type")
   private DocumentType documentType;
 
+  @Column(name = "document_s3_key")
   private String documentS3Key;
 
   private String documentUrl; // 신분증, 범죄 경력 조회서, 보건증 및 건강검진서
@@ -45,7 +46,8 @@ public class ManagerDocument {
   private Manager manager;
 
   @Builder
-  public ManagerDocument(DocumentType documentType, String documentS3Key, String documentUrl, Manager manager) {
+  public ManagerDocument(DocumentType documentType, String documentS3Key, String documentUrl,
+      Manager manager) {
     this.documentType = documentType;
     this.documentS3Key = documentS3Key;
     this.documentUrl = documentUrl;
