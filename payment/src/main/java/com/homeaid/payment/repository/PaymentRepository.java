@@ -17,4 +17,7 @@ public interface PaymentRepository extends JpaRepository<Payment, Long> {
   @Query("SELECT p FROM Payment p WHERE p.reservation.customerId = :customerId")
   List<Payment> findByCustomerId(@Param("customerId") Long customerId);
 
+  @Query("SELECT COUNT(p) FROM Payment p WHERE p.status = 'PAID'") // 또는 조건 없이 COUNT(p)
+  long countAllPayments();
+
 }
