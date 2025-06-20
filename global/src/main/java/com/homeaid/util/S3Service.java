@@ -90,8 +90,9 @@ public class S3Service {
       boolean isObjectExist = amazonS3.doesObjectExist(bucket, fileKey);
 
       if (isObjectExist) {
-
         amazonS3.deleteObject(bucket, fileKey);
+        log.debug("파일 삭제 성공 - key: {}", fileKey);
+
       } else {
         log.error(fileKey + " 를 찾을 수 없음");
       }
