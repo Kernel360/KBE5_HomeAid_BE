@@ -20,5 +20,7 @@ public interface CustomerAddressRepository extends JpaRepository<CustomerAddress
   CustomerAddress findByCustomerIdAndAddressId(@Param("customerId") Long customerId, @Param("addressId") Long addressId);
 
   boolean existsByCustomerIdAndAlias(Long customerId, String alias);
+
+  CustomerAddress findByCustomerIdAndId(Long customerId, Long addressId);
 }
 

@@ -50,10 +50,7 @@ public class CustomerAddress {
     this.longitude = longitude;
   }
 
-  public void updateAddressInfo(String address, String addressDetail, Double latitude, Double longitude) {
-    this.address = address;
-    this.addressDetail = addressDetail;
-    this.latitude = latitude;
-    this.longitude = longitude;
+  public void updateAddressInfo(CustomerAddress updatedCustomerAddress) {
+    this.addressDetail = updatedCustomerAddress.getAddressDetail();
   }
 }

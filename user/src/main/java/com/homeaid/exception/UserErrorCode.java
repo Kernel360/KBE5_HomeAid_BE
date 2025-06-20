@@ -31,14 +31,14 @@ public enum UserErrorCode implements BaseErrorCode {
   USER_NOT_FOUND(HttpStatus.NOT_FOUND, "USER_NOT_FOUND", "사용자를 찾을 수 없습니다."),
   MANAGER_NOT_FOUND(HttpStatus.NOT_FOUND, "MANAGER_NOT_FOUND", "매니저를 찾을 수 없습니다."),
   CUSTOMER_NOT_FOUND(HttpStatus.NOT_FOUND, "CUSTOMER_NOT_FOUND", "고객을 찾을 수 없습니다."),
-  ADDRESS_NOT_FOUND(HttpStatus.NOT_FOUND, "ADDRESS_001", "주소를 찾을 수 없습니다."),
+  ADDRESS_NOT_FOUND(HttpStatus.NOT_FOUND, "ADDRESS_NOT_FOUND", "주소를 찾을 수 없습니다."),
   INVALID_MANAGER_REGION(HttpStatus.BAD_REQUEST, "INVALID_MANAGER_REGION", "존재하지 않는 시/군/구 지역입니다."),
 
   // 409 CONFLICT
   USER_ALREADY_EXISTS(HttpStatus.CONFLICT, "USER_ALREADY_EXISTS", "이미 가입된 회원입니다."),
   SOCIAL_ACCOUNT_ALREADY_LINKED(HttpStatus.CONFLICT, "SOCIAL_ACCOUNT_ALREADY_LINKED", "이미 연동된 소셜 계정입니다."),
   PHONE_NUMBER_ALREADY_USED(HttpStatus.CONFLICT, "PHONE_NUMBER_ALREADY_USED", "이미 사용 중인 전화번호입니다."),
-  DUPLICATE_ADDRESS(HttpStatus.CONFLICT, "ADDRESS_002", "이미 등록된 주소입니다."),
+  DUPLICATE_ADDRESS(HttpStatus.CONFLICT, "ADDRESS_ALREADY_REGISTERED", "이미 등록된 주소입니다."),
   DUPLICATE_ADDRESS_ALIAS(HttpStatus.CONFLICT, "DUPLICATE_ADDRESS_ALIAS", "이미 사용 중인 주소 별칭입니다.");
 
 

@@ -63,30 +63,18 @@ public class CustomerAddressServiceImpl implements CustomerAddressService {
   @Override
   @Transactional
   public CustomerAddress updateAddress(Long customerId, Long addressId,
-      CustomerAddress requestDto) {
+      CustomerAddress updatedAddress) {
 
-    // 수정할 주소 조회 및 권한 확인
-    CustomerAddress customerAddress = customerAddressRepository.findByCustomerIdAndAddressId(
+    CustomerAddress originCustomerAddress = customerAddressRepository.findByCustomerIdAndId(
         customerId, addressId);
 
-    if (customerAddress == null) {
+    if (originCustomerAddress == null) {
       throw new CustomException(UserErrorCode.ADDRESS_NOT_FOUND);
     }
 
-    // 중복 주소 확인 (수정하려는 주소가 다른 저장된 주소와 중복되는지 확인)
-    validateDuplicateAddressForUpdate(customerId, addressId, requestDto);
+    originCustomerAddress.updateAddressInfo(updatedAddress);
 
-    // 주소 정보 업데이트
-    customerAddress.updateAddressInfo(
-        requestDto.getAddress(),
-        requestDto.getAddressDetail(),
-        requestDto.getLatitude(),
-        requestDto.getLongitude()
-    );
-
-    CustomerAddress savedAddress = customerAddressRepository.save(customerAddress);
-
-    return savedAddress;
+    return originCustomerAddress;
   }
 
   // 주소 삭제
