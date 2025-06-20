@@ -72,7 +72,7 @@ public class AdminPaymentController {
     return ResponseEntity.ok(CommonApiResponse.success(response));
   }
 
-  @GetMapping
+  @GetMapping("/list")
   @Operation(summary = "관리자 전체 결제 내역 조회")
   @ApiResponses(value = {
       @ApiResponse(responseCode = "200", description = "전체 결제 내역 조회 성공",
