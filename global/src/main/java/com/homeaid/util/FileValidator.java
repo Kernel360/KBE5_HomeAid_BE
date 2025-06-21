@@ -10,7 +10,7 @@ import org.springframework.web.multipart.MultipartFile;
 public class FileValidator {
 
   private static final List<String> SUPPORTED_IMAGE_TYPES = List.of(
-      "image/jpeg", "image/png", "image/jpg", "image/webp"
+      "image/jpeg", "image/png", "image/jpg", "image/webp", "image/avif"
   );
 
   private static final List<String> SUPPORTED_DOCUMENT_TYPES = List.of(

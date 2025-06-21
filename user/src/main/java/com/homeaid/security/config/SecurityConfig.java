@@ -33,12 +33,12 @@ public class SecurityConfig {
   private final RefreshTokenService refreshTokenService;
   private final TokenBlacklistService tokenBlacklistService;
 
-
   private final String[] allowUrls = {
       "/", "/actuator/health",
       "/api/v1/users/signup/**",
       "/api/v1/swagger/users/**",
-      "/api/v1/auth/**"
+      "/api/v1/auth/**",
+      "api/v1/users/my/**"
   };
 
   private final String[] swaggerUrls = {
