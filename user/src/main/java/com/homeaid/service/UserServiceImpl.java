@@ -11,6 +11,7 @@ import com.homeaid.exception.CustomException;
 import com.homeaid.exception.UserErrorCode;
 import com.homeaid.repository.UserRepository;
 import com.homeaid.security.jwt.JwtTokenProvider;
+import com.homeaid.util.FileValidator;
 import com.homeaid.util.S3Service;
 import jakarta.validation.Valid;
 import java.io.IOException;
@@ -88,6 +89,8 @@ public class UserServiceImpl implements UserService {
   public void uploadProfileImage(Long userId, MultipartFile file) throws IOException {
     User user = userRepository.findById(userId)
         .orElseThrow(() -> new CustomException(UserErrorCode.USER_NOT_FOUND));
+
+    FileValidator.validateImageFile(file);
 
     String existingS3Key = user.getProfileImageS3Key();
 

@@ -13,6 +13,8 @@ public enum ErrorCode implements BaseErrorCode {
   INVALID_REQUEST(HttpStatus.BAD_REQUEST, "INVALID_REQUEST", "잘못된 요청입니다."),
   VALIDATION_ERROR(HttpStatus.BAD_REQUEST, "VALIDATION_ERROR", "요청 값이 올바르지 않습니다."),
   FILE_EMPTY(HttpStatus.BAD_REQUEST, "FILE_EMPTY", "파일이 비어있습니다."),
+  INVALID_IMAGE_TYPE(HttpStatus.BAD_REQUEST, "INVALID_IMAGE_TYPE", "유효하지 않은 이미지 형식입니다."),
+  INVALID_DOCUMENT_TYPE(HttpStatus.BAD_REQUEST, "INVALID_DOCUMENT_TYPE", "지원하지 않는 파일 형식입니다. PDF, DOC, DOCX만 업로드 가능합니다."),
 
 
   // 401 UNAUTHORIZED
