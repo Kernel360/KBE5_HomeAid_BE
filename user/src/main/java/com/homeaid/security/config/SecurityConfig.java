@@ -5,6 +5,7 @@ import com.homeaid.auth.service.TokenBlacklistService;
 import com.homeaid.security.filter.AccessTokenFilter;
 import com.homeaid.security.filter.JwtAuthenticationFilter;
 import com.homeaid.security.jwt.JwtTokenProvider;
+import com.homeaid.security.util.CookieUtil;
 import java.util.Arrays;
 import java.util.Collections;
 import lombok.RequiredArgsConstructor;
@@ -32,13 +33,16 @@ public class SecurityConfig {
   private final JwtTokenProvider jwtTokenProvider;
   private final RefreshTokenService refreshTokenService;
   private final TokenBlacklistService tokenBlacklistService;
+  private final CookieUtil cookieUtil;
 
   private final String[] allowUrls = {
       "/", "/actuator/health",
       "/api/v1/users/signup/**",
       "/api/v1/swagger/users/**",
       "/api/v1/auth/**",
-      "api/v1/users/my/**"
+      "/api/v1/users/my/**",
+      "api/v1/reservations/**",
+      "api/v1/**" // TODO 매칭 api 수정 필요
   };
 
   private final String[] swaggerUrls = {
@@ -50,7 +54,7 @@ public class SecurityConfig {
   SecurityFilterChain securityFilterChain(HttpSecurity http, AuthenticationManager authManager)
       throws Exception {
     JwtAuthenticationFilter signinFilter = new JwtAuthenticationFilter(authManager,
-        jwtTokenProvider, refreshTokenService);
+        jwtTokenProvider, refreshTokenService, cookieUtil);
     signinFilter.setFilterProcessesUrl("/api/v1/auth/signin");
 
     http
@@ -65,6 +69,7 @@ public class SecurityConfig {
         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
         .requestMatchers(allowUrls).permitAll()
         .requestMatchers(swaggerUrls).permitAll()
+        .requestMatchers("/api/v1").hasAnyRole("ADMIN", "USER", "MANAGER")
         .anyRequest().authenticated()
     );
 
