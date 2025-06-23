@@ -22,10 +22,12 @@ import com.homeaid.repository.ManagerRepository;
 import com.homeaid.repository.MatchingRepository;
 import com.homeaid.repository.ReservationRepository;
 import com.homeaid.serviceoption.domain.ServiceOption;
+import com.homeaid.util.RegionValidator;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
@@ -52,6 +54,14 @@ class MatchingServiceTest {
 
   @Mock
   private MatchingRepository matchingRepository;
+
+  @Mock
+  private RegionValidator regionValidator;
+
+  @BeforeEach
+  void setUp() {
+    given(regionValidator.isValid("서울특별시", "강남구")).willReturn(true); // ✅
+  }
 
 
   @Test
@@ -117,6 +127,7 @@ class MatchingServiceTest {
         .requestedTime(LocalTime.of(14, 0))
         .duration(2)
         .totalPrice(serviceOption.getPrice())
+        .address("서울특별시 강남구 대치동")
         .build();
 
     List<Manager> managerList = List.of(
@@ -152,16 +163,18 @@ class MatchingServiceTest {
         )
     );
 
+    String sido = "서울특별시";
+    String sigungu = "강남구";
 
     given(reservationRepository.findById(reservationId))
         .willReturn(Optional.of(reservation));
-    given(managerRepository.findMatchingManagers(eq(Weekday.TUESDAY), any(), any(), eq("가사 서비스")))
+    given(managerRepository.findMatchingManagers(eq(sido), eq(sigungu), eq(Weekday.TUESDAY.name()), any(), any(), eq("가사 서비스")))
         .willReturn(managerList);
 
     reservation.addItem(serviceOption);
 
     // when
-      List<Manager> result = matchingService.recommendManagers(reservationId);
+    List<Manager> result = matchingService.recommendManagers(reservationId);
 
     // then
     assertThat(result).hasSize(3);

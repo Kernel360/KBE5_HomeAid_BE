@@ -3,6 +3,7 @@ package com.homeaid.dto.request;
 
 import com.homeaid.domain.Reservation;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -36,8 +37,20 @@ public class ReservationRequestDto {
   @Schema(description = "선택한 서비스 소요 시간(시간)", example = "3")
   private Integer totalDuration;
 
+  @NotBlank
+  @Schema(description = "주소 정보", example = "서울시 강남구 강남대로 15")
+  private String address;
+
+  @NotBlank
+  @Schema(description = "주소 상세 정보", example = "2층")
+  private String addressDetail;
+
+  @NotNull
+  @Schema(description = "위도", example = "37.495708585432276")
   private Double latitude;
 
+  @NotNull
+  @Schema(description = "경도", example = "127.02894600148066")
   private Double longitude;
 
   public static Reservation toEntity(ReservationRequestDto reservationRequestDto, Long userId) {
@@ -48,6 +61,8 @@ public class ReservationRequestDto {
         .latitude(reservationRequestDto.getLatitude())
         .longitude(reservationRequestDto.getLongitude())
         .duration(reservationRequestDto.getTotalDuration())
+        .address(reservationRequestDto.getAddress())
+        .addressDetail(reservationRequestDto.getAddressDetail())
         .build();
   }
 
