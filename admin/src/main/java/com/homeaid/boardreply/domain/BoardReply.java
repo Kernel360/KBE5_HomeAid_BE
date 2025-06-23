@@ -55,5 +55,6 @@ public class BoardReply {
     if (content != null && !content.trim().isEmpty()) {
       this.content = content;
     }
+    return null;
   }
 }
