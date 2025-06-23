@@ -25,16 +25,46 @@ public class AdminStatisticsServiceImpl implements AdminStatisticsService {
   private final MatchingRepository matchingRepository;
   //private final ReviewRepository reviewRepository;
 
-  // 회원 통계
-  @Override
-  public UserStatsDto getUserStats(int year) {
-    Double withdrawRate = userRepository.calculateWithdrawRate(year);
+  // 회원 통계 - 연도/월 파라미터 공통 처리
+  private UserStatsDto buildUserStats(int year, Integer month) {
+    Double withdrawRate = userRepository.calculateWithdrawRate(year, month);
     return UserStatsDto.builder()
         .year(year)
-        .signupCount(userRepository.countSignUpsByYear(year))
+        .month(month)
+        .signupCount(userRepository.countSignUps(year, month))
         .totalUsers(userRepository.count())
-        .withdrawCount(userRepository.countWithdrawnByYear(year))
+        .withdrawCount(userRepository.countWithdrawn(year, month))
         .inactiveUserCount(userRepository.countInactiveUsers(LocalDate.now().minusMonths(6).atStartOfDay()))
+        .withdrawRate(withdrawRate != null ? withdrawRate : 0.0)
+        .build();
+  }
+
+  @Override
+  public UserStatsDto getUserStats(int year) {
+    return buildUserStats(year, null);
+  }
+
+  @Override
+  public UserStatsDto getUserStatsByMonth(int year, int month) {
+    return buildUserStats(year, month);
+  }
+
+  @Override
+  public UserStatsDto getWithdrawalStatsByMonth(int year, int month) {
+    Double withdrawRate = userRepository.calculateWithdrawRate(year, month);
+    return UserStatsDto.builder()
+        .year(year)
+        .month(month)
+        .withdrawRate(withdrawRate != null ? withdrawRate : 0.0)
+        .build();
+  }
+
+  // 이탈 통계
+  @Override
+  public UserStatsDto getWithdrawalStats(int year) {
+    Double withdrawRate = userRepository.calculateWithdrawRate(year, null);
+    return UserStatsDto.builder()
+        .year(year)
         .withdrawRate(withdrawRate != null ? withdrawRate : 0.0)
         .build();
   }
@@ -42,91 +72,92 @@ public class AdminStatisticsServiceImpl implements AdminStatisticsService {
   // 정산 통계
   @Override
   public SettlementStatsDto getSettlementStats(int year) {
+    return buildSettlementStats(year, null);
+  }
+
+  @Override
+  public SettlementStatsDto getSettlementStatsByMonth(int year, int month) {
+    return buildSettlementStats(year, month);
+  }
+
+  private SettlementStatsDto buildSettlementStats(int year, Integer month) {
     return SettlementStatsDto.builder()
         .year(year)
-        .requestedCount(settlementRepository.countRequestedByYear(year))
-        .paidCount(settlementRepository.countPaidByYear(year))
+        .month(month)
+        .requestedCount(settlementRepository.countRequested(year, month))
+        .paidCount(settlementRepository.countPaid(year, month))
         .build();
   }
 
   // 결제 통계
   @Override
   public PaymentStatsDto getPaymentStats(int year) {
-    return PaymentStatsDto.builder()
-        .year(year)
-        .totalAmount(paymentRepository.sumPaymentsByYear(year))
-        .cancelAmount(paymentRepository.sumCanceledPaymentsByYear(year))
-        .build();
+    return buildPaymentStats(year, null);
   }
 
   @Override
-  public PaymentStatsDto getPaymentMethodStats(int year, int month) {
-    Object result = paymentRepository.findPaymentMethodSums(year, month);
-
-    long card = 0L;
-    long transfer = 0L;
-    long cash = 0L;
-
-    if (result != null) {
-      Object[] values = (Object[]) result;
-
-      if (values.length == 3) {
-        if (values[0] instanceof Number) card = ((Number) values[0]).longValue();
-        if (values[1] instanceof Number) transfer = ((Number) values[1]).longValue();
-        if (values[2] instanceof Number) cash = ((Number) values[2]).longValue();
-      }
-    }
-
-    long total = paymentRepository.sumPaymentsByYear(year);
-    long canceled = paymentRepository.sumCanceledPaymentsByYear(year);
-
-    return PaymentStatsDto.builder()
-        .year(year)
-        .month(month)
-        .card(card)
-        .transfer(transfer)
-        .cash(cash)
-        .totalAmount(total)
-        .cancelAmount(canceled)
-        .build();
+  public PaymentStatsDto getPaymentStatsByMonth(int year, int month) {
+    return buildPaymentStats(year, month);
   }
 
+  // 공통 메서드
+  private PaymentStatsDto buildPaymentStats(int year, Integer month) {
+    long total = paymentRepository.sumPayments(year, month);
+    long canceled = paymentRepository.sumCanceledPayments(year, month);
+
+    PaymentStatsDto.PaymentStatsDtoBuilder builder = PaymentStatsDto.builder()
+        .year(year)
+        .month(month)
+        .totalAmount(total)
+        .cancelAmount(canceled);
+
+    // 월별일 경우만 수단별 통계 추가
+    if (month != null) {
+      applyPaymentMethodSums(builder, year, month);
+    }
+
+    return builder.build();
+  }
+
+  private void applyPaymentMethodSums(PaymentStatsDto.PaymentStatsDtoBuilder builder, int year, int month) {
+    Object result = paymentRepository.findPaymentMethodSums(year, month);
+
+    if (result instanceof Object[] values && values.length == 3) {
+      if (values[0] instanceof Number card) builder.card(card.longValue());
+      if (values[1] instanceof Number transfer) builder.transfer(transfer.longValue());
+      if (values[2] instanceof Number cash) builder.cash(cash.longValue());
+    } else {
+      builder.card(0L).transfer(0L).cash(0L);
+    }
+  }
 
   // 예약 통계
   @Override
-  public ReservationStatsDto getReservationStats(int year) {
+  public ReservationStatsDto getReservationStats(int year, Integer month) {
     return ReservationStatsDto.builder()
         .year(year)
-        .reservationCount(reservationRepository.countByYear(year))
-        .avgProcessingMinutes(reservationRepository.getAverageProcessingDays(year))
-        .build();
-  }
-
-  // 이탈 통계
-  @Override
-  public UserStatsDto getWithdrawalStats(int year) {
-    Double withdrawRate = userRepository.calculateWithdrawRate(year);
-
-    return UserStatsDto.builder()
-        .year(year)
-        .withdrawRate(withdrawRate != null ? withdrawRate : 0.0)
+        .month(month)
+        .reservationCount(reservationRepository.countByYearAndMonth(year, month))
+        .avgProcessingMinutes(reservationRepository.getAverageProcessingDays(year, month))
         .build();
   }
 
   // 매칭 통계
   @Override
-  public MatchingStatsDto getMatchingSuccessStats(int year) {
+  public MatchingStatsDto getMatchingSuccessStats(int year, Integer month) {
     return MatchingStatsDto.builder()
         .year(year)
-        .successCount(matchingRepository.countConfirmedMatchingsByYear(year))
+        .month(month)
+        .successCount(matchingRepository.countConfirmedMatchings(year, month))
         .build();
   }
 
   @Override
-  public MatchingStatsDto getMatchingFailStats(int year) {
+  public MatchingStatsDto getMatchingFailStats(int year, Integer month) {
     return MatchingStatsDto.builder()
         .year(year)
-        .failCount(matchingRepository.countFailedOrCancelledMatchingsByYear(year))
+        .month(month)
+        .failCount(matchingRepository.countFailedOrCancelledMatchings(year, month))
         .build();
   }
 

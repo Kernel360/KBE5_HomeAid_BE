@@ -1,7 +1,6 @@
 package com.homeaid.statistics.controller;
 
 import com.homeaid.common.response.CommonApiResponse;
-import com.homeaid.statistics.dto.ManagerRatingStatsDto;
 import com.homeaid.statistics.dto.MatchingStatsDto;
 import com.homeaid.statistics.dto.PaymentStatsDto;
 import com.homeaid.statistics.dto.ReservationStatsDto;
@@ -25,62 +24,98 @@ public class AdminStatisticsController {
 
   private final AdminStatisticsService adminStatisticsService;
 
-  // TODO : 데이터가 Null 일 경우에 대한 방어로직 추가, 월 단위 추가
-  // 회원 통계 전체 조회
+  // TODO : 데이터가 Null 일 경우에 대한 방어로직 추가
+
+  // 회원 통계
   @GetMapping("/users")
-  @Operation(summary = "연간 회원 통계")
-  public ResponseEntity<CommonApiResponse<UserStatsDto>> getUserStatistics(@RequestParam int year) {
-    return ResponseEntity.ok(CommonApiResponse.success(adminStatisticsService.getUserStats(year)));
+  @Operation(summary = "회원 통계 (연간 또는 월간)")
+  public ResponseEntity<CommonApiResponse<UserStatsDto>> getUserStatistics(
+      @RequestParam int year,
+      @RequestParam(required = false) Integer month) {
+
+    UserStatsDto dto = (month == null)
+        ? adminStatisticsService.getUserStats(year)
+        : adminStatisticsService.getUserStatsByMonth(year, month);
+
+    return ResponseEntity.ok(CommonApiResponse.success(dto));
+  }
+
+  // 탈퇴율 통계
+  @GetMapping("/withdraw-rate")
+  @Operation(summary = "탈퇴율 통계 (연간 또는 월간)")
+  public ResponseEntity<CommonApiResponse<UserStatsDto>> getWithdrawRate(
+      @RequestParam int year,
+      @RequestParam(required = false) Integer month) {
+
+    UserStatsDto dto = (month == null)
+        ? adminStatisticsService.getWithdrawalStats(year)
+        : adminStatisticsService.getWithdrawalStatsByMonth(year, month);
+
+    return ResponseEntity.ok(CommonApiResponse.success(dto));
   }
 
   // 정산 통계
   @GetMapping("/settlements")
-  @Operation(summary = "연간 정산 통계")
-  public ResponseEntity<CommonApiResponse<SettlementStatsDto>> getSettlementStatistics(@RequestParam int year) {
-    return ResponseEntity.ok(CommonApiResponse.success(adminStatisticsService.getSettlementStats(year)));
+  @Operation(summary = "정산 통계 (연간 또는 월간)")
+  public ResponseEntity<CommonApiResponse<SettlementStatsDto>> getSettlementStatistics(
+      @RequestParam int year,
+      @RequestParam(required = false) Integer month) {
+
+    SettlementStatsDto dto = (month == null)
+        ? adminStatisticsService.getSettlementStats(year)
+        : adminStatisticsService.getSettlementStatsByMonth(year, month);
+
+    return ResponseEntity.ok(CommonApiResponse.success(dto));
   }
 
-  // 결제 통계
+  /// 결제 통계 (연간 총액 / 월간 총액 + 수단별)
   @GetMapping("/payments")
-  @Operation(summary = "연간 결제 통계")
-  public ResponseEntity<CommonApiResponse<PaymentStatsDto>> getPaymentStatistics(@RequestParam int year) {
-    return ResponseEntity.ok(CommonApiResponse.success(adminStatisticsService.getPaymentStats(year)));
-  }
+  @Operation(summary = "결제 통계")
+  public ResponseEntity<CommonApiResponse<PaymentStatsDto>> getPaymentStats(
+      @RequestParam int year,
+      @RequestParam(required = false) Integer month) {
 
-  // 결제 수단별 매출 통계
-  @GetMapping("/payments/methods")
-  @Operation(summary = "월별 결제 수단별 통계")
-  public ResponseEntity<CommonApiResponse<PaymentStatsDto>> getPaymentMethodStatistics(
-      @RequestParam int year, @RequestParam int month) {
-    return ResponseEntity.ok(CommonApiResponse.success(adminStatisticsService.getPaymentMethodStats(year, month)));
+    PaymentStatsDto result = (month == null)
+        ? adminStatisticsService.getPaymentStats(year)
+        : adminStatisticsService.getPaymentStatsByMonth(year, month);
+
+    return ResponseEntity.ok(CommonApiResponse.success(result));
   }
 
   // 예약 통계
   @GetMapping("/reservations")
-  @Operation(summary = "연간 예약 통계")
-  public ResponseEntity<CommonApiResponse<ReservationStatsDto>> getReservationStatistics(@RequestParam int year) {
-    return ResponseEntity.ok(CommonApiResponse.success(adminStatisticsService.getReservationStats(year)));
+  @Operation(summary = "예약 통계 (연간 또는 월간)")
+  public ResponseEntity<CommonApiResponse<ReservationStatsDto>> getReservationStatistics(
+      @RequestParam int year,
+      @RequestParam(required = false) Integer month) {
+
+    return ResponseEntity.ok(CommonApiResponse.success(
+        adminStatisticsService.getReservationStats(year, month)
+    ));
   }
 
-  // 이탈 통계 - 탈퇴율
-  @GetMapping("/withdraw-rate")
-  @Operation(summary = "연간 탈퇴율 통계")
-  public ResponseEntity<CommonApiResponse<UserStatsDto>> getWithdrawRate(@RequestParam int year) {
-    return ResponseEntity.ok(CommonApiResponse.success(adminStatisticsService.getWithdrawalStats(year)));
-  }
-
-  // 매칭 통계 - 성공
+  // 매칭 성공 통계
   @GetMapping("/matching/success")
-  @Operation(summary = "연간 매칭 성공 건수")
-  public ResponseEntity<CommonApiResponse<MatchingStatsDto>> getMatchingSuccessStats(@RequestParam int year) {
-    return ResponseEntity.ok(CommonApiResponse.success(adminStatisticsService.getMatchingSuccessStats(year)));
+  @Operation(summary = "매칭 성공 통계 (연간 또는 월간)")
+  public ResponseEntity<CommonApiResponse<MatchingStatsDto>> getMatchingSuccessStats(
+      @RequestParam int year,
+      @RequestParam(required = false) Integer month) {
+
+    return ResponseEntity.ok(CommonApiResponse.success(
+        adminStatisticsService.getMatchingSuccessStats(year, month)
+    ));
   }
 
-  // 매칭 통계 - 실패/취소
+  // 매칭 실패/취소 통계
   @GetMapping("/matching/fail")
-  @Operation(summary = "연간 매칭 실패/취소 건수")
-  public ResponseEntity<CommonApiResponse<MatchingStatsDto>> getMatchingFailStats(@RequestParam int year) {
-    return ResponseEntity.ok(CommonApiResponse.success(adminStatisticsService.getMatchingFailStats(year)));
+  @Operation(summary = "매칭 실패/취소 통계 (연간 또는 월간)")
+  public ResponseEntity<CommonApiResponse<MatchingStatsDto>> getMatchingFailStats(
+      @RequestParam int year,
+      @RequestParam(required = false) Integer month) {
+
+    return ResponseEntity.ok(CommonApiResponse.success(
+        adminStatisticsService.getMatchingFailStats(year, month)
+    ));
   }
 
   // 서비스 품질 (평점 평균) 통계 추후 구현 시 아래 참고

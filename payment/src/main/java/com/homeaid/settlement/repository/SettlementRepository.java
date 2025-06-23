@@ -19,9 +19,11 @@ public interface SettlementRepository extends JpaRepository<Settlement, Long> {
   // 관리지
   List<Settlement> findBySettlementWeekStartBetween(LocalDate start, LocalDate end); //주간 정산 조회시 필요
 
-  @Query("SELECT COUNT(s) FROM Settlement s WHERE YEAR(s.settledAt) = :year")
-  long countRequestedByYear(@Param("year") int year);
+  // 정산 신청 수 (연간 또는 월간)
+  @Query("SELECT COUNT(s) FROM Settlement s WHERE YEAR(s.settledAt) = :year AND (:month IS NULL OR MONTH(s.settledAt) = :month)")
+  long countRequested(@Param("year") int year, @Param("month") Integer month);
 
-  @Query("SELECT COUNT(s) FROM Settlement s WHERE s.paidAt IS NOT NULL AND YEAR(s.paidAt) = :year")
-  long countPaidByYear(@Param("year") int year);
+  // 정산 지급 완료 수 (연간 또는 월간)
+  @Query("SELECT COUNT(s) FROM Settlement s WHERE s.paidAt IS NOT NULL AND YEAR(s.paidAt) = :year AND (:month IS NULL OR MONTH(s.paidAt) = :month)")
+  long countPaid(@Param("year") int year, @Param("month") Integer month);
 }

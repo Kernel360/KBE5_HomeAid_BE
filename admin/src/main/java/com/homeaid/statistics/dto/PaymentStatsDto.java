@@ -21,8 +21,8 @@ public class PaymentStatsDto {
   @Schema(description = "취소 금액", example = "2000000")
   private long cancelAmount;
 
-  @Schema(description = "월", example = "6")
-  private int month;
+  @Schema(description = "월 (선택, 1~12)", example = "6")
+  private Integer month;
 
   @Schema(description = "카드 결제 금액", example = "1000000")
   private long card;

@@ -14,6 +14,8 @@ public class MatchingStatsDto {
 
   @Schema(description = "연도", example = "2025")
   private int year;
+  @Schema(description = "월 (선택, 1~12)", example = "6")
+  private Integer month;
 
   @Schema(description = "성공 매칭 수", example = "1000")
   private long successCount;
