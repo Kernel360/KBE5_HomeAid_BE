@@ -42,7 +42,8 @@ public class SecurityConfig {
       "/api/v1/auth/**",
       "/api/v1/users/my/**",
       "api/v1/reservations/**",
-      "api/v1/**" // TODO 매칭 api 수정 필요
+      "api/v1/**", // TODO 매칭 api 수정 필요
+      "api/v1/managers/**"
   };
 
   private final String[] swaggerUrls = {
@@ -69,7 +70,10 @@ public class SecurityConfig {
         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
         .requestMatchers(allowUrls).permitAll()
         .requestMatchers(swaggerUrls).permitAll()
-        .requestMatchers("/api/v1").hasAnyRole("ADMIN", "USER", "MANAGER")
+//        .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
+//        .requestMatchers("/api/v1/customer/**").hasRole("CUSTOMER")
+//        .requestMatchers("/api/v1/managers/**").hasRole("MANAGER")
+//        .requestMatchers("/api/v1/**").hasAnyRole("ADMIN", "USER", "MANAGER")
         .anyRequest().authenticated()
     );
 

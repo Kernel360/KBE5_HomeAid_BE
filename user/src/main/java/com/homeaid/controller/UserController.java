@@ -7,7 +7,7 @@ import com.homeaid.domain.User;
 import com.homeaid.dto.request.CustomerSignUpRequestDto;
 import com.homeaid.dto.request.ManagerSignUpRequestDto;
 import com.homeaid.dto.request.UserUpdateRequestDto;
-import com.homeaid.dto.response.GetUserProfileResponseDto;
+import com.homeaid.dto.response.UserProfileResponseDto;
 import com.homeaid.dto.response.SignUpResponseDto;
 import com.homeaid.exception.CustomException;
 import com.homeaid.exception.ErrorCode;
@@ -71,7 +71,7 @@ public class UserController {
 
   @GetMapping("/my")
   @Operation(summary = "회원 기본 정보 조회", description = "회원정보 기본 정보 수정을 위한 회원 정보 조회")
-  public ResponseEntity<CommonApiResponse<GetUserProfileResponseDto>> getUserProfile(
+  public ResponseEntity<CommonApiResponse<UserProfileResponseDto>> getUserProfile(
       @AuthenticationPrincipal CustomUserDetails user) {
 
     Long userId = user.getUserId();
@@ -80,7 +80,7 @@ public class UserController {
     log.debug("유저 프로필 이미지 URL: {}", userProfile.getProfileImageUrl());
 
     return ResponseEntity.status(HttpStatus.OK)
-        .body(CommonApiResponse.success(GetUserProfileResponseDto.toUserProfileDto(userProfile)));
+        .body(CommonApiResponse.success(UserProfileResponseDto.toUserProfileDto(userProfile)));
   }
 
   @PutMapping("/my")

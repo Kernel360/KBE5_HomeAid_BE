@@ -7,7 +7,7 @@ import lombok.Getter;
 
 @Getter
 @Builder
-public class GetUserProfileResponseDto {
+public class UserProfileResponseDto {
 
   @Schema(description = "이름", example = "홍길동")
   private String name;
@@ -21,8 +21,8 @@ public class GetUserProfileResponseDto {
   @Schema(description = "프로필 사진", example = "이미지.jpg")
   private String profileImageUrl;
 
-  public static GetUserProfileResponseDto toUserProfileDto (User user) {
-    return GetUserProfileResponseDto.builder()
+  public static UserProfileResponseDto toUserProfileDto (User user) {
+    return UserProfileResponseDto.builder()
         .name(user.getName())
         .email(user.getEmail())
         .phone(user.getPhone())
