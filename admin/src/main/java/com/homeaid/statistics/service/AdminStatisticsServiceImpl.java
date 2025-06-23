@@ -118,7 +118,7 @@ public class AdminStatisticsServiceImpl implements AdminStatisticsService {
   public MatchingStatsDto getMatchingSuccessStats(int year) {
     return MatchingStatsDto.builder()
         .year(year)
-        .successCount(matchingRepository.countSuccess(year))
+        .successCount(matchingRepository.countConfirmedMatchingsByYear(year))
         .build();
   }
 
@@ -126,7 +126,7 @@ public class AdminStatisticsServiceImpl implements AdminStatisticsService {
   public MatchingStatsDto getMatchingFailStats(int year) {
     return MatchingStatsDto.builder()
         .year(year)
-        .failCount(matchingRepository.countFailOrCancel(year))
+        .failCount(matchingRepository.countFailedOrCancelledMatchingsByYear(year))
         .build();
   }
 

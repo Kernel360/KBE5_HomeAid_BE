@@ -17,9 +17,9 @@ public interface MatchingRepository extends JpaRepository<Matching, Long> {
   Page<Matching> findAllByManagerId(Long managerId, Pageable pageable);
 
   @Query("SELECT COUNT(m) FROM Matching m WHERE m.status = 'CONFIRMED' AND YEAR(m.createdDate) = :year")
-  long countSuccess(@Param("year") int year);
+  long countConfirmedMatchingsByYear(@Param("year") int year);
 
   @Query("SELECT COUNT(m) FROM Matching m " +
       "WHERE m.status IN ('CANCELLED', 'REJECTED') AND YEAR(m.createdDate) = :year")
-  long countFailOrCancel(@Param("year") int year);
+  long countFailedOrCancelledMatchingsByYear(@Param("year") int year);
 }
