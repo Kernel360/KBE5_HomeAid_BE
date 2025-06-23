@@ -27,7 +27,7 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
     WHERE YEAR(r.createdDate) = :year
       AND (:month IS NULL OR MONTH(r.createdDate) = :month)
     """)
-  long countByYearAndMonth(@Param("year") int year, @Param("month") Integer month);
+  long countReservationsByYearAndOptionalMonth(@Param("year") int year, @Param("month") Integer month);
 
   // 연도 또는 연도 + 월 기준 평균 처리 시간 (일)
   @Query(value = """

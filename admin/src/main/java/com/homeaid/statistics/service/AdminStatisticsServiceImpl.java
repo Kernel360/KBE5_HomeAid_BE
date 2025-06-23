@@ -137,7 +137,7 @@ public class AdminStatisticsServiceImpl implements AdminStatisticsService {
     return ReservationStatsDto.builder()
         .year(year)
         .month(month)
-        .reservationCount(reservationRepository.countByYearAndMonth(year, month))
+        .reservationCount(reservationRepository.countReservationsByYearAndOptionalMonth(year, month))
         .avgProcessingMinutes(reservationRepository.getAverageProcessingDays(year, month))
         .build();
   }
