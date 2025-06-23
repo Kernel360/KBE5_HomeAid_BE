@@ -2,7 +2,7 @@ package com.homeaid.service;
 
 import com.homeaid.domain.Notification;
 import com.homeaid.domain.enumerate.UserRole;
-import jakarta.transaction.Transactional;
+import com.homeaid.dto.ResponseAlert;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -61,7 +62,7 @@ public class SseNotificationService {
             try {
                 emitter.send(SseEmitter.event()
                         .name("new-notification")
-                        .data(notification));
+                        .data(ResponseAlert.toDto(notification)));
             } catch (IOException e) {
                 log.info("SseEmitter sending error");
                 connections.remove(userId);
@@ -70,51 +71,38 @@ public class SseNotificationService {
         }
     }
 
-    @Transactional
-    public void sendUnreadNotifications(Long userId, UserRole userType, SseEmitter emitter) {
-        List<Notification> unreadNotifications =
-                notificationService.getUnreadNotifications(userId, userType);
+    //sse 연결시 알람 전송
+    public SseEmitter sendAlertByConnection(List<Notification> notifications, SseEmitter emitter, Long userId) {
         try {
             emitter.send(SseEmitter.event()
                     .name("unread-notification")
-                    .data(unreadNotifications));
-        } catch (IOException e) {
-            connections.remove(userId);
-        }
-    }
-
-    //특정 사용자에게 알람 전송
-    public SseEmitter sendNotificationByConnection(List<Notification> notifications, SseEmitter emitter, Long userId) {
-        try {
-            emitter.send(SseEmitter.event()
-                    .name("unread-notification")
-                    .data(notifications));
+                    .data(notifications.stream().map(ResponseAlert::toDto)));
         } catch (IOException e) {
             connections.remove(userId);
         }
         return emitter;
     }
 
-    //현재 관리자는 타겟아이디가 관리자 id인 사람만 알림을 받을수 있다
-    //관리자가 받아야하는 알림을 모든 관리자가 일괄되게 받을려면 변경해야함
     @Scheduled(fixedDelay = 30000) //60초
     public void unSentAllNotifications() {
-        log.info("schedule schedule schedule schedule notifications");
-
         Set<Long> connectionIds = connections.keySet();
 
+        // 최근 10분 내 생성 + 5분 이상 전송 안한 알림
+        LocalDateTime recentCutoff = LocalDateTime.now().minusMinutes(10);
+        LocalDateTime sendCutoff = LocalDateTime.now().minusMinutes(5);
+
         if (connectionIds.isEmpty()) {
-            log.info("스케쥴러 , 연결된 아이디 없음");
+            log.info("스케쥴러 연결된 아이디 없음");
             return;
         }
 
-        List<Notification> onlineUserAlerts = notificationService.findByTargetIdAndUnsent(connectionIds);
-        List<Notification> onlineAdminAlerts = notificationService.getUnreadNotificationAdmin();
+        List<Notification> onlineUserAlerts = notificationService.getUnReadAlerts(connectionIds, recentCutoff, sendCutoff);
+        List<Notification> onlineAdminAlerts = notificationService.getUnreadAdminAlerts(recentCutoff, sendCutoff);
 
         for (Notification alert : onlineUserAlerts) {
             sendAlertToUser(alert.getTargetId(), alert);
         }
-        broadcastAdminNotification(onlineAdminAlerts);
+        broadcastAdminAlert(onlineAdminAlerts);
     }
 
     @Scheduled(fixedRate = 30000) // 30초마다
@@ -128,8 +116,6 @@ public class SseNotificationService {
                         .data(System.currentTimeMillis()));
 
             } catch (IOException e) {
-                // 🎯 30초 안에 끊어진 연결 발견!
-                // TCP 타임아웃(2시간) 기다리지 않음
                 zombieConnections.add(userId);
                 log.info("좀비 연결 발견: {}", userId);
             }
@@ -138,15 +124,15 @@ public class SseNotificationService {
         zombieConnections.forEach(connections::remove);
     }
 
-    public void broadcastAdminNotification(List<Notification> notifications) {
+    public void broadcastAdminAlert(List<Notification> notifications) {
         connections.keySet().stream()
                 .filter(adminIds::contains)
                 .forEach(adminId -> {
                     SseEmitter emitter = connections.get(adminId);
                     try {
                         emitter.send(SseEmitter.event()
-                                .name("unread-notification")
-                                .data(notifications));
+                                .name("new-notification")
+                                .data(notifications.stream().map(ResponseAlert::toDto)));
                     } catch (IOException e) {
                         connections.remove(adminId);
                     }

@@ -89,7 +89,8 @@ public class MatchingServiceImpl implements MatchingService {
         matching.getReservation().failedMatching();
       }
     }
-    NotificationEventType notificationEventType = memo == null ? NotificationEventType.MATCHING_ACCEPTED_BY_MANAGER
+    NotificationEventType notificationEventType = memo == null ?
+            NotificationEventType.MATCHING_ACCEPTED_BY_MANAGER
             : NotificationEventType.MATCHING_REJECTED_BY_MANAGER;
 
     RequestNotification requestNotification = RequestNotification.builder()

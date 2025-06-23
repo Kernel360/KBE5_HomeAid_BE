@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
 
@@ -17,11 +18,40 @@ public interface NotificationRepository extends JpaRepository<Notification, Long
 
     List<Notification> findByTargetRoleAndStatus(UserRole userType, NotificationStatus notificationStatus);
 
+    @Query("""
+        SELECT
+            n
+        FROM
+            Notification n
+        WHERE
+            n.targetId IN :connectionIds
+            AND n.status = 'UNREAD'
+            AND n.createdAt >= :recentCutoff
+            AND n.lastSentAt <= :sentCutoff
+        ORDER BY
+            n.createdAt DESC
+    """)
+    List<Notification> findUnSentAlerts(
+            Set<Long> connectionIds,
+            LocalDateTime recentCutoff,
+            LocalDateTime sentCutoff
+    );
 
-    //온라인사용자의
-    @Query("SELECT a FROM Notification a WHERE " +
-            "a.targetId IN :onlineUsers AND " +
-            "a.isSent = false " +
-            "ORDER BY a.createdAt DESC")
-    List<Notification> findByTargetIdAndUnsent(Set<Long> onlineUsers);
+    @Query("""
+        SELECT
+            n
+        FROM
+            Notification n
+        WHERE
+            n.targetRole = 'ADMIN'
+            AND n.status = 'UNREAD'
+            AND n.createdAt >= :recentCutoff
+            AND n.lastSentAt <= :sentCutoff
+        ORDER BY
+            n.createdAt DESC
+    """)
+    List<Notification> findUnsetAdminAlerts(
+            LocalDateTime recentCutoff,
+            LocalDateTime sentCutoff
+    );
 }

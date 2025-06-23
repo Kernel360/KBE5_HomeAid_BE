@@ -7,7 +7,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
@@ -23,9 +22,8 @@ public class Notification {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // 기본 정보
     @Enumerated(EnumType.STRING)
-    @Column(nullable = true)
+    @Column(nullable = false)
     private NotificationEventType eventType;
 
     @Column(nullable = true)
@@ -34,51 +32,35 @@ public class Notification {
     @Column(columnDefinition = "TEXT")
     private String content;
 
-    // 수신자 정보
     @Column(nullable = true)
-    private Long targetId;
+    private Long targetId;      //관리자일 경우 null
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = true)
     private UserRole targetRole;
 
-    // 발신자 정보 (선택적)
     private Long senderId;
 
     @Enumerated(EnumType.STRING)
     private UserRole senderType;
 
     // 관련 엔티티 정보
-    private Long relatedEntityId;  // 예약 ID, 매칭 ID 등
+    private Long relatedEntityId;
 
     @Enumerated(EnumType.STRING)
-    private RelatedEntity relatedEntityType;  // "RESERVATION", "MATCHING" 등
+    private RelatedEntity relatedEntityType;
 
-    // 상태
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private NotificationStatus status = NotificationStatus.UNREAD;
 
-    // 메타데이터 (JSON 형태로 추가 정보 저장)
-    // {"customerName": "홍길동", "serviceType": "청소" 등}
-//    @Column(columnDefinition = "TEXT")
-//    private String metadata;
-
-    // 스케줄 관련
-    // 예약 발송 시간
-//    private LocalDateTime scheduledAt;
-//    private boolean isScheduled = false;
-    private boolean isSent = false;
-
-    // 감사 정보
     @CreatedDate
     @Column(updatable = false)
     private LocalDateTime createdAt;
 
-//    @LastModifiedDate
-//    private LocalDateTime updatedAt;
-
     private LocalDateTime readAt;
+
+    private LocalDateTime lastSentAt;
 
     @Builder
     public Notification(NotificationEventType eventType,
@@ -94,18 +76,12 @@ public class Notification {
         this.relatedEntityType = relatedEntityType;
     }
 
-    // 비즈니스 메서드
     public void markAsRead() {
         this.status = NotificationStatus.READ;
         this.readAt = LocalDateTime.now();
     }
 
     public void markAsSent() {
-        this.isSent = true;
+        this.lastSentAt = LocalDateTime.now();
     }
-
-//    public boolean isReadyToSend() {
-//        return isScheduled && !isSent &&
-//                (scheduledAt == null || LocalDateTime.now().isAfter(scheduledAt));
-//    }
 }

@@ -4,12 +4,15 @@ import com.homeaid.domain.Notification;
 import com.homeaid.domain.enumerate.NotificationStatus;
 import com.homeaid.domain.enumerate.UserRole;
 import com.homeaid.dto.RequestNotification;
+import com.homeaid.exception.CustomException;
+import com.homeaid.exception.UserErrorCode;
 import com.homeaid.repository.NotificationRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
 
@@ -19,7 +22,6 @@ import java.util.Set;
 public class NotificationService {
     private final NotificationRepository notificationRepository;
 
-    //다른 비즈니스로직중 알림이벤트 추가할때
     @Async
     public void createNotification(RequestNotification requestNotification) {
         try {
@@ -29,32 +31,28 @@ public class NotificationService {
         }
     }
 
-    // 최초 연결시 사용자의 읽지 않은 알림들
-    public List<Notification> getUnreadNotifications(Long userId, UserRole userType) {
-        if (userType == UserRole.ADMIN) {
-            //관리자는 여려명에게 다보낸다하면 그중 한명이 알람을 읽고 해당 이벤트를 처리를 안한다면?..
-        }
+    //연결시 사용자의 읽지 않은 알림들
+    public List<Notification> getUnReadAlerts(Long userId) {
         return notificationRepository.findByTargetIdAndStatus(userId, NotificationStatus.UNREAD);
     }
 
-    public List<Notification> getUnreadNotificationsForAdmin(UserRole userType) {
+    //연결시 관리자의 읽지 않은 알림들
+    public List<Notification> getUnReadAdminAlerts(UserRole userType) {
         return notificationRepository.findByTargetRoleAndStatus(userType, NotificationStatus.UNREAD);
     }
 
-
-    public List<Notification> findByTargetIdAndUnsent(Set<Long> connectionIds) {
-        log.info("스케줄러 데이터 확인할 아이디들 {}", connectionIds.toString());
-        return notificationRepository.findByTargetIdAndUnsent(connectionIds);
+    public List<Notification> getUnReadAlerts(Set<Long> connectionIds, LocalDateTime recentCutoff, LocalDateTime sendCutoff) {
+        return notificationRepository.findUnSentAlerts(connectionIds, recentCutoff, sendCutoff);
     }
 
     @Transactional
-    public void updateNotificationMarkSent(List<Notification> notifications) {
+    public void updateMarkSentAt(List<Notification> notifications) {
         notifications.forEach(Notification::markAsSent);
-        log.info("✅ {} 개의 알림이 isSent=true로 업데이트됨", notifications.size());
+        log.info("✅ {} 개의 알림이 lastSentAt 업데이트됨", notifications.size());
     }
 
-    public List<Notification> getUnreadNotificationAdmin() {
+    public List<Notification> getUnreadAdminAlerts(LocalDateTime recentCutoff, LocalDateTime sendCutoff) {
         log.info("관리자 안읽은 알림");
-        return notificationRepository.findByTargetRoleAndStatus(UserRole.ADMIN, NotificationStatus.UNREAD);
+        return notificationRepository.findUnsetAdminAlerts(recentCutoff, sendCutoff);
     }
 }

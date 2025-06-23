@@ -26,26 +26,18 @@ public class NotificationController {
 
     @GetMapping(value = "/connection", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public SseEmitter subscribe(@AuthenticationPrincipal CustomUserDetails user) {
-        log.info("🔥 SSE 연결 요청 도착! User: {}", user);
-
-        if (user == null) {
-            log.error("❌ User가 null입니다!");
-//            throw new RuntimeException("인증되지 않은 사용자");
-            throw new CustomException(ErrorCode.UNAUTHORIZED);
-        }
-        log.info("subscribe subscribe subscribe {}", user.getUsername());
 
         SseEmitter sseEmitterInstance = sseNotificationService.createConnection(user.getUserId(), user.getUserRole());
 
         List<Notification> notifications = null;
         if (user.getUserRole().equals(UserRole.ADMIN)) {
-            notifications = notificationService.getUnreadNotificationsForAdmin(user.getUserRole());
+            notifications = notificationService.getUnReadAdminAlerts(user.getUserRole());
         } else {
-            notifications = notificationService.getUnreadNotifications(user.getUserId(), user.getUserRole());
+            notifications = notificationService.getUnReadAlerts(user.getUserId());
         }
 
-        SseEmitter sseEmitter = sseNotificationService.sendNotificationByConnection(notifications, sseEmitterInstance, user.getUserId());
-        notificationService.updateNotificationMarkSent(notifications);
+        SseEmitter sseEmitter = sseNotificationService.sendAlertByConnection(notifications, sseEmitterInstance, user.getUserId());
+        notificationService.updateMarkSentAt(notifications);
         return sseEmitter;
     }
 }

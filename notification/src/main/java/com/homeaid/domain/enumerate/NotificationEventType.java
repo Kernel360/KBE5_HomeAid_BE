@@ -1,7 +1,9 @@
 package com.homeaid.domain.enumerate;
 
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
+@Getter
 @RequiredArgsConstructor
 public enum NotificationEventType {
     // 예약 관련
