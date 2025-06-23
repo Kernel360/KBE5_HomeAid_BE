@@ -5,7 +5,7 @@ import com.homeaid.domain.enumerate.NotificationStatus;
 import com.homeaid.domain.enumerate.UserRole;
 import com.homeaid.dto.RequestNotification;
 import com.homeaid.exception.CustomException;
-import com.homeaid.exception.UserErrorCode;
+import com.homeaid.exception.NotificationErrorCode;
 import com.homeaid.repository.NotificationRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -54,5 +54,13 @@ public class NotificationService {
     public List<Notification> getUnreadAdminAlerts(LocalDateTime recentCutoff, LocalDateTime sendCutoff) {
         log.info("관리자 안읽은 알림");
         return notificationRepository.findUnsetAdminAlerts(recentCutoff, sendCutoff);
+    }
+
+    @Transactional
+    public void updateMarkRead(Long notificationId) {
+        Notification notification = notificationRepository.findById(notificationId).orElseThrow(() ->
+                new CustomException(NotificationErrorCode.NOTIFICATION_NOT_FOUND));
+
+        notification.markAsRead();
     }
 }

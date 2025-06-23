@@ -1,19 +1,18 @@
 package com.homeaid.controller;
 
+import com.homeaid.common.response.CommonApiResponse;
 import com.homeaid.domain.Notification;
 import com.homeaid.domain.enumerate.UserRole;
-import com.homeaid.exception.CustomException;
-import com.homeaid.exception.ErrorCode;
 import com.homeaid.security.user.CustomUserDetails;
 import com.homeaid.service.NotificationService;
 import com.homeaid.service.SseNotificationService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import java.util.List;
 @RestController
@@ -39,5 +38,12 @@ public class NotificationController {
         SseEmitter sseEmitter = sseNotificationService.sendAlertByConnection(notifications, sseEmitterInstance, user.getUserId());
         notificationService.updateMarkSentAt(notifications);
         return sseEmitter;
+    }
+
+    @PatchMapping("/{alertId}")
+    public ResponseEntity<CommonApiResponse<Void>> modifyAlertToRead(@PathVariable (name = "alertId") Long alertId) {
+        log.info("modifyAlertToRead alertId: {}", alertId);
+        notificationService.updateMarkRead(alertId);
+        return new ResponseEntity<>(CommonApiResponse.success(), HttpStatus.OK);
     }
 }
