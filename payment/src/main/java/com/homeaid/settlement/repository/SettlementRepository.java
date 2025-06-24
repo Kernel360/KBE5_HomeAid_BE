@@ -16,8 +16,11 @@ public interface SettlementRepository extends JpaRepository<Settlement, Long> {
   List<Settlement> findBySettlementWeekStart(LocalDate startDate);
   List<Settlement> findByManagerIdAndSettlementWeekStart(Long managerId, LocalDate settlementWeekStart);
 
-  // 관리지
+  // 관리자
   List<Settlement> findBySettlementWeekStartBetween(LocalDate start, LocalDate end); //주간 정산 조회시 필요
+
+  @Query("SELECT COALESCE(SUM(s.managerSettlementPrice), 0) FROM Settlement s")
+  long sumAllSettlementAmounts();
 
   // 정산 신청 수 (연간 또는 월간)
   @Query("SELECT COUNT(s) FROM Settlement s WHERE YEAR(s.settledAt) = :year AND (:month IS NULL OR MONTH(s.settledAt) = :month)")

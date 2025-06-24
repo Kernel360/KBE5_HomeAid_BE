@@ -6,6 +6,7 @@ import com.homeaid.payment.repository.PaymentRepository;
 import com.homeaid.repository.ManagerRepository;
 import com.homeaid.repository.ReservationRepository;
 import com.homeaid.repository.UserRepository;
+import com.homeaid.settlement.repository.SettlementRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -17,6 +18,7 @@ public class AdminDashboardServiceImpl implements AdminDashboardService {
    private final ManagerRepository managerRepository;
    private final ReservationRepository reservationRepository;
    private final PaymentRepository paymentRepository;
+  private final SettlementRepository settlementRepository;
 
   public AdminDashboardStatsDto getStats() {
     long totalUsers = userRepository.countAllUsers();
@@ -24,6 +26,8 @@ public class AdminDashboardServiceImpl implements AdminDashboardService {
     long pendingApprovals = managerRepository.countPendingManagers();
     long todayReservations = reservationRepository.countTodayReservations();
     long totalPayments = paymentRepository.countAllPayments();
+    long totalPaymentAmount = paymentRepository.sumAllPaymentAmounts();
+    long totalSettlementAmount = settlementRepository.sumAllSettlementAmounts();
 
     return AdminDashboardStatsDto.builder()
         .totalUsers(totalUsers)
@@ -31,6 +35,8 @@ public class AdminDashboardServiceImpl implements AdminDashboardService {
         .totalPayments(totalPayments)
         .todayReservations(todayReservations)
         .pendingApprovals(pendingApprovals)
+        .totalPaymentAmount(totalPaymentAmount)
+        .totalSettlementAmount(totalSettlementAmount)
         .build();
   }
 }
