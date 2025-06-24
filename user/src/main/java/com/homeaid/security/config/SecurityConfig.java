@@ -42,8 +42,9 @@ public class SecurityConfig {
       "/api/v1/auth/**",
       "/api/v1/users/my/**",
       "api/v1/reservations/**",
-      "api/v1/**", // TODO 매칭 api 수정 필요
-      "api/v1/managers/**"
+      "api/v1/**", // TODO api 수정 필요
+      "api/v1/managers/**",
+      "api/v1/reviews/**"
   };
 
   private final String[] swaggerUrls = {
