@@ -105,9 +105,15 @@ public class MatchingServiceImpl implements MatchingService {
             .build();
     sseNotificationService.createAlertByRequestAlert(requestAlert); //고객 알람용
 
-    requestAlert.setTargetId(-1L);
-    requestAlert.setTargetRole(UserRole.ADMIN);
-    sseNotificationService.createAdminAlertByRequestAlert(requestAlert); //관리자 알람용
+    RequestAlert requestAdminAlert = RequestAlert.builder()
+            .notificationEventType(notificationEventType)
+            .targetRole(UserRole.ADMIN)
+            .relatedEntityId(matching.getId())
+            .relatedEntityType(RelatedEntity.MATCHING)
+            .content(memo)
+            .build();
+
+    sseNotificationService.createAdminAlertByRequestAlert(requestAdminAlert); //관리자 알람용
 
   }
 
@@ -149,9 +155,14 @@ public class MatchingServiceImpl implements MatchingService {
             .build();
     sseNotificationService.createAlertByRequestAlert(requestAlert);//고객 알람용
 
-    requestAlert.setTargetId(-1L);
-    requestAlert.setTargetRole(UserRole.ADMIN);
-    sseNotificationService.createAdminAlertByRequestAlert(requestAlert);//관리자 알람용
+    RequestAlert requestAdminAlert = RequestAlert.builder()
+            .notificationEventType(notificationEventType)
+            .targetRole(UserRole.ADMIN)
+            .relatedEntityId(matching.getId())
+            .relatedEntityType(RelatedEntity.MATCHING)
+            .content(memo)
+            .build();
+    sseNotificationService.createAdminAlertByRequestAlert(requestAdminAlert);//관리자 알람용
 
   }
 
