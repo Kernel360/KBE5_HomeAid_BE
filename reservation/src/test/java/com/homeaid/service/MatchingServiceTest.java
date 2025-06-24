@@ -58,6 +58,9 @@ class MatchingServiceTest {
   @Mock
   private RegionValidator regionValidator;
 
+  @Mock
+  private SseNotificationService sseNotificationService;
+
   @BeforeEach
   void setUp() {
     given(regionValidator.isValid("서울특별시", "강남구")).willReturn(true); // ✅
