@@ -207,10 +207,14 @@ class MatchingServiceTest {
 
     Matching matching = mock(Matching.class);
     Manager manager = mock(Manager.class);
+    Reservation reservation = mock(Reservation.class);
 
     given(matchingRepository.findById(matchingId)).willReturn(Optional.of(matching));
     given(matching.getManager()).willReturn(manager);
     given(manager.getId()).willReturn(userId);
+
+    given(matching.getReservation()).willReturn(reservation); // 추가
+    given(reservation.getCustomerId()).willReturn(123L); // 추가
 
     // when
     matchingService.respondToMatchingAsManager(userId, matchingId, ManagerAction.ACCEPT, null);
