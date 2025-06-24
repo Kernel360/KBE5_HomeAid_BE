@@ -99,8 +99,8 @@ public class MatchingServiceImpl implements MatchingService {
             .notificationEventType(notificationEventType)
             .targetId(matching.getReservation().getCustomerId())
             .targetRole(UserRole.CUSTOMER)
-            .relatedEntityId(matching.getId())
-            .relatedEntityType(RelatedEntity.MATCHING)
+            .relatedEntityId(matching.getReservation().getId())
+            .relatedEntityType(RelatedEntity.RESERVATION)
             .content(memo)
             .build();
     sseNotificationService.createAlertByRequestAlert(requestAlert); //고객 알람용
