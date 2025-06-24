@@ -84,14 +84,35 @@ public class ReviewController {
         CommonApiResponse.success(PagingResponseUtil.newInstance(myReviewResponseDtoPage)));
   }
 
-  @Operation(summary = "매니저 리뷰 목록 조회", description = "매니저에게 작성된 리뷰 목록을 조회합니다.")
-  @GetMapping("/{targetId}")
+  @Operation(summary = "특정 매니저 리뷰 목록 조회", description = "고객은 특정 매니저에게 작성된 리뷰 목록을 조회합니다.")
+  @GetMapping("/managers/{targetId}")
   public ResponseEntity<CommonApiResponse<PagingResponseDto<TargetReviewResponseDto>>> getReviewOfTarget(
       @ParameterObject
       @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable,
       @PathVariable Long targetId) {
 
     Page<TargetReviewResponseDto> targetResponseDtoPage = reviewService.getReviewOfTarget(targetId,
+            pageable)
+        .map(TargetReviewResponseDto::from);
+
+    // 리뷰 작성자 이름 셋팅하기
+    targetResponseDtoPage.getContent().forEach(review -> {
+      review.setName(userService.getUserById(review.getWriterId()).getName());
+    });
+
+    return ResponseEntity.ok(
+        CommonApiResponse.success(PagingResponseUtil.newInstance(targetResponseDtoPage)));
+  }
+
+  @Operation(summary = "매니저 리뷰 목록 조회", description = "매니저는 자신에게 작성된 리뷰 목록을 조회합니다.")
+  @GetMapping("/my")
+  public ResponseEntity<CommonApiResponse<PagingResponseDto<TargetReviewResponseDto>>> getReviewOfManager(
+      @ParameterObject
+      @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable,
+      @AuthenticationPrincipal CustomUserDetails user) {
+
+    Long managerId = user.getUserId();
+    Page<TargetReviewResponseDto> targetResponseDtoPage = reviewService.getReviewOfTarget(managerId,
             pageable)
         .map(TargetReviewResponseDto::from);
 
