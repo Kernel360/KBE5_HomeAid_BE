@@ -96,7 +96,6 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     return cookie;
   }
 
-
   @Override
   protected void unsuccessfulAuthentication(HttpServletRequest request,
       HttpServletResponse response,

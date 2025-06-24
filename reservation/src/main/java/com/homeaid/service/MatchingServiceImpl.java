@@ -18,6 +18,7 @@ import com.homeaid.exception.UserErrorCode;
 import com.homeaid.repository.ManagerRepository;
 import com.homeaid.repository.MatchingRepository;
 import com.homeaid.repository.ReservationRepository;
+import com.homeaid.util.RegionValidator;
 import java.time.LocalTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -34,6 +35,7 @@ public class MatchingServiceImpl implements MatchingService {
   private final ReservationRepository reservationRepository;
   private final MatchingRepository matchingRepository;
   private final NotificationService notificationService;
+  private final RegionValidator regionValidator;
 
   @Override
   @Transactional
@@ -159,6 +161,14 @@ public class MatchingServiceImpl implements MatchingService {
     Reservation reservation = reservationRepository.findById(reservationId)
         .orElseThrow(() -> new CustomException(ReservationErrorCode.RESERVATION_NOT_FOUND));
 
+    String[] addressParts = reservation.getAddress().split(" ");
+    String sido = addressParts[0].trim();
+    String sigungu = addressParts[1].trim();
+
+    if (!regionValidator.isValid(sido, sigungu)) {
+      throw new CustomException(ReservationErrorCode.INVALID_RESERVATION_REGION);
+    }
+
     Weekday reservationWeekday = Weekday.from(reservation.getRequestedDate());
 
     LocalTime startTime = reservation.getRequestedTime();
@@ -168,8 +178,7 @@ public class MatchingServiceImpl implements MatchingService {
     String optionName = reservation.getItem().getServiceOptionName();
 
     // Todo: 매니저 통계 테이블 만든 후에 조회된 매니저의 리뷰 수, 별점 등도 같이 조회
-    return managerRepository.findMatchingManagers(reservationWeekday, startTime, endTime, optionName);
-
+    return managerRepository.findMatchingManagers(sido, sigungu, reservationWeekday.name(), startTime, endTime, optionName);
   }
 
   // 매니저 매칭 전체 조회
