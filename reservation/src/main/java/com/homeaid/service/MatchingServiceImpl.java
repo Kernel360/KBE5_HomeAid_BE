@@ -8,7 +8,7 @@ import com.homeaid.domain.enumerate.NotificationEventType;
 import com.homeaid.domain.enumerate.RelatedEntity;
 import com.homeaid.domain.enumerate.UserRole;
 import com.homeaid.domain.enumerate.Weekday;
-import com.homeaid.dto.RequestNotification;
+import com.homeaid.dto.RequestAlert;
 import com.homeaid.dto.request.MatchingCustomerResponseDto.CustomerAction;
 import com.homeaid.dto.request.MatchingManagerResponseDto.ManagerAction;
 import com.homeaid.exception.CustomException;
@@ -34,8 +34,8 @@ public class MatchingServiceImpl implements MatchingService {
   private final ManagerRepository managerRepository;
   private final ReservationRepository reservationRepository;
   private final MatchingRepository matchingRepository;
-  private final NotificationService notificationService;
   private final RegionValidator regionValidator;
+  private final SseNotificationService sseNotificationService;
 
   @Override
   @Transactional
@@ -57,7 +57,7 @@ public class MatchingServiceImpl implements MatchingService {
     
     Long matchingId = matchingRepository.save(matching).getId();
 
-    RequestNotification requestNotification = RequestNotification.builder()
+    RequestAlert requestAlert = RequestAlert.builder()
             .notificationEventType(NotificationEventType.MATCHING_CREATED)
             .targetId(managerId)
             .targetRole(UserRole.MANAGER)
@@ -65,7 +65,7 @@ public class MatchingServiceImpl implements MatchingService {
             .relatedEntityType(RelatedEntity.MATCHING)
             .senderType(UserRole.ADMIN)
             .build();
-    notificationService.createNotification(requestNotification);
+    sseNotificationService.createAlertByRequestAlert(requestAlert);
 
     return matchingId;
   }
@@ -95,7 +95,7 @@ public class MatchingServiceImpl implements MatchingService {
             NotificationEventType.MATCHING_ACCEPTED_BY_MANAGER
             : NotificationEventType.MATCHING_REJECTED_BY_MANAGER;
 
-    RequestNotification requestNotification = RequestNotification.builder()
+    RequestAlert requestAlert = RequestAlert.builder()
             .notificationEventType(notificationEventType)
             .targetId(matching.getReservation().getCustomerId())
             .targetRole(UserRole.CUSTOMER)
@@ -103,11 +103,11 @@ public class MatchingServiceImpl implements MatchingService {
             .relatedEntityType(RelatedEntity.MATCHING)
             .content(memo)
             .build();
-    notificationService.createNotification(requestNotification); //고객 알람용
+    sseNotificationService.createAlertByRequestAlert(requestAlert); //고객 알람용
 
-    requestNotification.setTargetId(-1L);
-    requestNotification.setTargetRole(UserRole.ADMIN);
-    notificationService.createNotification(requestNotification); //관리자 알람용
+    requestAlert.setTargetId(-1L);
+    requestAlert.setTargetRole(UserRole.ADMIN);
+    sseNotificationService.createAdminAlertByRequestAlert(requestAlert); //관리자 알람용
 
   }
 
@@ -139,7 +139,7 @@ public class MatchingServiceImpl implements MatchingService {
     NotificationEventType notificationEventType = memo == null || memo.isBlank() ?
             NotificationEventType.MATCHING_ACCEPTED_BY_CUSTOMER : NotificationEventType.MATCHING_REJECTED_BY_CUSTOMER;
 
-    RequestNotification requestNotification = RequestNotification.builder()
+    RequestAlert requestAlert = RequestAlert.builder()
             .notificationEventType(notificationEventType)
             .targetId(matching.getManager().getId())
             .targetRole(UserRole.MANAGER)
@@ -147,11 +147,11 @@ public class MatchingServiceImpl implements MatchingService {
             .relatedEntityType(RelatedEntity.MATCHING)
             .content(memo)
             .build();
-    notificationService.createNotification(requestNotification);//고객 알람용
+    sseNotificationService.createAlertByRequestAlert(requestAlert);//고객 알람용
 
-    requestNotification.setTargetId(-1L);
-    requestNotification.setTargetRole(UserRole.ADMIN);
-    notificationService.createNotification(requestNotification);//관리자 알람용
+    requestAlert.setTargetId(-1L);
+    requestAlert.setTargetRole(UserRole.ADMIN);
+    sseNotificationService.createAdminAlertByRequestAlert(requestAlert);//관리자 알람용
 
   }
 

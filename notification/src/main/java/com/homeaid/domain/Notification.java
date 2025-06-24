@@ -74,6 +74,7 @@ public class Notification {
         this.senderType = senderType;
         this.relatedEntityId = relatedEntityId;
         this.relatedEntityType = relatedEntityType;
+        this.lastSentAt = LocalDateTime.now();
     }
 
     public void markAsRead() {

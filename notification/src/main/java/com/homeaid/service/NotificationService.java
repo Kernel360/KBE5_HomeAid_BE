@@ -3,14 +3,12 @@ package com.homeaid.service;
 import com.homeaid.domain.Notification;
 import com.homeaid.domain.enumerate.NotificationStatus;
 import com.homeaid.domain.enumerate.UserRole;
-import com.homeaid.dto.RequestNotification;
 import com.homeaid.exception.CustomException;
 import com.homeaid.exception.NotificationErrorCode;
 import com.homeaid.repository.NotificationRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -22,10 +20,9 @@ import java.util.Set;
 public class NotificationService {
     private final NotificationRepository notificationRepository;
 
-    @Async
-    public void createNotification(RequestNotification requestNotification) {
+    public void createNotification(Notification notification) {
         try {
-            notificationRepository.save(RequestNotification.toNotification(requestNotification));
+            notificationRepository.save(notification);
         } catch (Exception e) {
             log.error("알림 생성 실패", e);
         }

@@ -11,7 +11,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @Builder
-public class RequestNotification {
+public class RequestAlert {
 
     private NotificationEventType notificationEventType;
 
@@ -31,7 +31,7 @@ public class RequestNotification {
     private Long relatedEntityId;  // 예약 ID, 매칭 ID 등
     private RelatedEntity relatedEntityType;
 
-    public static Notification toNotification(RequestNotification notification) {
+    public static Notification toNotification(RequestAlert notification) {
         return Notification.builder()
                 .eventType(notification.getNotificationEventType())
                 .targetId(notification.getTargetId())

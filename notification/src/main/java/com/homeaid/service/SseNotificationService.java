@@ -2,19 +2,18 @@ package com.homeaid.service;
 
 import com.homeaid.domain.Notification;
 import com.homeaid.domain.enumerate.UserRole;
+import com.homeaid.dto.RequestAlert;
 import com.homeaid.dto.ResponseAlert;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Service
@@ -37,16 +36,16 @@ public class SseNotificationService {
         // 연결 정리 이벤트 처리
         emitter.onCompletion(() -> {
             connections.remove(userId);
-            log.info("Connection onCompletion closed");
+            log.info("Connection onCompletion closed id: {}", userId);
         });
         emitter.onTimeout(() -> {
             emitter.complete();
             connections.remove(userId);
-            log.info("Connection timed out");
+            log.info("Connection timed out id: {}", userId);
         });
         emitter.onError(e -> {
             connections.remove(userId);
-            log.info("Connection error closed");
+            log.info("Connection error closed id: {}", userId);
         });
         connections.put(userId, emitter);
         log.info("connection count: {}", connections.size());
@@ -55,8 +54,8 @@ public class SseNotificationService {
     }
 
     // 특정 사용자에게 실시간 알림 전송
-    public void sendAlertToUser(Long userId, Notification notification) {
-        SseEmitter emitter = connections.get(userId);
+    public void sendAlertToUser(Long targetId, Notification notification) {
+        SseEmitter emitter = connections.get(targetId);
 
         if (emitter != null) {
             try {
@@ -65,10 +64,35 @@ public class SseNotificationService {
                         .data(ResponseAlert.toDto(notification)));
             } catch (IOException e) {
                 log.info("SseEmitter sending error");
-                connections.remove(userId);
+                connections.remove(targetId);
                 emitter.complete();
             }
         }
+        notification.markAsSent();
+    }
+
+    @Async
+    public void createAlertByRequestAlert(RequestAlert requestAlert) {
+        Notification notification = RequestAlert.toNotification(requestAlert);
+        notificationService.createNotification(notification);
+
+        if (!connections.containsKey(notification.getTargetId())) {
+            return;
+        }
+
+        sendAlertToUser(requestAlert.getTargetId(), notification);
+    }
+
+    @Async
+    public void createAdminAlertByRequestAlert(RequestAlert requestAlert) {
+        Notification notification = RequestAlert.toNotification(requestAlert);
+        notificationService.createNotification(notification);
+
+        if (adminIds.isEmpty()) {
+            return;
+        }
+
+        broadcastAdminAlert(Collections.singletonList(notification));
     }
 
     //sse 연결시 알람 전송
@@ -137,5 +161,6 @@ public class SseNotificationService {
                         connections.remove(adminId);
                     }
                 });
+        notifications.forEach(Notification::markAsSent);
     }
 }

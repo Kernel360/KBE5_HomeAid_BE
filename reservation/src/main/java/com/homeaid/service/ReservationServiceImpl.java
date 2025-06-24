@@ -10,7 +10,7 @@ import com.homeaid.domain.enumerate.NotificationEventType;
 import com.homeaid.domain.enumerate.RelatedEntity;
 import com.homeaid.domain.enumerate.ReservationStatus;
 import com.homeaid.domain.enumerate.UserRole;
-import com.homeaid.dto.RequestNotification;
+import com.homeaid.dto.RequestAlert;
 import com.homeaid.dto.response.ReservationResponseDto;
 import com.homeaid.exception.CustomException;
 import com.homeaid.exception.MatchingErrorCode;
@@ -43,7 +43,7 @@ public class ReservationServiceImpl implements ReservationService {
   private final MatchingRepository matchingRepository;
 
   private final ServiceOptionRepository serviceOptionRepository;
-  private final NotificationService notificationService;
+  private final SseNotificationService sseNotificationService;
 
   @Override
   @Transactional
@@ -51,16 +51,18 @@ public class ReservationServiceImpl implements ReservationService {
     ServiceOption serviceOption = serviceOptionRepository.findById(serviceOptionId).orElseThrow(() -> new CustomException(ReservationErrorCode.RESERVATION_NOT_FOUND));
     reservation.addItem(serviceOption);
 
-    RequestNotification requestNotification = RequestNotification.builder()
+    Reservation savedReservation = reservationRepository.save(reservation);
+
+    RequestAlert requestAlert = RequestAlert.builder()
             .notificationEventType(NotificationEventType.RESERVATION_CREATED)
             .targetRole(UserRole.ADMIN)
             .relatedEntityType(RelatedEntity.RESERVATION)
-            .relatedEntityId(reservation.getId())
+            .relatedEntityId(savedReservation.getId())
             .senderId(reservation.getCustomerId())
             .build();
-    notificationService.createNotification(requestNotification);
+    sseNotificationService.createAdminAlertByRequestAlert(requestAlert);
 
-    return reservationRepository.save(reservation);
+    return savedReservation;
   }
 
   @Override
