@@ -88,10 +88,15 @@ public class ReviewServiceImpl implements ReviewService {
     userRatingUpdateService.updateRating(review.getTargetId(), review.getWriterRole());
   }
 
-    @Override
-    public Page<Review> getReviewOfWriter(Long writerId, Pageable pageable) {
-        return reviewRepository.findByWriterId(writerId, pageable);
-    }
+  @Override
+  public Page<Review> getReviewOfWriter(Long writerId, Pageable pageable) {
+    return reviewRepository.findByWriterId(writerId, pageable);
+  }
+
+  @Override
+  public Page<Review> getReviewOfTarget(Long targetId, Pageable pageable) {
+    return reviewRepository.findByTargetId(targetId, pageable);
+  }
 
 
   /**
