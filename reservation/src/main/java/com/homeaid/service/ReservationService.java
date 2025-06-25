@@ -22,7 +22,7 @@ public interface ReservationService {
 
   Page<Reservation> getReservationsByCustomer(Long userId, Pageable pageable);
 
-  Page<Reservation> getReservationsByManager(Long userId, Pageable pageable);
+  Page<ReservationResponseDto> getReservationsByManager(Long userId, Pageable pageable);
 
 
 }

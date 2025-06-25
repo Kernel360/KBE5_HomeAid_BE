@@ -11,6 +11,7 @@ import com.homeaid.exception.CustomException;
 import com.homeaid.exception.UserErrorCode;
 import com.homeaid.repository.UserRepository;
 import com.homeaid.security.jwt.JwtTokenProvider;
+import com.homeaid.util.FileValidator;
 import com.homeaid.util.S3Service;
 import jakarta.validation.Valid;
 import java.io.IOException;
@@ -33,6 +34,7 @@ public class UserServiceImpl implements UserService {
 
   private static final String PACKAGE_NAME = "USERS/PROFILE/";
 
+  // 매니저 회원가입
   public Manager signUpManager(@Valid Manager manager) {
 
     if (userRepository.existsByPhone(manager.getPhone())) {
@@ -43,6 +45,7 @@ public class UserServiceImpl implements UserService {
     return manager;
   }
 
+  // 고객 회원가입
   @Override
   public Customer signUpCustomer(Customer customer) {
 
@@ -54,40 +57,21 @@ public class UserServiceImpl implements UserService {
     return customer;
   }
 
-
-  @Override
-  public User getUserById(Long id) {
-    return userRepository.findById(id)
-        .orElseThrow(() -> new CustomException(UserErrorCode.USER_NOT_FOUND));
-  }
-
-  public String loginAndGetToken(SignInRequestDto request) {
-    var user = userRepository.findByPhone(request.getPhone());
-    if (user.isEmpty()) {
-      log.warn("로그인 실패 - User not found: email={}", request.getPhone());
-      throw new CustomException(UserErrorCode.LOGIN_FAILED);
-    }
-
-    if (!passwordEncoder.matches(request.getPassword(), user.get().getPassword())) {
-      log.warn("로그인 실패 - Invalid password: email={}", request.getPhone());
-      throw new CustomException(UserErrorCode.LOGIN_FAILED);
-    }
-    return jwtTokenProvider.createAccessToken(user.get().getId(), user.get().getRole().name());
-  }
-
+  // 사용자 정보 수정
   @Transactional
   public void updateUserInfo(Long userId, UserUpdateRequestDto dto) {
-    User user = userRepository.findById(userId)
-        .orElseThrow(() -> new CustomException(UserErrorCode.USER_NOT_FOUND));
+    User user =getUserById(userId);
 
     user.updateInfo(dto.getName(), dto.getEmail(), dto.getPhone());
   }
 
+  // 프로필 이미지 등록
   @Override
   @Transactional
   public void uploadProfileImage(Long userId, MultipartFile file) throws IOException {
-    User user = userRepository.findById(userId)
-        .orElseThrow(() -> new CustomException(UserErrorCode.USER_NOT_FOUND));
+    User user = getUserById(userId);
+
+    FileValidator.validateImageFile(file);
 
     String existingS3Key = user.getProfileImageS3Key();
 
@@ -104,11 +88,11 @@ public class UserServiceImpl implements UserService {
     userRepository.save(user);
   }
 
+  // 프로필 이미지 삭제
   @Override
   @Transactional
   public void deleteProfileImage(Long userId) {
-    User user = userRepository.findById(userId)
-        .orElseThrow(() -> new CustomException(UserErrorCode.USER_NOT_FOUND));
+    User user = getUserById(userId);
 
     String profileImageS3Key = user.getProfileImageS3Key();
 
@@ -127,4 +111,28 @@ public class UserServiceImpl implements UserService {
     user.profileImage(null, null);
     userRepository.save(user);
   }
+
+
+  @Override
+  public User getUserById(Long id) {
+    return userRepository.findById(id)
+        .orElseThrow(() -> new CustomException(UserErrorCode.USER_NOT_FOUND));
+  }
+
+
+  // 스웨거 로그인 관련 메서드
+  public String loginAndGetToken(SignInRequestDto request) {
+    var user = userRepository.findByPhone(request.getPhone());
+    if (user.isEmpty()) {
+      log.warn("로그인 실패 - User not found: email={}", request.getPhone());
+      throw new CustomException(UserErrorCode.LOGIN_FAILED);
+    }
+
+    if (!passwordEncoder.matches(request.getPassword(), user.get().getPassword())) {
+      log.warn("로그인 실패 - Invalid password: email={}", request.getPhone());
+      throw new CustomException(UserErrorCode.LOGIN_FAILED);
+    }
+    return jwtTokenProvider.createAccessToken(user.get().getId(), user.get().getRole().name());
+  }
+
 }

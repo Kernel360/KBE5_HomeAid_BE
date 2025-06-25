@@ -40,7 +40,7 @@ public class BoardReply {
   private Long userId;
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "user_id", insertable = false, updatable = false)
+  @JoinColumn(name = "id", insertable = false, updatable = false)
   private User user;
 
   @Column(name = "admin_id", nullable = false)

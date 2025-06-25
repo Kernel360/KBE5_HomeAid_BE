@@ -7,11 +7,14 @@ import org.springframework.data.domain.Pageable;
 
 
 public interface ReviewService {
-    Review createReviewByCustomer(Review requestReview);
 
-    Review createReviewByManager(Review requestReview);
+  Review createReviewByCustomer(Review requestReview);
 
-    void deleteReview(Long reviewId, Long userId);
+  Review createReviewByManager(Review requestReview);
 
-    Page<Review> getReviewOfWriter(Long writerId, Pageable pageable);
+  void deleteReview(Long reviewId, Long userId);
+
+  Page<Review> getReviewOfWriter(Long writerId, Pageable pageable);
+
+  Page<Review> getReviewOfTarget(Long targetId, Pageable pageable);
 }

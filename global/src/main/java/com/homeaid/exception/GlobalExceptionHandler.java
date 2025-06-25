@@ -2,6 +2,7 @@ package com.homeaid.exception;
 
 
 import com.homeaid.common.response.CommonApiResponse;
+import io.jsonwebtoken.ExpiredJwtException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
@@ -23,6 +24,17 @@ public class GlobalExceptionHandler {
 
     return ResponseEntity.status(e.getErrorCode().getStatus())
         .body(CommonApiResponse.fail(e.getErrorCode().getCode(), e.getErrorCode().getMessage()));
+  }
+
+  /**
+   * JWT 토큰 만료 예외 처리
+   */
+  @ExceptionHandler(ExpiredJwtException.class)
+  public ResponseEntity<CommonApiResponse<Void>> handleExpiredJwtException(ExpiredJwtException e) {
+    log.warn("[ExpiredJwtException] {}", e.getMessage());
+
+    return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+        .body(CommonApiResponse.fail("JWT_EXPIRED", "엑세스 토큰이 만료되었습니다."));
   }
 
   /**

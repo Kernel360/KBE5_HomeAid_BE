@@ -23,8 +23,7 @@ public class UserUpdateRequestDto {
   @Schema(description = "이메일", example = "honggildong@example.com")
   private String email;
 
-  @NotBlank(message = "전화번호는 필수입니다.")
   @Pattern(regexp = "^01[0-9]-\\d{3,4}-\\d{4}$", message = "올바른 전화번호 형식이 아닙니다. (예: 010-1234-5678)")
-  @Schema(description = "전화번호", example = "+821012345678")
+  @Schema(description = "전화번호", example = "010-1111-1111")
   private String phone;
 }
