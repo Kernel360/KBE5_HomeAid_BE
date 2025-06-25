@@ -21,6 +21,8 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
 
   Page<Review> findByWriterId(Long userId, Pageable pageable);
 
+  Page<Review> findByTargetId(Long targetId, Pageable pageable);
+  
   Page<Review> findAllByWriterRole(UserRole writerRole, Pageable pageable);
 
   // 관리자 권한별 조회

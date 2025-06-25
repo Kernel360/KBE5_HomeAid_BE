@@ -5,6 +5,7 @@ import com.homeaid.auth.service.RefreshTokenService;
 import com.homeaid.dto.request.SignInRequestDto;
 import com.homeaid.security.jwt.JwtTokenProvider;
 import com.homeaid.security.user.CustomUserDetails;
+import com.homeaid.security.util.CookieUtil;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
@@ -22,18 +23,19 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
   private static final String TOKEN_HEADER = "Authorization";
   private static final String TOKEN_PREFIX = "Bearer ";
-  private static final String REFRESH_TOKEN = "refresh_token";
-  private static final int COOKIE_MAX_AGE = 604800;
 
   private final AuthenticationManager authenticationManager;
   private final JwtTokenProvider jwtTokenProvider;
   private final RefreshTokenService refreshTokenService;
+  private final CookieUtil cookieUtil;
 
   public JwtAuthenticationFilter(AuthenticationManager authenticationManager,
-      JwtTokenProvider jwtTokenProvider, RefreshTokenService refreshTokenService) {
+      JwtTokenProvider jwtTokenProvider, RefreshTokenService refreshTokenService,
+      CookieUtil cookieUtil) {
     this.authenticationManager = authenticationManager;
     this.jwtTokenProvider = jwtTokenProvider;
     this.refreshTokenService = refreshTokenService;
+    this.cookieUtil = cookieUtil;
   }
 
   @Override
@@ -73,7 +75,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     refreshTokenService.saveRefreshToken(userId, refreshToken);
 
     // RT를 httpOnly 쿠키에 저장
-    Cookie refreshCookie = buildRefreshCookie(refreshToken);
+    Cookie refreshCookie = cookieUtil.buildRefreshCookie(refreshToken);
     response.addCookie(refreshCookie);
 
     // 응답 Body에 필요한 사용자 정보만 포함
@@ -85,15 +87,6 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
     response.setContentType("application/json; charset=UTF-8");
     new ObjectMapper().writeValue(response.getWriter(), responseBody);
-  }
-
-  private Cookie buildRefreshCookie(String refreshToken) {
-    Cookie cookie = new Cookie(REFRESH_TOKEN, refreshToken);
-    cookie.setHttpOnly(true);
-    cookie.setSecure(true); // HTTPS 사용 시에만 true로 설정
-    cookie.setPath("/");
-    cookie.setMaxAge(COOKIE_MAX_AGE); // 7일
-    return cookie;
   }
 
   @Override

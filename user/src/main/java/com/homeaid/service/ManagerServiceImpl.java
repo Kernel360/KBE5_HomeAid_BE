@@ -48,8 +48,7 @@ public class ManagerServiceImpl implements ManagerService {
   @Override
   @Transactional
   public void saveManagerDetailInfo(Long managerId, ManagerDetailInfoRequestDto dto) {
-    Manager manager = managerRepository.findById(managerId)
-        .orElseThrow(() -> new CustomException(UserErrorCode.MANAGER_NOT_FOUND));
+    Manager manager = getManagerById(managerId);
 
     // 1. 선호 서비스 옵션 저장
     List<ManagerServiceOption> preferences = dto.getPreferenceIds().stream()
@@ -108,8 +107,7 @@ public class ManagerServiceImpl implements ManagerService {
       MultipartFile healthFile)
       throws IOException {
 
-    Manager manager = managerRepository.findById(managerId)
-        .orElseThrow(() -> new CustomException(UserErrorCode.MANAGER_NOT_FOUND));
+    Manager manager = getManagerById(managerId);
 
     List<FileUploadResult> managerDocuments = Stream.of(
             new UploadFileParam(DocumentType.ID_CARD, S3_PACKAGE_NAME_ID, idFile),
@@ -136,7 +134,14 @@ public class ManagerServiceImpl implements ManagerService {
 
     managerDocumentRepository.saveAll(documents);
   }
-  
+
+  @Override
+  public Manager getUploadManagerFiles(Long managerId) {
+    Manager manager = getManagerById(managerId);
+
+    return manager;
+  }
+
   private void registerAddress(String sido, String sigungu) {
     if (!regionValidator.isValid(sido, sigungu)) {
       throw new CustomException(UserErrorCode.INVALID_MANAGER_REGION);
@@ -158,6 +163,12 @@ public class ManagerServiceImpl implements ManagerService {
     if (!startTime.isBefore(endTime)) {
       throw new CustomException(UserErrorCode.INVALID_WORKTIME_ORDER);
     }
+  }
+
+  @Override
+  public Manager getManagerById(Long id) {
+    return managerRepository.findById(id)
+        .orElseThrow(() -> new CustomException(UserErrorCode.MANAGER_NOT_FOUND));
   }
   
 }
