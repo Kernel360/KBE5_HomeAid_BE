@@ -1,6 +1,7 @@
 package com.homeaid.payment.domain;
 
 import com.homeaid.domain.Reservation;
+import com.homeaid.domain.enumerate.ReservationStatus;
 import com.homeaid.exception.CustomException;
 import com.homeaid.payment.exception.PaymentErrorCode;
 import jakarta.persistence.Column;
@@ -75,6 +76,21 @@ public class Payment {
   }
 
   public void cancelPayment() {
+    this.status = PaymentStatus.CANCELED;
+    this.refundedAmount = this.amount;
+  }
+
+  public void cancel(ReservationStatus reservationStatus) {
+    if (!(reservationStatus == ReservationStatus.REQUESTED
+        || reservationStatus == ReservationStatus.MATCHING
+        || reservationStatus == ReservationStatus.MATCHED)) {
+      throw new CustomException(PaymentErrorCode.PAYMENT_CANCELLATION_NOT_ALLOWED);
+    }
+
+    if (this.status == PaymentStatus.REFUNDED || this.status == PaymentStatus.CANCELED) {
+      throw new CustomException(PaymentErrorCode.PAYMENT_ALREADY_REFUNDED);
+    }
+
     this.status = PaymentStatus.CANCELED;
     this.refundedAmount = this.amount;
   }
