@@ -110,4 +110,19 @@ public class ReservationResponseDto {
             .customerMemo(reservation.getCustomerMemo())
         .build();
   }
+
+  public static ReservationResponseDto toDtoForManager(Reservation reservation, Customer customer) {
+    return ReservationResponseDto.builder()
+        .reservationId(reservation.getId())
+        .status(reservation.getStatus())
+        .serviceOptionName(reservation.getItem().getServiceOptionName())
+        .startTime(LocalDateTime.of(
+            reservation.getRequestedDate(),
+            reservation.getRequestedTime()
+        ))
+        .customerName(customer.getName())
+        .build();
+  }
+
+
 }

@@ -38,7 +38,8 @@ public class SecurityConfig {
       "/", "/actuator/health",
       "/api/v1/users/signup/**",
       "/api/v1/swagger/users/**",
-      "/api/v1/auth/**"
+      "/api/v1/auth/**",
+      "/api/v1/users/**"
   };
 
   private final String[] swaggerUrls = {

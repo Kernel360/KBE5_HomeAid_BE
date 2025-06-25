@@ -46,7 +46,8 @@ public class ReservationServiceImpl implements ReservationService {
   @Override
   @Transactional
   public Reservation createReservation(Reservation reservation, Long serviceOptionId) {
-    ServiceOption serviceOption = serviceOptionRepository.findById(serviceOptionId).orElseThrow(() -> new CustomException(ReservationErrorCode.RESERVATION_NOT_FOUND));
+    ServiceOption serviceOption = serviceOptionRepository.findById(serviceOptionId)
+        .orElseThrow(() -> new CustomException(ReservationErrorCode.RESERVATION_NOT_FOUND));
     reservation.addItem(serviceOption);
     return reservationRepository.save(reservation);
   }
@@ -76,7 +77,7 @@ public class ReservationServiceImpl implements ReservationService {
         .orElseThrow(() -> new CustomException(ReservationErrorCode.RESERVATION_NOT_FOUND));
 
     if (!originReservation.getCustomerId().equals(userId)) {
-      throw new CustomException(ReservationErrorCode.UNAUTHORIZED_RESERVATION_ACCESS)  ;
+      throw new CustomException(ReservationErrorCode.UNAUTHORIZED_RESERVATION_ACCESS);
     }
 
     if (originReservation.getStatus() != ReservationStatus.REQUESTED) {
@@ -104,7 +105,7 @@ public class ReservationServiceImpl implements ReservationService {
         .orElseThrow(() -> new CustomException(ReservationErrorCode.RESERVATION_NOT_FOUND));
 
     if (!reservation.getCustomerId().equals(userId)) {
-      throw new CustomException(ReservationErrorCode.UNAUTHORIZED_RESERVATION_ACCESS)  ;
+      throw new CustomException(ReservationErrorCode.UNAUTHORIZED_RESERVATION_ACCESS);
     }
 
     reservation.softDelete();
@@ -159,7 +160,29 @@ public class ReservationServiceImpl implements ReservationService {
 
   @Override
   @Transactional(readOnly = true)
-  public Page<Reservation> getReservationsByManager(Long managerId, Pageable pageable) {
-    return reservationRepository.findAllByManagerId(managerId, pageable);
+  public Page<ReservationResponseDto> getReservationsByManager(Long managerId, Pageable pageable) {
+    Page<Reservation> reservations = reservationRepository.findAllByManagerId(managerId, pageable);
+
+    Map<Long, Customer> customerMap = batchGetCustomersFromReservations(reservations);
+
+    return  reservations.map(reservation -> {
+      Customer customer = customerMap.get(reservation.getCustomerId());
+      if (customer == null) {
+        throw new CustomException(UserErrorCode.CUSTOMER_NOT_FOUND);
+      }
+
+      return ReservationResponseDto.toDtoForManager(reservation, customer);
+    });
+  }
+
+  private Map<Long, Customer> batchGetCustomersFromReservations(Page<Reservation> reservations) {
+    List<Long> customerIds = reservations.stream()
+        .map(Reservation::getCustomerId)
+        .distinct()
+        .toList();
+
+    return customerRepository.findByIdIn(customerIds).stream()
+        .collect(Collectors.toMap(Customer::getId, Function.identity()));
+
   }
 }
