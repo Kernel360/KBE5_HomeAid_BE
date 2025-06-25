@@ -176,7 +176,10 @@ public class MatchingServiceImpl implements MatchingService {
     String sido = addressParts[0].trim();
     String sigungu = addressParts[1].trim();
 
-    if (!regionValidator.isValid(sido, sigungu)) {
+    String normalizedSido = regionValidator.normalizeSido(sido);
+
+
+    if (!regionValidator.isValid(normalizedSido, sigungu)) {
       throw new CustomException(ReservationErrorCode.INVALID_RESERVATION_REGION);
     }
 
@@ -185,11 +188,10 @@ public class MatchingServiceImpl implements MatchingService {
     LocalTime startTime = reservation.getRequestedTime();
     Integer duration = reservation.getDuration();
     LocalTime endTime = startTime.plusHours(duration);
-
     String optionName = reservation.getItem().getServiceOptionName();
 
     // Todo: 매니저 통계 테이블 만든 후에 조회된 매니저의 리뷰 수, 별점 등도 같이 조회
-    return managerRepository.findMatchingManagers(sido, sigungu, reservationWeekday.name(), startTime, endTime, optionName);
+    return managerRepository.findMatchingManagers(normalizedSido, sigungu, reservationWeekday.name(), startTime, endTime, optionName);
   }
 
   // 매니저 매칭 전체 조회
