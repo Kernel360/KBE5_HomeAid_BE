@@ -23,7 +23,7 @@ public interface UserBoardRepository extends JpaRepository<UserBoard, Long> {
   // [관리자] 문의글 목록 전체 조회
   @Query("""
     SELECT new com.homeaid.dto.response.UserBoardListResponseDto(
-      ub.id, ub.userId, u.name, ub.title, ub.content, ub.createdAt
+      ub.id, ub.userId, u.name, ub.title, ub.content, ub.createdAt, ub.isAnswered
     )
     FROM UserBoard ub
     JOIN User u ON ub.userId = u.id

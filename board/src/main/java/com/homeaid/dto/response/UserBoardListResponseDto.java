@@ -29,12 +29,15 @@ public class UserBoardListResponseDto {
   @Schema(description = "게시글 작성일시", example = "2024-12-01T10:30:00")
   private LocalDateTime createdAt;
 
+  private boolean isAnswered; // 답변 등록 유무
+
   public static UserBoardListResponseDto toDto(UserBoard userBoard) {
     return UserBoardListResponseDto.builder()
         .id(userBoard.getId())
         .userId(userBoard.getUserId())
         .title(userBoard.getTitle())
         .createdAt(userBoard.getCreatedAt())
+        .isAnswered(userBoard.isAnswered())
         .build();
   }
 
