@@ -41,14 +41,6 @@ public class GlobalExceptionHandler {
 
     log.warn("[ValidationException] {}", message);
 
-    Map<String, String> errors = new HashMap<>();
-    e.getBindingResult().getAllErrors().forEach((error) -> {
-              String fieldName = ((FieldError) error).getField();
-              String errorMessage = error.getDefaultMessage();
-              errors.put(fieldName, errorMessage);
-        log.warn("유효성 검증 실패 - 필드: {}, 메시지: {}", fieldName, errorMessage);
-    });
-
     return ResponseEntity.badRequest()
         .body(CommonApiResponse.fail("VALIDATION_ERROR", message));
   }
