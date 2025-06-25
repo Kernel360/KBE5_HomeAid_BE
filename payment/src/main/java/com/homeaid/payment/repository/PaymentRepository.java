@@ -20,6 +20,9 @@ public interface PaymentRepository extends JpaRepository<Payment, Long> {
   @Query("SELECT COUNT(p) FROM Payment p WHERE p.status = 'PAID'") // 또는 조건 없이 COUNT(p)
   long countAllPayments();
 
+  @Query("SELECT COALESCE(SUM(p.amount), 0) FROM Payment p WHERE p.status = 'PAID'")
+  long sumAllPaymentAmounts();
+
   // 총 결제 금액 (연간/월간)
   @Query("SELECT COALESCE(SUM(p.amount), 0) FROM Payment p WHERE YEAR(p.paidAt) = :year AND (:month IS NULL OR MONTH(p.paidAt) = :month) AND p.status = 'PAID'")
   long sumPayments(@Param("year") int year, @Param("month") Integer month);
