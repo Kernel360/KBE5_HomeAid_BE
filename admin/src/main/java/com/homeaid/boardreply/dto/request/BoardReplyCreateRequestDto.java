@@ -1,6 +1,8 @@
 package com.homeaid.boardreply.dto.request;
 
 import com.homeaid.boardreply.domain.BoardReply;
+import com.homeaid.domain.User;
+import com.homeaid.domain.enumerate.UserRole;
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Getter;
@@ -12,10 +14,13 @@ public class BoardReplyCreateRequestDto {
   @NotNull(message = "내용을 작성해 주세요")
   private String content;
 
-  public static BoardReply toEntity(Long boardId, Long adminId, BoardReplyCreateRequestDto dto) {
+  // userId, userRole은 서비스단에서 세팅
+  public static BoardReply toEntity(Long boardId, Long adminId, User user, UserRole userRole, BoardReplyCreateRequestDto dto) {
     return BoardReply.builder()
         .boardId(boardId)
         .adminId(adminId)
+        .user(user)
+        .userRole(userRole)
         .content(dto.getContent())
         .build();
   }
