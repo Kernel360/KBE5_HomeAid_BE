@@ -87,9 +87,12 @@ public class ReservationResponseDto {
         .totalDuration(reservation.getDuration())
         .serviceOptionName(reservation.getItem().getServiceOptionName())
         .customerId(reservation.getCustomerId())
-        .managerId(reservation.getManagerId())
-        .requestedDate(reservation.getRequestedDate())
-        .requestedTime(reservation.getRequestedTime())
+        .startTime(LocalDateTime.of(
+            reservation.getRequestedDate(),
+            reservation.getRequestedTime()
+        ))
+        .address(reservation.getAddress())
+        .addressDetail(reservation.getAddressDetail())
         .matchingStatus(matchingStatus)
         .build();
   }
@@ -111,7 +114,7 @@ public class ReservationResponseDto {
         .build();
   }
 
-  public static ReservationResponseDto toDtoForManager(Reservation reservation, Customer customer) {
+  public static ReservationResponseDto toDtoForManager(Reservation reservation, Customer customer, MatchingStatus matchingStatus) {
     return ReservationResponseDto.builder()
         .reservationId(reservation.getId())
         .status(reservation.getStatus())
@@ -120,6 +123,7 @@ public class ReservationResponseDto {
             reservation.getRequestedDate(),
             reservation.getRequestedTime()
         ))
+        .matchingStatus(matchingStatus)
         .customerName(customer.getName())
         .build();
   }

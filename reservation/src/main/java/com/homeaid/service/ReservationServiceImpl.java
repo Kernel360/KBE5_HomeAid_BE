@@ -163,15 +163,26 @@ public class ReservationServiceImpl implements ReservationService {
   public Page<ReservationResponseDto> getReservationsByManager(Long managerId, Pageable pageable) {
     Page<Reservation> reservations = reservationRepository.findAllByManagerId(managerId, pageable);
 
+
     Map<Long, Customer> customerMap = batchGetCustomersFromReservations(reservations);
 
     return  reservations.map(reservation -> {
       Customer customer = customerMap.get(reservation.getCustomerId());
+
       if (customer == null) {
         throw new CustomException(UserErrorCode.CUSTOMER_NOT_FOUND);
       }
 
-      return ReservationResponseDto.toDtoForManager(reservation, customer);
+      Long finalMatchingId = reservation.getFinalMatchingId();
+
+      if (finalMatchingId != null) {
+        Matching matching = matchingRepository.findById(finalMatchingId)
+            .orElseThrow(() -> new CustomException(MatchingErrorCode.MATCHING_NOT_FOUND));
+
+        return ReservationResponseDto.toDtoForManager(reservation, customer, matching.getStatus());
+      }
+
+      return ReservationResponseDto.toDtoForManager(reservation, customer,null);
     });
   }
 
