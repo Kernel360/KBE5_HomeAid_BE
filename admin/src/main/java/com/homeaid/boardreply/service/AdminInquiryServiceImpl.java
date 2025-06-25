@@ -1,18 +1,17 @@
 package com.homeaid.boardreply.service;
 
-import com.homeaid.boardreply.domain.BoardReply;
 import com.homeaid.boardreply.dto.response.BoardReplyListResponseDto;
 import com.homeaid.boardreply.dto.response.InquiryDetailResponseDto;
 import com.homeaid.boardreply.exception.BoardReplyErrorCode;
 import com.homeaid.boardreply.repository.AdminBoardReplyRepository;
-import com.homeaid.domain.User;
+import com.homeaid.domain.BoardReply;
 import com.homeaid.domain.UserBoard;
 import com.homeaid.domain.enumerate.UserRole;
 import com.homeaid.dto.response.UserBoardListResponseDto;
 import com.homeaid.exception.BoardErrorCode;
 import com.homeaid.exception.CustomException;
 import com.homeaid.repository.UserBoardRepository;
-import com.homeaid.repository.UserRepository;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -79,8 +78,19 @@ public class AdminInquiryServiceImpl implements AdminInquiryService {
       throw new CustomException(BoardReplyErrorCode.REPLY_ALREADY_EXISTS);
     }
 
-    // reply 객체에는 user, boardId, adminId, userRole 등 세팅돼 있어야 함
-    return adminBoardReplyRepository.save(boardReply);
+    // 답변 저장
+    BoardReply savedReply = adminBoardReplyRepository.save(boardReply);
+
+    // 게시글 찾아서 상태 변경
+    UserBoard userBoard = userBoardRepository.findById(boardReply.getBoardId())
+        .orElseThrow(() -> new CustomException(BoardErrorCode.BOARD_NOT_FOUND));
+
+    userBoard.setReplyId(savedReply.getId());  // reply_id 연결
+    userBoard.setAnswered();                   // 답변 완료 상태로 변경
+
+    userBoardRepository.save(userBoard); // 변경사항 반영
+
+    return savedReply;
   }
 
   // 답변 수정

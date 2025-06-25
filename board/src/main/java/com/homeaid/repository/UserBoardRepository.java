@@ -3,6 +3,7 @@ package com.homeaid.repository;
 
 import com.homeaid.domain.UserBoard;
 import com.homeaid.dto.response.UserBoardListResponseDto;
+import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -28,5 +29,9 @@ public interface UserBoardRepository extends JpaRepository<UserBoard, Long> {
     JOIN User u ON ub.userId = u.id
   """)
   Page<UserBoardListResponseDto> findAllWithUserName(Pageable pageable);
+
+
+  @Query("SELECT b FROM UserBoard b LEFT JOIN FETCH b.reply r LEFT JOIN FETCH r.user WHERE b.id = :boardId")
+  Optional<UserBoard> findBoardWithReplyById(@Param("boardId") Long boardId);
 
 }

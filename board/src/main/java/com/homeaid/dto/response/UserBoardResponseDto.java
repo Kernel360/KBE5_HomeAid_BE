@@ -1,6 +1,7 @@
 package com.homeaid.dto.response;
 
 
+import com.homeaid.domain.BoardReply;
 import com.homeaid.domain.UserBoard;
 import com.homeaid.domain.enumerate.UserRole;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -39,7 +40,20 @@ public class UserBoardResponseDto {
   @Schema(description = "게시글 작성일시", example = "2024-12-01T10:30:00")
   private LocalDateTime createdAt;
 
+  private ReplyDto reply;
+
+  @Getter
+  @Builder
+  @AllArgsConstructor
+  public static class ReplyDto {
+    private Long replyId;
+    private String content;
+    private String adminName;
+    private LocalDateTime createdAt;
+  }
+
   public static UserBoardResponseDto toDto(UserBoard userBoard) {
+    BoardReply reply = userBoard.getReply();
     return UserBoardResponseDto.builder()
         .id(userBoard.getId())
         .userId(userBoard.getUserId())
@@ -48,6 +62,12 @@ public class UserBoardResponseDto {
         .role(userBoard.getRole())
         .isAnswered(userBoard.isAnswered())
         .createdAt(userBoard.getCreatedAt())
+        .reply(reply != null ? ReplyDto.builder()
+            .replyId(reply.getId())
+            .content(reply.getContent())
+            .adminName(reply.getUser() != null ? reply.getUser().getName() : null)
+            .createdAt(reply.getCreatedAt())
+            .build() : null)
         .build();
   }
 }

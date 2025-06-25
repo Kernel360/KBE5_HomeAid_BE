@@ -1,8 +1,8 @@
 package com.homeaid.boardreply.service;
 
-import com.homeaid.boardreply.domain.BoardReply;
 import com.homeaid.boardreply.dto.response.BoardReplyListResponseDto;
 import com.homeaid.boardreply.dto.response.InquiryDetailResponseDto;
+import com.homeaid.domain.BoardReply;
 import com.homeaid.domain.enumerate.UserRole;
 import com.homeaid.dto.response.UserBoardListResponseDto;
 import org.springframework.data.domain.Page;
