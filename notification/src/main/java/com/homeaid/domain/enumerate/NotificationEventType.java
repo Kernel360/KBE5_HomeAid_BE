@@ -16,7 +16,6 @@ public enum NotificationEventType {
     MATCHING_REJECTED_BY_CUSTOMER("고객이 매칭을 거절하였습니다"),
     MATCHING_ACCEPTED_BY_MANAGER("매니저가 매칭을 수락하였습니다"),
     MATCHING_REJECTED_BY_MANAGER("매니저가 매칭을 거절하였습니다"),
-    MATCHING_CONFIRMED("매칭이 최종 확정되었습니다"),
 
     // 작업 관련
     WORK_REMINDER("작업 예정 알림"),
