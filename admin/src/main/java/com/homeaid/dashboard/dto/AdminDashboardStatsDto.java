@@ -14,5 +14,7 @@ public class AdminDashboardStatsDto {
   private long activeManagers;
   private long totalPayments;
   private long todayReservations;
+  private long totalPaymentAmount;
+  private long totalSettlementAmount;
   private long pendingApprovals;
 }

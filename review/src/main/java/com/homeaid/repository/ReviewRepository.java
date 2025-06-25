@@ -2,6 +2,7 @@ package com.homeaid.repository;
 
 
 import com.homeaid.domain.Review;
+import com.homeaid.domain.enumerate.UserRole;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -19,5 +20,17 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
   Double getAverageReviewRatingByTargetId(@Param("targetId") Long targetId);
 
   Page<Review> findByWriterId(Long userId, Pageable pageable);
+
+  Page<Review> findByTargetId(Long targetId, Pageable pageable);
+  
+  Page<Review> findAllByWriterRole(UserRole writerRole, Pageable pageable);
+
+  // 관리자 권한별 조회
+  @Query("""
+      SELECT r FROM Review r
+      WHERE (:writerRole IS NULL OR r.writerRole = :writerRole)
+      ORDER BY r.createdAt DESC
+  """)
+  Page<Review> findByWriterRoleCondition(@Param("writerRole") UserRole writerRole, Pageable pageable);
 
 }

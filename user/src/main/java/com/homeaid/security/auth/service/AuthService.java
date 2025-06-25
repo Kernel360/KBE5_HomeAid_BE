@@ -1,15 +1,19 @@
-package com.homeaid.auth.service;
+package com.homeaid.security.auth.service;
 
 import com.homeaid.auth.dto.TokenResponse;
 import com.homeaid.auth.exception.TokenErrorCode;
+import com.homeaid.auth.service.RefreshTokenService;
+import com.homeaid.auth.service.TokenBlacklistService;
 import com.homeaid.exception.CustomException;
 import com.homeaid.security.jwt.JwtTokenProvider;
 import com.homeaid.security.user.CustomUserDetails;
 import com.homeaid.security.user.CustomUserDetailsService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 @Transactional
 @RequiredArgsConstructor
@@ -21,6 +25,7 @@ public class AuthService {
   private final CustomUserDetailsService customUserDetailsService;
 
   public void logout(String accessToken) {
+    log.debug("로그아웃 요청: {}", accessToken);
     Long userId = jwtTokenProvider.getUserIdFromToken(accessToken);
 
     // Redis에서 RefreshToken 삭제
@@ -34,6 +39,7 @@ public class AuthService {
   }
 
   public TokenResponse reissueToken(String refreshToken) {
+    log.debug("AT 재발급 요청 - RT: {}", refreshToken);
 
     if (refreshToken == null) {
       throw new CustomException(TokenErrorCode.REFRESH_TOKEN_MISSING);
@@ -58,6 +64,7 @@ public class AuthService {
 
     // 새 RT 저장
     refreshTokenService.saveRefreshToken(userId, newRefreshToken);
+    log.debug("AT/RT 재발급 성공 - AT: {}, RT: {}", newAccessToken, newRefreshToken);
 
     // 응답 객체 생성
     return new TokenResponse(newAccessToken, newRefreshToken);

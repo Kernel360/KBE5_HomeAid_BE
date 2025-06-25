@@ -1,11 +1,10 @@
 package com.homeaid.service;
 
 import com.homeaid.domain.Manager;
-import com.homeaid.domain.enumerate.ManagerStatus;
+import com.homeaid.domain.ManagerDocument;
 import com.homeaid.dto.request.ManagerDetailInfoRequestDto;
 import java.io.IOException;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import java.util.List;
 import org.springframework.web.multipart.MultipartFile;
 
 public interface ManagerService {
@@ -15,4 +14,8 @@ public interface ManagerService {
   void uploadManagerFiles(Long managerId, MultipartFile idFile, MultipartFile criminalFile,
       MultipartFile healthFile)
       throws IOException;
+
+  Manager getUploadManagerFiles(Long managerId);
+
+  Manager getManagerById(Long id);
 }

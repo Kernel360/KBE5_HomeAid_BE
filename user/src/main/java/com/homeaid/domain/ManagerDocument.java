@@ -15,11 +15,13 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.time.LocalDateTime;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @Entity
+@Getter
 @NoArgsConstructor
 @Table(name = "manager_document")
 @EntityListeners(AuditingEntityListener.class)
@@ -36,6 +38,7 @@ public class ManagerDocument {
   @Column(name = "document_s3_key")
   private String documentS3Key;
 
+  @Column(name = "document_url")
   private String documentUrl; // 신분증, 범죄 경력 조회서, 보건증 및 건강검진서
 
   @CreatedDate
