@@ -40,6 +40,7 @@ public class SecurityConfig {
       "/api/v1/users/signup/**",
       "/api/v1/swagger/users/**",
       "/api/v1/auth/**",
+      "/api/v1/users/**",
       "/api/v1/users/my/**",
       "api/v1/reservations/**",
       "api/v1/**", // TODO api 수정 필요
