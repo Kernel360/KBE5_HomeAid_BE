@@ -47,7 +47,6 @@ public class AdminCustomerController {
   })
 
   @GetMapping
-  @PreAuthorize("hasRole('ADMIN')")
   public ResponseEntity<CommonApiResponse<PagedResponseDto<CustomerResponseDto>>> getCustomers(
       @ModelAttribute AdminCustomerSearchRequestDto dto,
       @RequestParam(value = "page", defaultValue = "0") int page,
