@@ -21,6 +21,7 @@ import com.homeaid.serviceoption.repository.ServiceOptionRepository;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -163,26 +164,21 @@ public class ReservationServiceImpl implements ReservationService {
   public Page<ReservationResponseDto> getReservationsByManager(Long managerId, Pageable pageable) {
     Page<Reservation> reservations = reservationRepository.findAllByManagerId(managerId, pageable);
 
-
     Map<Long, Customer> customerMap = batchGetCustomersFromReservations(reservations);
 
-    return  reservations.map(reservation -> {
+    return reservations.map(reservation -> {
       Customer customer = customerMap.get(reservation.getCustomerId());
 
       if (customer == null) {
         throw new CustomException(UserErrorCode.CUSTOMER_NOT_FOUND);
       }
 
-      Long finalMatchingId = reservation.getFinalMatchingId();
+      Optional<Matching> matching = matchingRepository.findLatestByReservationId(reservation.getId());
 
-      if (finalMatchingId != null) {
-        Matching matching = matchingRepository.findById(finalMatchingId)
-            .orElseThrow(() -> new CustomException(MatchingErrorCode.MATCHING_NOT_FOUND));
-
-        return ReservationResponseDto.toDtoForManager(reservation, customer, matching.getStatus());
+      if (matching.isPresent()) {
+        return ReservationResponseDto.toDtoForManager(reservation, customer, matching.get().getStatus());
       }
-
-      return ReservationResponseDto.toDtoForManager(reservation, customer,null);
+      return ReservationResponseDto.toDtoForManager(reservation, customer, null);
     });
   }
 
