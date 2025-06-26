@@ -13,7 +13,7 @@ public interface MatchingService {
 
   Long createMatching(Long managerId, Long reservationId, Matching matching);
 
-  void respondToMatchingAsManager(Long userId, Long matchingId, ManagerAction action, String memo);
+  void respondToMatchingAsManager(Long userId, Long reservationId, ManagerAction action, String memo);
 
   void respondToMatchingAsCustomer(Long userId, Long reservationId, CustomerAction action, String memo);
 
@@ -21,5 +21,5 @@ public interface MatchingService {
 
   Page<Matching> getMatchingListByManager(Long userId, Pageable pageable);
 
-  Matching getMatchingByManager(Long matchingId, Long userId);
+  Matching getMatchingByManager(Long reservationId, Long userId);
 }
