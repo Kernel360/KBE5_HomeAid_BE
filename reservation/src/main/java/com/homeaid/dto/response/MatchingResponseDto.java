@@ -47,6 +47,8 @@ public class MatchingResponseDto {
 
   private Long reservationId;
 
+  private String fullAddress;
+
   public static MatchingResponseDto toDto(Matching matching) {
     return MatchingResponseDto.builder()
         .matchingId(matching.getId())
@@ -61,6 +63,20 @@ public class MatchingResponseDto {
         .customerStatus(matching.getStatus())
             .status(matching.getStatus())
             .reservationId(matching.getReservation().getId())
+        .build();
+  }
+
+  public static MatchingResponseDto toDtoForManagerMatching(Matching matching) {
+    return MatchingResponseDto.builder()
+        .matchingId(matching.getId())
+        .serviceType(matching.getReservation().getItem().getServiceOptionName())
+        .reservedDate(matching.getReservation().getRequestedDate())
+        .reservedTime(matching.getReservation().getRequestedTime())
+        .estimatedDuration(matching.getReservation().getDuration())
+        .fullAddress(matching.getReservation().getAddress() + matching.getReservation().getAddressDetail())
+        .customerRequest(matching.getReservation().getCustomerMemo())
+        .reservationId(matching.getReservation().getId())
+        .status(matching.getStatus())
         .build();
   }
 }
