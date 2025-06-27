@@ -39,6 +39,9 @@ public class ManagerResponseDto {
   @Schema(description = "가입일", example = "2025-06-06")
   private String signupDate;
 
+  @Schema(description = "반려 사유", example = "파일이 명확하지 않습니다.")
+  private String rejectionReason;
+
   public static ManagerResponseDto toDto(Manager manager) {
     return ManagerResponseDto.builder()
         .id(manager.getId())
@@ -51,6 +54,7 @@ public class ManagerResponseDto {
         .signupDate(manager.getCreatedAt() != null
             ? manager.getCreatedAt().toLocalDate().toString()
             : null)
+        .rejectionReason(manager.getRejectionReason())
         .build();
   }
 }

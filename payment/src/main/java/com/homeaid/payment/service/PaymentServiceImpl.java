@@ -10,6 +10,7 @@ import com.homeaid.payment.dto.response.PaymentResponseDto;
 import com.homeaid.exception.CustomException;
 import com.homeaid.payment.exception.PaymentErrorCode;
 import com.homeaid.payment.repository.PaymentRepository;
+import com.homeaid.payment.validator.PaymentValidator;
 import com.homeaid.repository.ReservationRepository;
 import com.homeaid.repository.UserRepository;
 import jakarta.transaction.Transactional;
@@ -25,32 +26,19 @@ public class PaymentServiceImpl implements PaymentService {
 
   private final PaymentRepository paymentRepository;
   private final ReservationRepository reservationRepository;
-  private final UserRepository userRepository; // userId → 이름 조회용
+  private final UserRepository userRepository;
+  private final PaymentValidator paymentValidator;
 
   @Override
   @Transactional
   public PaymentResponseDto pay(PaymentRequestDto dto) { // 예약 상태 확인 후 결제
-    // 1. 예약 조회
+
     Reservation reservation = reservationRepository.findById(dto.getReservationId())
         .orElseThrow(() -> new CustomException(PaymentErrorCode.PAYMENT_RESERVATION_NOT_FOUND));
 
-    // 2. 이미 해당 예약에 결제가 존재하는지 확인 (중복 결제 방지)
-    boolean alreadyPaid = paymentRepository.existsByReservationId(dto.getReservationId());
-    if (alreadyPaid) {
-      throw new CustomException(PaymentErrorCode.PAYMENT_ALREADY_PAID);
-    }
+    paymentValidator.validateNotAlreadyPaid(reservation.getId());
+    paymentValidator.validateReservableStatus(reservation.getStatus());
 
-    // 3. 예약 상태 검증
-    switch (reservation.getStatus()) {
-      case MATCHED:
-        break;
-      case COMPLETED:
-        throw new CustomException(PaymentErrorCode.PAYMENT_ALREADY_PAID);
-      default:
-        throw new CustomException(PaymentErrorCode.PAYMENT_INVALID_STATUS_FOR_PAYMENT);
-    }
-
-    // 4. 결제 생성 및 저장
     Payment payment = Payment.builder()
         .reservation(reservation)
         .amount(dto.getAmount())
@@ -60,8 +48,7 @@ public class PaymentServiceImpl implements PaymentService {
         .refundedAmount(0)
         .build();
 
-    Payment saved = paymentRepository.save(payment);
-    return toDtoWithNames(saved);
+    return toDtoWithNames(paymentRepository.save(payment));
   }
 
   @Override
@@ -70,22 +57,10 @@ public class PaymentServiceImpl implements PaymentService {
     Payment payment = paymentRepository.findById(paymentId)
         .orElseThrow(() -> new CustomException(PaymentErrorCode.PAYMENT_NOT_FOUND));
 
-    // 본인 결제인지 검증
-    if (!payment.getReservation().getCustomerId().equals(customerId)) {
-      throw new CustomException(PaymentErrorCode.PAYMENT_ACCESS_DENIED);
-    }
+    paymentValidator.validatePaymentOwnership(payment, customerId);
 
-    // 예약 상태가 MATCHED 일 때만 취소 가능
-    if (payment.getReservation().getStatus() != ReservationStatus.MATCHED) {
-      throw new CustomException(PaymentErrorCode.PAYMENT_CANCELLATION_NOT_ALLOWED);
-    }
+    payment.cancel(payment.getReservation().getStatus());
 
-    // 이미 환불되거나 취소된 경우 예외
-    if (payment.getStatus() == PaymentStatus.REFUNDED || payment.getStatus() == PaymentStatus.CANCELED) {
-      throw new CustomException(PaymentErrorCode.PAYMENT_ALREADY_REFUNDED);
-    }
-
-    payment.cancelPayment();
     return toDtoWithNames(payment);
   }
   // 환불 중간에 문제가 발생하면 -> 전체 작업을 롤백해야 함 -> 트랜잭션이 없다면 중간 상태가 DB에 반영될 수 있음 -> 장애 위험 발생
@@ -111,7 +86,7 @@ public class PaymentServiceImpl implements PaymentService {
         .collect(Collectors.toList());
   }
 
-  // ✨ 공통 DTO 변환 메서드 (이름 포함)
+  // 공통 DTO 변환 메서드 (이름 포함)
   private PaymentResponseDto toDtoWithNames(Payment payment) {
     Reservation reservation = payment.getReservation();
 

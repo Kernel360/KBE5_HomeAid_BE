@@ -36,6 +36,7 @@ public enum UserErrorCode implements BaseErrorCode {
   INVALID_MANAGER_REGION(HttpStatus.BAD_REQUEST, "INVALID_MANAGER_REGION", "존재하지 않는 시/군/구 지역입니다."),
   PROFILE_IMAGE_NOT_FOUND(HttpStatus.BAD_REQUEST, "PROFILE_IMAGE_NOT_FOUND",
       "프로필 이미지가 이미 삭제되었거나 프로필 이미지를 찾을 수 없습니다."),
+  INVALID_REVIEW_STATUS(HttpStatus.BAD_REQUEST, "INVALID_REVIEW_STATUS", "유효하지 않은 매니저 상태입니다."),
 
   // 409 CONFLICT
   USER_ALREADY_EXISTS(HttpStatus.CONFLICT, "USER_ALREADY_EXISTS", "이미 가입된 회원입니다."),

@@ -2,8 +2,12 @@ package com.homeaid.user.service;
 
 import com.homeaid.domain.Manager;
 import com.homeaid.domain.enumerate.ManagerStatus;
+import com.homeaid.dto.response.ManagerDocumentListResponseDto;
+import com.homeaid.dto.response.ManagerResponseDto;
 import com.homeaid.exception.CustomException;
 import com.homeaid.exception.UserErrorCode;
+import com.homeaid.repository.ManagerRepository;
+import com.homeaid.user.dto.request.AdminDocumentReviewRequest;
 import com.homeaid.user.dto.request.AdminManagerSearchRequestDto;
 import com.homeaid.user.repository.AdminManagerRepository;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class AdminManagerServiceImpl implements AdminManagerService {
 
   private final AdminManagerRepository adminManagerRepository;
+  private final ManagerRepository managerRepository;
 
   @Override
   @Transactional(readOnly = true)
@@ -52,27 +57,42 @@ public class AdminManagerServiceImpl implements AdminManagerService {
   // 만약 이름+전화번호처럼 복합 검색을 할려면 Querydsl 사용 추천
 
   // TODO : 파일 업로드 확인 후 상태값 변경할 수 있도록 수정 필수
-//  @Override
-//  @Transactional
-//  public void updateStatus(Long id, ManagerStatus status) {
-//    Manager manager = adminManagerRepository.findById(id)
-//        .orElseThrow(() -> new CustomException(UserErrorCode.MANAGER_NOT_FOUND));
-//
-//    manager.changeStatus(status);
-//  }
+  @Override
+  @Transactional
+  public void updateStatus(Long id, ManagerStatus status) {
+    Manager manager = adminManagerRepository.findById(id)
+        .orElseThrow(() -> new CustomException(UserErrorCode.MANAGER_NOT_FOUND));
 
-//  @Override
-//  @Transactional
-//  public void reviewDocument(Long id, DocumentReviewRequest request) {
-//    Manager manager = adminManagerRepository.findById(id)
-//        .orElseThrow(() -> new CustomException(UserErrorCode.MANAGER_NOT_FOUND));
-//
-//    if (request.getStatus() == ManagerStatus.APPROVED) {
-//      manager.changeStatus(ManagerStatus.APPROVED);
-//    } else if (request.getStatus() == ManagerStatus.REJECTED) {
-//      manager.reject(request.getRejectionReason());
-//    } else {
-//      throw new CustomException(UserErrorCode.INVALID_REVIEW_STATUS);
-//    }
-//  }
+    manager.changeStatus(status);
+  }
+
+  @Transactional
+  @Override
+  public void reviewDocument(Long id, AdminDocumentReviewRequest request) {
+    Manager manager = adminManagerRepository.findById(id)
+        .orElseThrow(() -> new CustomException(UserErrorCode.MANAGER_NOT_FOUND));
+
+    ManagerStatus status = request.getStatus();
+
+    if (request.getStatus() == ManagerStatus.REJECTED) {
+      manager.reject(request.getRejectionReason());  // 메모 저장
+    } else {
+      throw new CustomException(UserErrorCode.INVALID_REVIEW_STATUS);
+    }
+  }
+
+  @Transactional(readOnly = true)
+  public ManagerResponseDto getManagerDetail(Long managerId) {
+    Manager manager = managerRepository.findById(managerId)
+        .orElseThrow(() -> new CustomException(UserErrorCode.USER_NOT_FOUND));
+    return ManagerResponseDto.toDto(manager);
+  }
+
+  @Transactional(readOnly = true)
+  public ManagerDocumentListResponseDto getManagerDocuments(Long managerId) {
+    Manager manager = managerRepository.findById(managerId)
+        .orElseThrow(() -> new CustomException(UserErrorCode.USER_NOT_FOUND));
+    return ManagerDocumentListResponseDto.toDto(manager);
+  }
+
 }
