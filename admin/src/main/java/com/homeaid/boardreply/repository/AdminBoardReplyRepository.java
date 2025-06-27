@@ -1,6 +1,6 @@
 package com.homeaid.boardreply.repository;
 
-import com.homeaid.boardreply.domain.BoardReply;
+import com.homeaid.domain.BoardReply;
 import com.homeaid.domain.enumerate.UserRole;
 import java.util.Optional;
 import org.springframework.data.domain.Page;

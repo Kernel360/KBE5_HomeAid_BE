@@ -1,6 +1,6 @@
 package com.homeaid.boardreply.dto.request;
 
-import com.homeaid.boardreply.domain.BoardReply;
+import com.homeaid.domain.BoardReply;
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Getter;

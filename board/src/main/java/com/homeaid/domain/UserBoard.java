@@ -4,15 +4,19 @@ import com.homeaid.domain.enumerate.UserRole;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
@@ -40,6 +44,14 @@ public class UserBoard {
   private String content;
 
   private UserRole role;
+
+  @Setter
+  @Column(name = "reply_id")
+  private Long replyId;
+
+  @OneToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "reply_id", referencedColumnName = "id", insertable = false, updatable = false)
+  private BoardReply reply;
 
   private boolean isAnswered; // 답변 등록 유무
 
@@ -69,4 +81,7 @@ public class UserBoard {
     }
   }
 
+  public void setAnswered() {
+    this.isAnswered = true;
+  }
 }

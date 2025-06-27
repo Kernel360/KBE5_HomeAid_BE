@@ -87,9 +87,8 @@ public class UserBoardController {
       @AuthenticationPrincipal CustomUserDetails customUserDetails
   ) {
     Long userId = customUserDetails.getUserId();
-    UserRole role = customUserDetails.getUserRole();
 
-    UserBoard board = userBoardService.updateBoard(id, userId, role,
+    UserBoard board = userBoardService.updateBoard(id, userId,
         UpdateBoardRequestDto.toEntity(updateBoardRequestDto));
 
     return ResponseEntity.status(HttpStatus.OK).body(
@@ -115,9 +114,8 @@ public class UserBoardController {
       @AuthenticationPrincipal CustomUserDetails customUserDetails
   ) {
     Long userId = customUserDetails.getUserId();
-    UserRole role = customUserDetails.getUserRole();
 
-    userBoardService.deleteBoard(id, userId, role);
+    userBoardService.deleteBoard(id, userId);
     return ResponseEntity.ok(CommonApiResponse.success(null));
   }
 
@@ -139,10 +137,9 @@ public class UserBoardController {
       @AuthenticationPrincipal CustomUserDetails customUserDetails
   ) {
     Long userId = customUserDetails.getUserId();
-    UserRole role = customUserDetails.getUserRole();
     return ResponseEntity.ok(
         CommonApiResponse.success(
-            UserBoardResponseDto.toDto(userBoardService.getBoard(id, userId, role))));
+            UserBoardResponseDto.toDto(userBoardService.getBoard(id, userId))));
   }
 
   @GetMapping("")
@@ -167,7 +164,6 @@ public class UserBoardController {
       @AuthenticationPrincipal CustomUserDetails customUserDetails
   ) {
     Long userId = customUserDetails.getUserId();
-    UserRole role = customUserDetails.getUserRole();
 
     Sort sort = sortDirection.equalsIgnoreCase("desc") ?
         Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();
@@ -175,6 +171,6 @@ public class UserBoardController {
     Pageable pageable = PageRequest.of(page, size, sort);
 
     return ResponseEntity.ok(
-        CommonApiResponse.success(userBoardService.searchBoard(keyword, pageable, userId, role)));
+        CommonApiResponse.success(userBoardService.searchBoard(keyword, pageable, userId)));
   }
 }
