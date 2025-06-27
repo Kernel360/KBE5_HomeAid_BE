@@ -11,10 +11,9 @@ public class ResponseAlert {
     private Long alertId;
     private String message;
     private String createdAt;
-
     private Long relatedEntityId;
-    private String relatedEntityType;
     private String eventType;
+    private String content;
 
     public static ResponseAlert toDto(Notification notification) {
         return ResponseAlert.builder()
@@ -22,8 +21,8 @@ public class ResponseAlert {
                 .message(notification.getEventType().getDefaultMessage())
                 .createdAt(DateTimeUtil.formatToSimpleDateTime(notification.getCreatedAt()))
                 .relatedEntityId(notification.getRelatedEntityId())
-                .relatedEntityType(notification.getRelatedEntityType().name())
                 .eventType(notification.getEventType().name())
+                .content(notification.getContent())
                 .build();
     }
 }

@@ -26,29 +26,16 @@ public class Notification {
     @Column(nullable = false)
     private NotificationEventType eventType;
 
-    @Column(nullable = true)
-    private String title;
-
     @Column(columnDefinition = "TEXT")
     private String content;
 
-    @Column(nullable = true)
     private Long targetId;      //관리자일 경우 null
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = true)
     private UserRole targetRole;
-
-    private Long senderId;
-
-    @Enumerated(EnumType.STRING)
-    private UserRole senderType;
 
     // 관련 엔티티 정보
     private Long relatedEntityId;
-
-    @Enumerated(EnumType.STRING)
-    private RelatedEntity relatedEntityType;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -64,17 +51,16 @@ public class Notification {
 
     @Builder
     public Notification(NotificationEventType eventType,
-                        Long targetId, UserRole targetRole,
-                        Long senderId, UserRole senderType, Long relatedEntityId,
-                        RelatedEntity relatedEntityType) {
+                        Long targetId,
+                        UserRole targetRole,
+                        Long relatedEntityId,
+                        String content) {
         this.eventType = eventType;
         this.targetId = targetId;
         this.targetRole = targetRole;
-        this.senderId = senderId;
-        this.senderType = senderType;
         this.relatedEntityId = relatedEntityId;
-        this.relatedEntityType = relatedEntityType;
         this.lastSentAt = LocalDateTime.now();
+        this.content = content;
     }
 
     public void markAsRead() {

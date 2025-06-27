@@ -28,7 +28,20 @@ public class SseNotificationService {
     private final NotificationService notificationService;
 
     public SseEmitter createConnection(Long userId, UserRole userRole) {
-        SseEmitter emitter = new SseEmitter(300_000L); // 5분 타임아웃
+        log.info("connection before {}", connections.size());
+
+        SseEmitter existingEmitter = connections.get(userId);
+        if (existingEmitter != null) {
+            try {
+                existingEmitter.complete();
+            } catch (Exception e) {
+                log.info("이미 존재하는 Emitter 연결 해제 실패");
+                log.error(e.getMessage());
+
+            }
+        }
+
+        SseEmitter emitter = new SseEmitter(120_000L); // 2분 타임아웃
 
         if (userRole == UserRole.ADMIN) {
             adminIds.add(userId);
@@ -39,9 +52,9 @@ public class SseNotificationService {
             log.info("Connection onCompletion closed id: {}", userId);
         });
         emitter.onTimeout(() -> {
-            emitter.complete();
             connections.remove(userId);
             log.info("Connection timed out id: {}", userId);
+            emitter.complete();
         });
         emitter.onError(e -> {
             connections.remove(userId);
@@ -162,5 +175,25 @@ public class SseNotificationService {
                     }
                 });
         notifications.forEach(Notification::markAsSent);
+    }
+
+    public void gracefulDisconnect(Long userId) {
+        SseEmitter emitter = connections.get(userId);
+        if (emitter != null) {
+            try {
+
+                // 클라이언트에 종료 신호 전송
+                emitter.send(SseEmitter.event()
+                        .name("disconnect")
+                        .data("Server initiated disconnect"));
+
+                connections.remove(userId);
+                log.info("emitter disconnected");
+                log.info("emitter 확인: {}", emitter);
+
+            } catch (Exception e) {
+                log.warn("SSE 정상 종료 실패 - userId: {}", userId, e);
+            }
+        }
     }
 }

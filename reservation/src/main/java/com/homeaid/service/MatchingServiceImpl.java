@@ -5,7 +5,6 @@ import com.homeaid.domain.Manager;
 import com.homeaid.domain.Matching;
 import com.homeaid.domain.Reservation;
 import com.homeaid.domain.enumerate.NotificationEventType;
-import com.homeaid.domain.enumerate.RelatedEntity;
 import com.homeaid.domain.enumerate.UserRole;
 import com.homeaid.domain.enumerate.Weekday;
 import com.homeaid.dto.RequestAlert;
@@ -62,8 +61,6 @@ public class MatchingServiceImpl implements MatchingService {
             .targetId(managerId)
             .targetRole(UserRole.MANAGER)
             .relatedEntityId(matchingId)
-            .relatedEntityType(RelatedEntity.MATCHING)
-            .senderType(UserRole.ADMIN)
             .build();
     sseNotificationService.createAlertByRequestAlert(requestAlert);
 
@@ -100,7 +97,6 @@ public class MatchingServiceImpl implements MatchingService {
             .targetId(matching.getReservation().getCustomerId())
             .targetRole(UserRole.CUSTOMER)
             .relatedEntityId(matching.getReservation().getId())
-            .relatedEntityType(RelatedEntity.RESERVATION)
             .content(memo)
             .build();
     sseNotificationService.createAlertByRequestAlert(requestAlert); //고객 알람용
@@ -109,7 +105,6 @@ public class MatchingServiceImpl implements MatchingService {
             .notificationEventType(notificationEventType)
             .targetRole(UserRole.ADMIN)
             .relatedEntityId(matching.getReservation().getId())
-            .relatedEntityType(RelatedEntity.RESERVATION)
             .content(memo)
             .build();
 
@@ -150,7 +145,6 @@ public class MatchingServiceImpl implements MatchingService {
             .targetId(matching.getManager().getId())
             .targetRole(UserRole.MANAGER)
             .relatedEntityId(matching.getReservation().getId())
-            .relatedEntityType(RelatedEntity.RESERVATION)
             .content(memo)
             .build();
     sseNotificationService.createAlertByRequestAlert(requestAlert);//고객 알람용
@@ -159,7 +153,6 @@ public class MatchingServiceImpl implements MatchingService {
             .notificationEventType(notificationEventType)
             .targetRole(UserRole.ADMIN)
             .relatedEntityId(matching.getReservation().getId())
-            .relatedEntityType(RelatedEntity.RESERVATION)
             .content(memo)
             .build();
     sseNotificationService.createAdminAlertByRequestAlert(requestAdminAlert);//관리자 알람용

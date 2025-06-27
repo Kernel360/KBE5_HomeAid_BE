@@ -29,8 +29,9 @@ public class NotificationController {
         SseEmitter sseEmitterInstance = sseNotificationService.createConnection(user.getUserId(), user.getUserRole());
 
         List<Notification> notifications = null;
-        if (user.getUserRole().equals(UserRole.ADMIN)) {
-            notifications = notificationService.getUnReadAdminAlerts(user.getUserRole());
+
+        if (UserRole.ADMIN.equals(user.getUserRole())) {
+            notifications = notificationService.getUnReadAdminAlerts(UserRole.ADMIN); // 고정값 전달
         } else {
             notifications = notificationService.getUnReadAlerts(user.getUserId());
         }
@@ -45,5 +46,12 @@ public class NotificationController {
         log.info("modifyAlertToRead alertId: {}", alertId);
         notificationService.updateMarkRead(alertId);
         return new ResponseEntity<>(CommonApiResponse.success(), HttpStatus.OK);
+    }
+
+    @PostMapping("/disconnect")
+    public ResponseEntity<CommonApiResponse<Void>> disconnect(@AuthenticationPrincipal CustomUserDetails user) {
+        sseNotificationService.gracefulDisconnect(user.getUserId());
+
+        return ResponseEntity.ok(CommonApiResponse.success());
     }
 }
