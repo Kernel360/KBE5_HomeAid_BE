@@ -1,6 +1,9 @@
 package com.homeaid.repository;
 
 import com.homeaid.domain.Matching;
+import com.homeaid.domain.Reservation;
+import java.util.List;
+import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -33,4 +36,6 @@ public interface MatchingRepository extends JpaRepository<Matching, Long> {
       AND (:month IS NULL OR MONTH(m.createdDate) = :month)
   """)
   long countFailedOrCancelledMatchings(@Param("year") int year, @Param("month") Integer month);
+
+  Optional<Matching> findTopByReservationIdOrderByModifiedDateDesc(Long reservationId);
 }

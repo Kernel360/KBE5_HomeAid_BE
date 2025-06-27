@@ -26,6 +26,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -55,15 +56,15 @@ public class MatchingController {
         .body(CommonApiResponse.success(matchingId));
   }
 
-  @PatchMapping("/manager/matchings/{matchingId}/to-customer")
+  @PatchMapping("/manager/matchings/{reservationId}/to-customer")
   @Operation(summary = "매니저 매칭 응답", description = "매니저가 수락 또는 거절로 매칭에 응답합니다.")
   public ResponseEntity<CommonApiResponse<Void>> respondToMatching(
       @AuthenticationPrincipal CustomUserDetails user,
       @Parameter(description = "매칭 ID", required = true)
-      @PathVariable(name = "matchingId") Long matchingId,
+      @PathVariable(name = "reservationId") Long reservationId,
       @RequestBody @Valid MatchingManagerResponseDto requestDto
   ) {
-    matchingService.respondToMatchingAsManager(user.getUserId(), matchingId, requestDto.getAction(),
+    matchingService.respondToMatchingAsManager(user.getUserId(), reservationId, requestDto.getAction(),
         requestDto.getMemo());
 
     return ResponseEntity.ok().body(CommonApiResponse.success());
@@ -129,7 +130,7 @@ public class MatchingController {
   }
 
   // 매니저 담당 매칭 상세 조회
-  @GetMapping("manager/matchings/{matchingId}")
+  @GetMapping("manager/matchings/{reservationId}")
   @Operation(summary = "매니저 매칭 단건 조회", description = "매니저 매칭 단건 조회")
   @ApiResponses(value = {
       @ApiResponse(responseCode = "200", description = "매니저 매칭 단건 조회 성공",
@@ -143,13 +144,13 @@ public class MatchingController {
   })
   public ResponseEntity<CommonApiResponse<MatchingResponseDto>> getMatching(
       @Parameter(description = "조회할 매칭 ID", example = "1")
-      @PathVariable(name = "matchingId") Long matchingId,
+      @PathVariable(name = "reservationId") Long reservationId,
       @AuthenticationPrincipal CustomUserDetails customUserDetails
   ) {
     Long userId = customUserDetails.getUserId();
     return ResponseEntity.ok(
         CommonApiResponse.success(
-            MatchingResponseDto.toDto(matchingService.getMatchingByManager(matchingId, userId))));
+            MatchingResponseDto.toDtoForManagerMatching(matchingService.getMatchingByManager(reservationId, userId))));
   }
 
 

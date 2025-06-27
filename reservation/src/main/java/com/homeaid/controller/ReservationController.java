@@ -54,7 +54,8 @@ public class ReservationController {
       @RequestBody @Valid ReservationRequestDto reservationRequestDto) {
 
     Reservation reservation = reservationService.createReservation(
-        ReservationRequestDto.toEntity(reservationRequestDto, user.getUserId()), reservationRequestDto.getOptionId());
+        ReservationRequestDto.toEntity(reservationRequestDto, user.getUserId()),
+        reservationRequestDto.getOptionId());
 
     return ResponseEntity.status(HttpStatus.CREATED)
         .body(CommonApiResponse.success(ReservationResponseDto.toDto(reservation)));
@@ -166,11 +167,10 @@ public class ReservationController {
   ) {
 
     Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdDate"));
-    Page<Reservation> reservations = reservationService.getReservationsByManager(
+    Page<ReservationResponseDto> reservations = reservationService.getReservationsByManager(
         userDetails.getUserId(), pageable);
 
-    PagedResponseDto<ReservationResponseDto> response =
-        PagedResponseDto.fromPage(reservations, ReservationResponseDto::toDto);
+    PagedResponseDto<ReservationResponseDto> response = PagedResponseDto.fromPage(reservations);
 
     return ResponseEntity.ok(CommonApiResponse.success(response));
   }

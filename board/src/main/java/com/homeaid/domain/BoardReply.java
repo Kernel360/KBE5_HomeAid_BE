@@ -1,6 +1,5 @@
-package com.homeaid.boardreply.domain;
+package com.homeaid.domain;
 
-import com.homeaid.domain.User;
 import com.homeaid.domain.enumerate.UserRole;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

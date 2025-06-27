@@ -50,6 +50,7 @@ public class Reservation {
 
   private Long customerId;
 
+  @Setter
   private Long managerId;
 
   @Setter

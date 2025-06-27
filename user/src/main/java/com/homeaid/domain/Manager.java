@@ -43,6 +43,8 @@ public class Manager extends User {
   @Enumerated(EnumType.STRING)
   private ManagerStatus status = ManagerStatus.PENDING;
 
+  private String rejectionReason; // 반려 사유 필드 추가
+
   @Builder
   public Manager(String email, String password, String name, String phone, LocalDate birth,
       GenderType gender, String career, String experience) {
@@ -58,5 +60,10 @@ public class Manager extends User {
 
   public void changeStatus(ManagerStatus newStatus) {
     this.status = newStatus;
+  }
+
+  public void reject(String reason) {
+    this.status = ManagerStatus.REJECTED;
+    this.rejectionReason = reason;
   }
 }

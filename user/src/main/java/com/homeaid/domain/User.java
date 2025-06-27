@@ -57,13 +57,6 @@ public class User {
   @Enumerated(EnumType.STRING)
   private UserRole role;
 
-  @CreatedDate
-  @Column(updatable = false)
-  private LocalDateTime createdAt;
-
-  @LastModifiedDate
-  private LocalDateTime updatedAt;
-
   @Column(name = "profile_image_url")
   private String profileImageUrl;
 
@@ -72,6 +65,13 @@ public class User {
 
   @Column(nullable = false)
   private Boolean deleted = false;
+
+  @CreatedDate
+  @Column(updatable = false)
+  private LocalDateTime createdAt;
+
+  @LastModifiedDate
+  private LocalDateTime updatedAt;
 
   public void delete() {
     this.deleted = true;
@@ -102,12 +102,11 @@ public class User {
     this.role = role;
   }
 
-
-  public User(String email, UserRole role, String encodedPassword) {
-    this.email = email;
-    this.password = encodedPassword;
-    this.role = role;
-  }
+//  public User(String email, UserRole role, String encodedPassword) {
+//    this.email = email;
+//    this.password = encodedPassword;
+//    this.role = role;
+//  }
 
   public void updateInfo(String name, String email, String phone) {
     this.name = name;

@@ -52,6 +52,8 @@ public class MatchingServiceImpl implements MatchingService {
     matching.setReservationAndManagerAndMatchingRound(reservation, manager,
         calculateNextMatchingRound(reservationId));
 
+    reservation.setManagerId(manager.getId());
+
     reservation.updateStatusMatching();
     
     Long matchingId = matchingRepository.save(matching).getId();
@@ -70,8 +72,8 @@ public class MatchingServiceImpl implements MatchingService {
 
   @Override
   @Transactional
-  public void respondToMatchingAsManager(Long userId, Long matchingId, ManagerAction action, String memo) {
-    Matching matching = matchingRepository.findById(matchingId)
+  public void respondToMatchingAsManager(Long userId, Long reservationId, ManagerAction action, String memo) {
+    Matching matching = matchingRepository.findTopByReservationIdOrderByModifiedDateDesc(reservationId)
         .orElseThrow(() -> new CustomException(MatchingErrorCode.MATCHING_NOT_FOUND));
 
     if (!matching.getManager().getId().equals(userId)) {
@@ -198,11 +200,11 @@ public class MatchingServiceImpl implements MatchingService {
 
   // 매니저 매칭 단건 조회
   @Override
-  public Matching getMatchingByManager(Long matchingId, Long userId) {
+  public Matching getMatchingByManager(Long reservationId, Long userId) {
     if (managerRepository.findById(userId).isEmpty()) {
       throw new CustomException(UserErrorCode.MANAGER_NOT_FOUND);
     }
-    return matchingRepository.findById(matchingId).get();
+    return matchingRepository.findTopByReservationIdOrderByModifiedDateDesc(reservationId).get();
   }
 
 

@@ -36,6 +36,7 @@ spring:
     secret: ${JWT_SECRET}
     access-token-expire-time: ${ACCESS_TOKEN_EXPIRE_TIME}
     refresh-token-expire-time: ${REFRESH_TOKEN_EXPIRE_TIME}
+    cookie-max-age: ${COOKIE_MAX_AGE}
 
   servlet:
     multipart:

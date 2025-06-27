@@ -1,6 +1,7 @@
 package com.homeaid.payment.domain;
 
 import com.homeaid.domain.Reservation;
+import com.homeaid.domain.enumerate.ReservationStatus;
 import com.homeaid.exception.CustomException;
 import com.homeaid.payment.exception.PaymentErrorCode;
 import jakarta.persistence.Column;
@@ -56,11 +57,13 @@ public class Payment {
   @Column(nullable = false)
   private Integer refundedAmount = 0;  // 부분환불 누적 금액
 
+  // 전체 환불 처리
   public void markRefunded() {
     this.status = PaymentStatus.REFUNDED;
     this.refundedAmount = this.amount;
   }
 
+  // 부분 환불 처리
   public void applyPartialRefund(int refundAmount) {
     int total = this.refundedAmount + refundAmount;
     if (total > this.amount) {
@@ -78,5 +81,72 @@ public class Payment {
     this.status = PaymentStatus.CANCELED;
     this.refundedAmount = this.amount;
   }
+
+  // 결제 취소
+  public void cancel(ReservationStatus reservationStatus) {
+    validateCancellableStatus(reservationStatus);
+    validateNotAlreadyRefundedOrCanceled();
+
+    this.status = PaymentStatus.CANCELED;
+    this.refundedAmount = this.amount;
+  }
+
+  private void validateCancellableStatus(ReservationStatus reservationStatus) {
+    if (!isCancellableStatus(reservationStatus)) {
+      throw new CustomException(PaymentErrorCode.PAYMENT_CANCELLATION_NOT_ALLOWED);
+    }
+  }
+
+  private boolean isCancellableStatus(ReservationStatus status) {
+    return status == ReservationStatus.REQUESTED
+        || status == ReservationStatus.MATCHING
+        || status == ReservationStatus.MATCHED;
+  }
+
+  private void validateNotAlreadyRefundedOrCanceled() {
+    if (this.status == PaymentStatus.REFUNDED || this.status == PaymentStatus.CANCELED) {
+      throw new CustomException(PaymentErrorCode.PAYMENT_ALREADY_REFUNDED);
+    }
+  }
+
+  // 전체 환불
+  public void refund(ReservationStatus reservationStatus) {
+    validateRefundableStatus(reservationStatus);
+    validateNotAlreadyRefunded();
+    this.status = PaymentStatus.REFUNDED;
+    this.refundedAmount = this.amount;
+  }
+
+  private void validateRefundableStatus(ReservationStatus reservationStatus) {
+    if (!isRefundableStatus(reservationStatus)) {
+      throw new CustomException(PaymentErrorCode.PAYMENT_REFUND_NOT_ALLOWED);
+    }
+  }
+
+  private boolean isRefundableStatus(ReservationStatus status) {
+    return status == ReservationStatus.REQUESTED
+        || status == ReservationStatus.MATCHING
+        || status == ReservationStatus.MATCHED;
+  }
+
+  private void validateNotAlreadyRefunded() {
+    if (this.status == PaymentStatus.REFUNDED) {
+      throw new CustomException(PaymentErrorCode.PAYMENT_ALREADY_REFUNDED);
+    }
+  }
+
+  // 부분 환불
+  public void partialRefund(ReservationStatus reservationStatus, int refundAmount) {
+    validatePartialRefundableStatus(reservationStatus);
+    validateNotAlreadyRefunded();
+    applyPartialRefund(refundAmount);
+  }
+
+  private void validatePartialRefundableStatus(ReservationStatus reservationStatus) {
+    if (reservationStatus != ReservationStatus.COMPLETED) {
+      throw new CustomException(PaymentErrorCode.PAYMENT_REFUND_NOT_ALLOWED);
+    }
+  }
+
 
 }

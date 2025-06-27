@@ -44,17 +44,9 @@ public class AdminPaymentServiceImpl implements AdminPaymentService {
     Payment payment = paymentRepository.findById(paymentId)
         .orElseThrow(() -> new CustomException(PaymentErrorCode.PAYMENT_NOT_FOUND));
 
-    // 서비스가 완료된 예약만 환불 가능
-    if (payment.getReservation().getStatus() != ReservationStatus.COMPLETED) {
-      throw new CustomException(PaymentErrorCode.PAYMENT_REFUND_NOT_ALLOWED);
-    }
+    payment.refund(payment.getReservation().getStatus());
 
-    if (payment.getStatus() == PaymentStatus.REFUNDED) {
-      throw new CustomException(PaymentErrorCode.PAYMENT_ALREADY_REFUNDED);
-    }
-
-    payment.markRefunded();
-    return toDtoWithUserNames(payment);
+    return toDtoWithUserNames(payment); // 응답 DTO 변환
   }
 
   // TODO : 결제 도메인에 refundedAmount 추가했지만 아직 DB에 반영안됨. 추후 수정예정
@@ -64,15 +56,8 @@ public class AdminPaymentServiceImpl implements AdminPaymentService {
     Payment payment = paymentRepository.findById(paymentId)
         .orElseThrow(() -> new CustomException(PaymentErrorCode.PAYMENT_NOT_FOUND));
 
-    if (payment.getReservation().getStatus() != ReservationStatus.COMPLETED) {
-      throw new CustomException(PaymentErrorCode.PAYMENT_REFUND_NOT_ALLOWED);
-    }
+    payment.partialRefund(payment.getReservation().getStatus(), refundAmount);
 
-    if (payment.getStatus() == PaymentStatus.REFUNDED) {
-      throw new CustomException(PaymentErrorCode.PAYMENT_ALREADY_REFUNDED);
-    }
-
-    payment.applyPartialRefund(refundAmount);
     return toDtoWithUserNames(payment);
   }
 
