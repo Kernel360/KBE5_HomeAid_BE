@@ -74,21 +74,13 @@ public class AdminInquiryServiceImpl implements AdminInquiryService {
   @Transactional
   public BoardReply createReply(BoardReply boardReply) {
     // 게시글 ID에 대한 답변이 이미 존재하면 예외
-    if (adminBoardReplyRepository.existsByBoardId(boardReply.getBoardId())) {
-      throw new CustomException(BoardReplyErrorCode.REPLY_ALREADY_EXISTS);
-    }
+    validateReplyNotExists(boardReply.getBoardId());
 
     // 답변 저장
     BoardReply savedReply = adminBoardReplyRepository.save(boardReply);
 
     // 게시글 찾아서 상태 변경
-    UserBoard userBoard = userBoardRepository.findById(boardReply.getBoardId())
-        .orElseThrow(() -> new CustomException(BoardErrorCode.BOARD_NOT_FOUND));
-
-    userBoard.setReplyId(savedReply.getId());  // reply_id 연결
-    userBoard.setAnswered();                   // 답변 완료 상태로 변경
-
-    userBoardRepository.save(userBoard); // 변경사항 반영
+    updateUserBoardStatus(boardReply.getBoardId(), savedReply.getId());
 
     return savedReply;
   }
@@ -132,5 +124,20 @@ public class AdminInquiryServiceImpl implements AdminInquiryService {
     if (!reply.getAdminId().equals(adminId)) {
       throw new CustomException(BoardReplyErrorCode.REPLY_ACCESS_UNAUTHORIZED);
     }
+  }
+
+  private void validateReplyNotExists(Long boardId) {
+    if (adminBoardReplyRepository.existsByBoardId(boardId)) {
+      throw new CustomException(BoardReplyErrorCode.REPLY_ALREADY_EXISTS);
+    }
+  }
+
+  private void updateUserBoardStatus(Long boardId, Long replyId) {
+    UserBoard userBoard = userBoardRepository.findById(boardId)
+        .orElseThrow(() -> new CustomException(BoardErrorCode.BOARD_NOT_FOUND));
+
+    userBoard.setReplyId(replyId);
+    userBoard.setAnswered();
+    userBoardRepository.save(userBoard);
   }
 }
