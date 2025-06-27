@@ -114,7 +114,6 @@ public class UserBoardController {
       @AuthenticationPrincipal CustomUserDetails customUserDetails
   ) {
     Long userId = customUserDetails.getUserId();
-    UserRole role = customUserDetails.getUserRole();
 
     userBoardService.deleteBoard(id, userId);
     return ResponseEntity.ok(CommonApiResponse.success(null));
@@ -138,7 +137,6 @@ public class UserBoardController {
       @AuthenticationPrincipal CustomUserDetails customUserDetails
   ) {
     Long userId = customUserDetails.getUserId();
-    UserRole role = customUserDetails.getUserRole();
     return ResponseEntity.ok(
         CommonApiResponse.success(
             UserBoardResponseDto.toDto(userBoardService.getBoard(id, userId))));
@@ -166,7 +164,6 @@ public class UserBoardController {
       @AuthenticationPrincipal CustomUserDetails customUserDetails
   ) {
     Long userId = customUserDetails.getUserId();
-    UserRole role = customUserDetails.getUserRole();
 
     Sort sort = sortDirection.equalsIgnoreCase("desc") ?
         Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();

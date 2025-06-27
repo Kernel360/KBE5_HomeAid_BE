@@ -50,10 +50,22 @@ public class UserBoardResponseDto {
     private String content;
     private String adminName;
     private LocalDateTime createdAt;
+
+    public static ReplyDto toDto(BoardReply reply) {
+      if (reply == null) {
+        return null;
+      }
+
+      return ReplyDto.builder()
+          .replyId(reply.getId())
+          .content(reply.getContent())
+          .adminName(reply.getUser() != null ? reply.getUser().getName() : null)
+          .createdAt(reply.getCreatedAt())
+          .build();
+    }
   }
 
   public static UserBoardResponseDto toDto(UserBoard userBoard) {
-    BoardReply reply = userBoard.getReply();
     return UserBoardResponseDto.builder()
         .id(userBoard.getId())
         .userId(userBoard.getUserId())
@@ -62,12 +74,7 @@ public class UserBoardResponseDto {
         .role(userBoard.getRole())
         .isAnswered(userBoard.isAnswered())
         .createdAt(userBoard.getCreatedAt())
-        .reply(reply != null ? ReplyDto.builder()
-            .replyId(reply.getId())
-            .content(reply.getContent())
-            .adminName(reply.getUser() != null ? reply.getUser().getName() : null)
-            .createdAt(reply.getCreatedAt())
-            .build() : null)
+        .reply(ReplyDto.toDto(userBoard.getReply()))
         .build();
   }
 }
