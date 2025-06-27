@@ -203,4 +203,33 @@ public class ReservationServiceImpl implements ReservationService {
         .collect(Collectors.toMap(Customer::getId, Function.identity()));
 
   }
+
+  @Override
+  public Reservation validateReservation(Long reservationId) {
+    Reservation reservation = reservationRepository.findById(reservationId)
+        .orElseThrow(() -> new CustomException(ReservationErrorCode.RESERVATION_NOT_FOUND));
+
+    if (reservation.getStatus() != ReservationStatus.COMPLETED) {
+      throw new CustomException(ReservationErrorCode.RESERVATION_NOT_COMPLETED);
+    }
+
+    return reservation;
+  }
+
+  @Override
+  public void validateManagerAccess(Reservation reservation, Long managerId) {
+    if (!reservation.getCustomerId().equals(managerId)) {
+      throw new CustomException(ReservationErrorCode.RESERVATION_MANAGER_MISMATCH);
+    }
+  }
+
+  @Override
+  public void validateUserAccess(Reservation reservation, Long userId) {
+    boolean isManager = userId.equals(reservation.getManagerId());
+    boolean isCustomer = userId.equals(reservation.getCustomerId());
+
+    if (!isManager && !isCustomer) {
+      throw new CustomException(ReservationErrorCode.USER_ACCESS_DENIED);
+    }
+  }
 }
