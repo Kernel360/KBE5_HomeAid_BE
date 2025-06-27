@@ -29,6 +29,7 @@ public class RequestAlert {
                 .targetId(notification.getTargetId())
                 .targetRole(notification.getTargetRole())
                 .relatedEntityId(notification.getRelatedEntityId())
+                .content(notification.getContent())
                 .build();
     }
 
