@@ -21,7 +21,7 @@ public class RedisUtil {
   public void save(String key, Object val, Duration timeout) {
     try {
       redisTemplate.opsForValue().set(key, val, timeout);
-      log.debug("Redis 저장 성공 - Key: {}", key);
+      log.info("Redis 저장 성공 - Key: {}", key);
     } catch (RedisConnectionFailureException | RedisConnectionException e) {
       throw new RuntimeException("Redis 연결 실패", e);
     } catch (Exception e) {
@@ -56,7 +56,7 @@ public class RedisUtil {
     try {
       Boolean result = redisTemplate.delete(key);
       boolean deleted = Boolean.TRUE.equals(result);
-      log.debug("Redis 삭제 - Key: {}, 성공: {}", key, deleted);
+      log.info("Redis 삭제 - Key: {}, 성공: {}", key, deleted);
       return deleted;
     } catch (Exception e) {
       log.error("Redis 삭제 실패 - Key: {}", key, e);

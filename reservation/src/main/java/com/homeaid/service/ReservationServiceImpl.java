@@ -25,6 +25,7 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -32,6 +33,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ReservationServiceImpl implements ReservationService {
 
   private final ReservationRepository reservationRepository;
@@ -47,6 +49,7 @@ public class ReservationServiceImpl implements ReservationService {
   @Override
   @Transactional
   public Reservation createReservation(Reservation reservation, Long serviceOptionId) {
+    log.info("[예약 생성] customerId={}, serviceOptionId={}", reservation.getCustomerId(), serviceOptionId);
     ServiceOption serviceOption = serviceOptionRepository.findById(serviceOptionId)
         .orElseThrow(() -> new CustomException(ReservationErrorCode.RESERVATION_NOT_FOUND));
     reservation.addItem(serviceOption);
@@ -78,10 +81,12 @@ public class ReservationServiceImpl implements ReservationService {
         .orElseThrow(() -> new CustomException(ReservationErrorCode.RESERVATION_NOT_FOUND));
 
     if (!originReservation.getCustomerId().equals(userId)) {
+      log.warn("[예약 수정 실패] 권한 없음 - reservationId={}, userId={}", reservationId, userId);
       throw new CustomException(ReservationErrorCode.UNAUTHORIZED_RESERVATION_ACCESS);
     }
 
     if (originReservation.getStatus() != ReservationStatus.REQUESTED) {
+      log.warn("[예약 수정 실패] 예약 상태 불가 - reservationId={}, status={}", reservationId, originReservation.getStatus());
       throw new CustomException(ReservationErrorCode.RESERVATION_CANNOT_UPDATE);
     }
 
@@ -106,6 +111,7 @@ public class ReservationServiceImpl implements ReservationService {
         .orElseThrow(() -> new CustomException(ReservationErrorCode.RESERVATION_NOT_FOUND));
 
     if (!reservation.getCustomerId().equals(userId)) {
+      log.warn("[예약 삭제 실패] 권한 없음 - reservationId={}, userId={}", reservationId, userId);
       throw new CustomException(ReservationErrorCode.UNAUTHORIZED_RESERVATION_ACCESS);
     }
 
@@ -142,6 +148,7 @@ public class ReservationServiceImpl implements ReservationService {
     return reservations.map(reservation -> {
       Customer customer = customerMap.get(reservation.getCustomerId());
       if (customer == null) {
+        log.error("[예약 조회 실패] 고객 정보 없음 - reservationId={}, customerId={}", reservation.getId(), reservation.getCustomerId());
         throw new CustomException(UserErrorCode.CUSTOMER_NOT_FOUND);
       }
 
@@ -170,6 +177,7 @@ public class ReservationServiceImpl implements ReservationService {
       Customer customer = customerMap.get(reservation.getCustomerId());
 
       if (customer == null) {
+        log.error("[매니저 예약 조회 실패] 고객 정보 없음 - reservationId={}, customerId={}", reservation.getId(), reservation.getCustomerId());
         throw new CustomException(UserErrorCode.CUSTOMER_NOT_FOUND);
       }
 
