@@ -59,7 +59,7 @@ public class MatchingServiceImpl implements MatchingService {
   @Override
   @Transactional
   public void respondToMatchingAsManager(Long userId, Long reservationId, ManagerAction action, String memo) {
-    Matching matching = matchingRepository.findLatestByReservationId(reservationId)
+    Matching matching = matchingRepository.findTopByReservationIdOrderByModifiedDateDesc(reservationId)
         .orElseThrow(() -> new CustomException(MatchingErrorCode.MATCHING_NOT_FOUND));
 
     if (!matching.getManager().getId().equals(userId)) {
@@ -149,7 +149,7 @@ public class MatchingServiceImpl implements MatchingService {
     if (managerRepository.findById(userId).isEmpty()) {
       throw new CustomException(UserErrorCode.MANAGER_NOT_FOUND);
     }
-    return matchingRepository.findLatestByReservationId(reservationId).get();
+    return matchingRepository.findTopByReservationIdOrderByModifiedDateDesc(reservationId).get();
   }
 
 

@@ -173,7 +173,7 @@ public class ReservationServiceImpl implements ReservationService {
         throw new CustomException(UserErrorCode.CUSTOMER_NOT_FOUND);
       }
 
-      Optional<Matching> matching = matchingRepository.findLatestByReservationId(reservation.getId());
+      Optional<Matching> matching = matchingRepository.findTopByReservationIdOrderByModifiedDateDesc(reservation.getId());
 
       if (matching.isPresent()) {
         return ReservationResponseDto.toDtoForManager(reservation, customer, matching.get().getStatus());

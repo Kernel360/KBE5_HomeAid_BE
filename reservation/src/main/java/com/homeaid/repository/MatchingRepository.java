@@ -37,8 +37,5 @@ public interface MatchingRepository extends JpaRepository<Matching, Long> {
   """)
   long countFailedOrCancelledMatchings(@Param("year") int year, @Param("month") Integer month);
 
-  @Query("SELECT m FROM Matching m WHERE m.reservation.id = :reservationId ORDER BY m.modifiedDate DESC")
-  Optional<Matching> findLatestByReservationId(@Param("reservationId") Long reservationId);
-
-  List<Object> findByReservationId(Long matchingId);
+  Optional<Matching> findTopByReservationIdOrderByModifiedDateDesc(Long reservationId);
 }
