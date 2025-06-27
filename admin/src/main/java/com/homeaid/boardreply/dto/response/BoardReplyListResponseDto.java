@@ -1,6 +1,6 @@
 package com.homeaid.boardreply.dto.response;
 
-import com.homeaid.boardreply.domain.BoardReply;
+import com.homeaid.domain.BoardReply;
 import com.homeaid.domain.enumerate.UserRole;
 import java.time.LocalDateTime;
 import lombok.Builder;

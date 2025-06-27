@@ -1,18 +1,17 @@
 package com.homeaid.boardreply.service;
 
-import com.homeaid.boardreply.domain.BoardReply;
 import com.homeaid.boardreply.dto.response.BoardReplyListResponseDto;
 import com.homeaid.boardreply.dto.response.InquiryDetailResponseDto;
 import com.homeaid.boardreply.exception.BoardReplyErrorCode;
 import com.homeaid.boardreply.repository.AdminBoardReplyRepository;
-import com.homeaid.domain.User;
+import com.homeaid.domain.BoardReply;
 import com.homeaid.domain.UserBoard;
 import com.homeaid.domain.enumerate.UserRole;
 import com.homeaid.dto.response.UserBoardListResponseDto;
 import com.homeaid.exception.BoardErrorCode;
 import com.homeaid.exception.CustomException;
 import com.homeaid.repository.UserBoardRepository;
-import com.homeaid.repository.UserRepository;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -75,12 +74,15 @@ public class AdminInquiryServiceImpl implements AdminInquiryService {
   @Transactional
   public BoardReply createReply(BoardReply boardReply) {
     // 게시글 ID에 대한 답변이 이미 존재하면 예외
-    if (adminBoardReplyRepository.existsByBoardId(boardReply.getBoardId())) {
-      throw new CustomException(BoardReplyErrorCode.REPLY_ALREADY_EXISTS);
-    }
+    validateReplyNotExists(boardReply.getBoardId());
 
-    // reply 객체에는 user, boardId, adminId, userRole 등 세팅돼 있어야 함
-    return adminBoardReplyRepository.save(boardReply);
+    // 답변 저장
+    BoardReply savedReply = adminBoardReplyRepository.save(boardReply);
+
+    // 게시글 찾아서 상태 변경
+    updateUserBoardStatus(boardReply.getBoardId(), savedReply.getId());
+
+    return savedReply;
   }
 
   // 답변 수정
@@ -122,5 +124,20 @@ public class AdminInquiryServiceImpl implements AdminInquiryService {
     if (!reply.getAdminId().equals(adminId)) {
       throw new CustomException(BoardReplyErrorCode.REPLY_ACCESS_UNAUTHORIZED);
     }
+  }
+
+  private void validateReplyNotExists(Long boardId) {
+    if (adminBoardReplyRepository.existsByBoardId(boardId)) {
+      throw new CustomException(BoardReplyErrorCode.REPLY_ALREADY_EXISTS);
+    }
+  }
+
+  private void updateUserBoardStatus(Long boardId, Long replyId) {
+    UserBoard userBoard = userBoardRepository.findById(boardId)
+        .orElseThrow(() -> new CustomException(BoardErrorCode.BOARD_NOT_FOUND));
+
+    userBoard.setReplyId(replyId);
+    userBoard.setAnswered();
+    userBoardRepository.save(userBoard);
   }
 }

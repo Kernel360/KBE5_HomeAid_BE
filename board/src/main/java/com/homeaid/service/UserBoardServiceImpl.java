@@ -1,9 +1,8 @@
 package com.homeaid.service;
 
 
-import com.homeaid.domain.UserBoard;
-import com.homeaid.domain.enumerate.UserRole;
 import com.homeaid.common.response.PagedResponseDto;
+import com.homeaid.domain.UserBoard;
 import com.homeaid.dto.response.UserBoardListResponseDto;
 import com.homeaid.exception.BoardErrorCode;
 import com.homeaid.exception.CustomException;
@@ -32,21 +31,22 @@ public class UserBoardServiceImpl implements UserBoardService {
 
   @Override
   @Transactional
-  public UserBoard updateBoard(Long id, Long userId, UserRole role, UserBoard userBoard) {
+  public UserBoard updateBoard(Long id, Long userId, UserBoard userBoard) {
     validateBoardId(id);
 
     UserBoard board = userBoardRepository.findById(id)
         .orElseThrow(() -> new CustomException(BoardErrorCode.BOARD_NOT_FOUND));
 
-    updateAccess(board, userId, role);
+    updateAccess(board, userId);
+
+    if (board.isAnswered()) {
+      throw new CustomException(BoardErrorCode.BOARD_ANSWERED_UPDATE_FORBIDDEN);
+    }
+
     try {
       board.updateBoard(userBoard.getTitle(), userBoard.getContent());
       return board; // @Transactional에 의해 자동으로 변경사항 저장됨
     } catch (IllegalStateException e) {
-      // 엔티티에서 발생한 답변 완료 게시글 수정 시도 예외
-      if (e.getMessage().contains("답변이 완료된")) {
-        throw new CustomException(BoardErrorCode.BOARD_ANSWERED_UPDATE_FORBIDDEN);
-      }
       throw new CustomException(BoardErrorCode.BOARD_UPDATE_FORBIDDEN);
     } catch (Exception e) {
       throw new CustomException(BoardErrorCode.BOARD_UPDATE_FAILED);
@@ -55,14 +55,14 @@ public class UserBoardServiceImpl implements UserBoardService {
 
   @Override
   @Transactional
-  public void deleteBoard(Long id, Long userId, UserRole role) {
+  public void deleteBoard(Long id, Long userId) {
 
     validateBoardId(id);
 
     UserBoard board = userBoardRepository.findById(id)
         .orElseThrow(() -> new CustomException(BoardErrorCode.BOARD_NOT_FOUND));
 
-    deleteAccess(board, userId, role);
+    deleteAccess(board, userId);
 
     try {
       userBoardRepository.deleteById(id);
@@ -74,14 +74,14 @@ public class UserBoardServiceImpl implements UserBoardService {
 
   @Override
   @Transactional(readOnly = true)
-  public UserBoard getBoard(Long id, Long userId, UserRole role) {
+  public UserBoard getBoard(Long id, Long userId) {
 
     validateBoardId(id);
 
     UserBoard board = userBoardRepository.findById(id)
         .orElseThrow(() -> new CustomException(BoardErrorCode.BOARD_NOT_FOUND));
 
-    viewAccess(board, userId, role);
+    viewAccess(board, userId);
 
     return board;
   }
@@ -89,8 +89,7 @@ public class UserBoardServiceImpl implements UserBoardService {
   @Override
   @Transactional(readOnly = true)
   public PagedResponseDto<UserBoardListResponseDto> searchBoard(String keyword, Pageable pageable,
-      Long userId,
-      UserRole role) {
+      Long userId) {
     try {
       Page<UserBoard> boardPage;
 
@@ -116,27 +115,27 @@ public class UserBoardServiceImpl implements UserBoardService {
     }
   }
 
-  private boolean validateUserAccess(UserBoard board, Long userId, UserRole role) {
-    if (!board.getUserId().equals(userId) || role != board.getRole()) {
+  private boolean validateUserAccess(UserBoard board, Long userId) {
+    if (!board.getUserId().equals(userId)) {
       throw new CustomException(BoardErrorCode.BOARD_ACCESS_UNAUTHORIZED);
     }
     return true;
   }
 
-  private void updateAccess(UserBoard board, Long userId, UserRole role) {
-    if (!validateUserAccess(board, userId, role)) {
+  private void updateAccess(UserBoard board, Long userId) {
+    if (!validateUserAccess(board, userId)) {
       throw new CustomException(BoardErrorCode.BOARD_UPDATE_FORBIDDEN);
     }
   }
 
-  private void deleteAccess(UserBoard board, Long userId, UserRole role) {
-    if (!validateUserAccess(board, userId, role)) {
+  private void deleteAccess(UserBoard board, Long userId) {
+    if (!validateUserAccess(board, userId)) {
       throw new CustomException(BoardErrorCode.BOARD_DELETE_FORBIDDEN);
     }
   }
 
-  private void viewAccess(UserBoard board, Long userId, UserRole role) {
-    if (!validateUserAccess(board, userId, role)) {
+  private void viewAccess(UserBoard board, Long userId) {
+    if (!validateUserAccess(board, userId)) {
       throw new CustomException(BoardErrorCode.BOARD_VIEW_FORBIDDEN);
     }
   }
