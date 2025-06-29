@@ -10,14 +10,15 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -29,15 +30,19 @@ public class ServiceIssueController {
 
   private final ServiceIssueService serviceIssueService;
 
-  @PostMapping("/manager/reservations/{reservationId}/issues")
+  @PostMapping(value = "/manager/reservations/{reservationId}/issues", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   @Operation(summary = "서비스 이슈 생성", description = "매니저가 예약에 대한 서비스 이슈를 생성합니다.")
-  public ResponseEntity<CommonApiResponse<ServiceIssueResponseDto>> createIssue(
+  public ResponseEntity<CommonApiResponse<Void>> createIssue(
       @PathVariable(name = "reservationId") Long reservationId,
-      @RequestBody ServiceIssueRequestDto serviceIssueRequestDto,
+      @ModelAttribute ServiceIssueRequestDto requestDto,
       @AuthenticationPrincipal CustomUserDetails user) {
 
-    ServiceIssue serviceIssue = ServiceIssueRequestDto.toEntity(serviceIssueRequestDto);
-    serviceIssueService.createIssue(reservationId, user.getUserId(), serviceIssue);
+    serviceIssueService.createIssue(
+        reservationId,
+        user.getUserId(),
+        requestDto.getContent(),
+        requestDto.getFiles()
+    );
 
     return ResponseEntity.status(HttpStatus.CREATED)
         .body(CommonApiResponse.success(null));
@@ -49,24 +54,25 @@ public class ServiceIssueController {
       @PathVariable("reservationId") Long reservationId,
       @AuthenticationPrincipal CustomUserDetails user) {
 
-    ServiceIssue response = serviceIssueService.getIssueByReservation(reservationId, user.getUserId());
+    ServiceIssue serviceIssue = serviceIssueService.getIssueByReservation(reservationId,
+        user.getUserId());
 
     return ResponseEntity.status(HttpStatus.OK)
-        .body(CommonApiResponse.success(ServiceIssueResponseDto.toDto(response)));
+        .body(CommonApiResponse.success(ServiceIssueResponseDto.toDto(serviceIssue)));
   }
 
-  @PutMapping("manager/issues/{issueId}")
+  @PutMapping(value = "manager/issues/{issueId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   @Operation(summary = "서비스 이슈 수정", description = "매니저가 서비스 이슈를 수정합니다.")
   public ResponseEntity<CommonApiResponse<ServiceIssueResponseDto>> updateIssue(
       @PathVariable("issueId") Long issueId,
-      @RequestBody ServiceIssueRequestDto requestDto,
+      @ModelAttribute ServiceIssueRequestDto requestDto,
       @AuthenticationPrincipal CustomUserDetails user) {
 
-    ServiceIssue response = serviceIssueService.updateIssue(
-        issueId, user.getUserId(), requestDto.getContent());
+    ServiceIssue serviceIssue = serviceIssueService.updateIssue(
+        issueId, user.getUserId(), requestDto.getContent(), requestDto.getFiles());
 
     return ResponseEntity.status(HttpStatus.OK)
-        .body(CommonApiResponse.success(ServiceIssueResponseDto.toDto(response)));
+        .body(CommonApiResponse.success(ServiceIssueResponseDto.toDto(serviceIssue)));
   }
 
   @DeleteMapping("manager/issues/{issueId}")

@@ -5,9 +5,11 @@ import com.homeaid.domain.ServiceIssue;
 import com.homeaid.exception.CustomException;
 import com.homeaid.exception.ServiceIssueErrorCode;
 import com.homeaid.repository.ServiceIssueRepository;
+import java.util.List;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @RequiredArgsConstructor
@@ -15,25 +17,23 @@ public class ServiceIssueServiceImpl implements ServiceIssueService {
 
   private final ServiceIssueRepository serviceIssueRepository;
   private final ReservationService reservationService;
+  private final ServiceIssueFileService serviceIssueFileService;
 
   @Override
   @Transactional
-  public void createIssue(Long reservationId, Long managerId,
-      ServiceIssue serviceIssue) {
+  public void createIssue(Long reservationId, Long managerId, String content, List<MultipartFile> files) {
 
     Reservation reservation = reservationService.validateReservation(reservationId);
     reservationService.validateManagerAccess(reservation, managerId);
-
     existsByReservationId(reservation.getId());
 
     ServiceIssue issue = ServiceIssue.builder()
         .reservation(reservation)
-        .content(serviceIssue.getContent())
+        .content(content)
         .build();
 
+    serviceIssueFileService.uploadFiles(issue, files);
     serviceIssueRepository.save(issue);
-
-    // TODO 파일 추가 필요
   }
 
   @Override
@@ -47,12 +47,13 @@ public class ServiceIssueServiceImpl implements ServiceIssueService {
   }
 
   @Override
-  public ServiceIssue updateIssue(Long issueId, Long managerId, String content) {
+  public ServiceIssue updateIssue(Long issueId, Long managerId, String content, List<MultipartFile> files) {
 
     ServiceIssue issue = findIssueById(issueId);
     findIssueByIdAndManagerAccess(issueId, managerId);
 
-    issue.updateIssue(content); // TODO 파일 수정 추가 필요
+    issue.updateIssue(content);
+    serviceIssueFileService.updateFiles(issue, files);
 
     return issue;
   }
@@ -64,6 +65,7 @@ public class ServiceIssueServiceImpl implements ServiceIssueService {
     findIssueByIdAndManagerAccess(issueId, managerId);
 
     serviceIssueRepository.delete(issue);
+    serviceIssueFileService.deleteFiles(issue);
   }
 
   private ServiceIssue findIssueById(Long issueId) {
