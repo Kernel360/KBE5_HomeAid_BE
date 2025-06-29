@@ -50,7 +50,7 @@ public class S3Service {
       // S3에 파일 업로드
       amazonS3.putObject(putObjectRequest);
     }
-    log.debug("파일 업로드 성공 - key: {}, url: {}", fileName, getPublicUrl(fileName));
+    log.info("파일 업로드 성공 - key: {}, url: {}", fileName, getPublicUrl(fileName));
     return new FileUploadResult(documentType, fileName, getPublicUrl(fileName));
   }
 

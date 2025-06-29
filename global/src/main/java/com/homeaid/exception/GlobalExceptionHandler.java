@@ -20,7 +20,7 @@ public class GlobalExceptionHandler {
 
   @ExceptionHandler(CustomException.class)
   public ResponseEntity<CommonApiResponse<Void>> handleCustomException(CustomException e) {
-    log.warn("[CustomException] {} - {}", e.getErrorCode().getCode(), e.getMessage());
+    log.error("[CustomException] {} - {}", e.getErrorCode().getCode(), e.getMessage());
 
     return ResponseEntity.status(e.getErrorCode().getStatus())
         .body(CommonApiResponse.fail(e.getErrorCode().getCode(), e.getErrorCode().getMessage()));
@@ -31,7 +31,7 @@ public class GlobalExceptionHandler {
    */
   @ExceptionHandler(ExpiredJwtException.class)
   public ResponseEntity<CommonApiResponse<Void>> handleExpiredJwtException(ExpiredJwtException e) {
-    log.warn("[ExpiredJwtException] {}", e.getMessage());
+    log.error("[ExpiredJwtException] {}", e.getMessage());
 
     return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
         .body(CommonApiResponse.fail("JWT_EXPIRED", "엑세스 토큰이 만료되었습니다."));
@@ -48,7 +48,7 @@ public class GlobalExceptionHandler {
         .map(DefaultMessageSourceResolvable::getDefaultMessage)
         .orElse("입력값이 올바르지 않습니다.");
 
-    log.warn("[ValidationException] {}", message);
+    log.error("[ValidationException] {}", message);
 
     return ResponseEntity.badRequest()
         .body(CommonApiResponse.fail("VALIDATION_ERROR", message));
@@ -59,7 +59,7 @@ public class GlobalExceptionHandler {
    */
   @ExceptionHandler(HttpMessageNotReadableException.class)
   public ResponseEntity<CommonApiResponse<Void>> handleParsingException(HttpMessageNotReadableException e) {
-    log.warn("[HttpMessageNotReadableException] {}", e.getMessage());
+    log.error("[HttpMessageNotReadableException] {}", e.getMessage());
 
     return ResponseEntity.badRequest()
         .body(CommonApiResponse.fail("INVALID_JSON", "요청 형식이 잘못되었습니다."));
@@ -70,7 +70,7 @@ public class GlobalExceptionHandler {
    */
   @ExceptionHandler(SQLIntegrityConstraintViolationException.class)
   public ResponseEntity<CommonApiResponse<Void>> handleSQLIntegrityConstraintViolationException(SQLIntegrityConstraintViolationException e) {
-    log.warn("[SQLIntegrityConstraintViolationException] {}", e.getMessage());
+    log.error("[SQLIntegrityConstraintViolationException] {}", e.getMessage());
 
     return ResponseEntity.badRequest()
             .body(CommonApiResponse.fail("duplicate value", "이미 처리된 요청 입니다"));

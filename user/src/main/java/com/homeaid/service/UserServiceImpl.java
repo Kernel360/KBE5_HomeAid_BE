@@ -38,10 +38,12 @@ public class UserServiceImpl implements UserService {
   public Manager signUpManager(@Valid Manager manager) {
 
     if (userRepository.existsByPhone(manager.getPhone())) {
+      log.warn("[회원가입 실패] 이미 존재하는 전화번호 - phone={}", manager.getPhone());
       throw new CustomException(UserErrorCode.USER_ALREADY_EXISTS);
     }
 
     userRepository.save(manager);
+    log.info("[매니저 회원가입 완료] id={}, phone={}", manager.getId(), manager.getPhone());
     return manager;
   }
 
@@ -50,10 +52,12 @@ public class UserServiceImpl implements UserService {
   public Customer signUpCustomer(Customer customer) {
 
     if (userRepository.existsByPhone(customer.getPhone())) {
+      log.warn("[회원가입 실패] 이미 존재하는 전화번호 - phone={}", customer.getPhone());
       throw new CustomException(UserErrorCode.USER_ALREADY_EXISTS);
     }
 
     userRepository.save(customer);
+    log.info("[고객 회원가입 완료] id={}, phone={}", customer.getId(), customer.getPhone());
     return customer;
   }
 
