@@ -1,5 +1,6 @@
 package com.homeaid.domain;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
@@ -9,9 +10,11 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import java.time.LocalDateTime;
-import lombok.AllArgsConstructor;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -36,7 +39,8 @@ public class ServiceIssue {
 
   private String content;
 
-  // TODO 이미지 리스트 추가 필요
+  @OneToMany(mappedBy = "serviceIssue", cascade = CascadeType.ALL, orphanRemoval = true)
+  private List<ServiceIssueImage> images = new ArrayList<>();
 
   @CreatedDate
   @Column(updatable = false)
@@ -59,4 +63,8 @@ public class ServiceIssue {
     }
   }
 
+  public void addImage(ServiceIssueImage image) {
+    this.images.add(image);
+    image.setServiceIssue(this);
+  }
 }
