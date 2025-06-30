@@ -1,11 +1,11 @@
 package com.homeaid.service;
 
-import com.homeaid.domain.Matching;
 import com.homeaid.domain.Reservation;
 import com.homeaid.domain.WorkLog;
+import com.homeaid.domain.enumerate.NotificationEventType;
 import com.homeaid.domain.enumerate.WorkType;
+import com.homeaid.dto.RequestAlert;
 import com.homeaid.exception.CustomException;
-import com.homeaid.exception.MatchingErrorCode;
 import com.homeaid.exception.ReservationErrorCode;
 import com.homeaid.exception.WorkLogErrorCode;
 import com.homeaid.repository.MatchingRepository;
@@ -27,6 +27,7 @@ public class WorkLogServiceImpl implements WorkLogService {
   private final ReservationRepository reservationRepository;
   private final static int CHECK_RANGE_DISTANCE_METER = 500; //500미터
   private final MatchingRepository matchingRepository;
+  private final SseNotificationService sseNotificationService;
 
   @Transactional
   @Override
@@ -45,6 +46,13 @@ public class WorkLogServiceImpl implements WorkLogService {
     WorkLog workLog = WorkLog.builder().workType(WorkType.CHECKIN).managerId(userId)
         .reservation(reservation).build();
 
+    RequestAlert requestAlert = RequestAlert.builder()
+            .targetId(reservation.getCustomerId())
+            .notificationEventType(NotificationEventType.WORK_CHECKIN)
+            .relatedEntityId(reservationId)
+            .build();
+    sseNotificationService.createAlertByRequestAlert(requestAlert);
+
     return workLogRepository.save(workLog);
   }
 
@@ -62,6 +70,13 @@ public class WorkLogServiceImpl implements WorkLogService {
     workLog.updateCheckOut();
 
     updateReservationStatusCompleted(workLog.getReservation());
+
+    RequestAlert requestAlert = RequestAlert.builder()
+            .targetId(workLog.getReservation().getCustomerId())
+            .notificationEventType(NotificationEventType.WORK_CHECKOUT)
+            .relatedEntityId(reservationId)
+            .build();
+    sseNotificationService.createAlertByRequestAlert(requestAlert);
   }
 
   @Override

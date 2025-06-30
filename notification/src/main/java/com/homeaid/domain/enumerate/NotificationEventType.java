@@ -12,7 +12,7 @@ public enum NotificationEventType {
 
     // 매칭 관련
     MATCHING_CREATED("고객님의 청소 요청 도착 \n지금 수락하거나 거절할 수 있습니다"),
-    MATCHING_ACCEPTED_BY_CUSTOMER("고객이 매칭을 최종수락했습니다"),
+    MATCHING_ACCEPTED_BY_CUSTOMER("예약이 확정되었습니다"),
     MATCHING_REJECTED_BY_CUSTOMER("고객이 매칭을 거절하였습니다"),
     MATCHING_ACCEPTED_BY_MANAGER("매니저가 매칭을 수락하였습니다"),
     MATCHING_ACCEPTED_BY_MANAGER_FOR_CUSTOMER("매니저님이 예약을 수락했습니다. \n결제를 완료하고 예약을 확정하세요"),
@@ -20,9 +20,9 @@ public enum NotificationEventType {
 
     // 작업 관련
     WORK_REMINDER("작업 예정 알림"),
-    WORK_CHECKIN("체크인 알림"),
-    WORK_CHECKOUT("체크아웃 알림"),
-    WORK_COMPLETED("작업 완료 알림"),
+    WORK_CHECKIN("매니저가 청소 작업을 시작했습니다"),
+    WORK_CHECKOUT("매니저가 청소 작업을 마무리했습니다"),
+    WORK_COMPLETED("매니저가 해당 예약의 작업을 완수했습니다"),
 
     // 시스템 관련
     PAYMENT_COMPLETED("결제가 완료되었습니다"),
