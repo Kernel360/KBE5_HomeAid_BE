@@ -2,6 +2,7 @@ package com.homeaid.boardreply.service;
 
 import com.homeaid.boardreply.dto.response.BoardReplyListResponseDto;
 import com.homeaid.boardreply.dto.response.InquiryDetailResponseDto;
+import com.homeaid.boardreply.dto.response.InquiryWithReplyResponseDto;
 import com.homeaid.boardreply.exception.BoardReplyErrorCode;
 import com.homeaid.boardreply.repository.AdminBoardReplyRepository;
 import com.homeaid.domain.BoardReply;
@@ -11,7 +12,6 @@ import com.homeaid.dto.response.UserBoardListResponseDto;
 import com.homeaid.exception.BoardErrorCode;
 import com.homeaid.exception.CustomException;
 import com.homeaid.repository.UserBoardRepository;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -111,6 +111,26 @@ public class AdminInquiryServiceImpl implements AdminInquiryService {
 
     validateAdminAccess(adminId, reply);
     adminBoardReplyRepository.delete(reply);
+  }
+
+  // 문의글 + 답변 조회
+  @Override
+  @Transactional(readOnly = true)
+  public InquiryWithReplyResponseDto getBoardWithReply(Long boardId) {
+    UserBoard board = userBoardRepository.findById(boardId)
+        .orElseThrow(() -> new CustomException(BoardErrorCode.BOARD_NOT_FOUND));
+
+    BoardReply reply = adminBoardReplyRepository.findByBoardId(boardId).orElse(null);
+
+    UserBoardListResponseDto boardDto = UserBoardListResponseDto.toDto(board);
+    InquiryDetailResponseDto replyDto = (reply != null)
+        ? InquiryDetailResponseDto.from(reply, reply.getUser() != null ? reply.getUser().getName() : null)
+        : null;
+
+    return InquiryWithReplyResponseDto.builder()
+        .board(boardDto)
+        .reply(replyDto)
+        .build();
   }
 
   // 유효성 검사
