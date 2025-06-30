@@ -32,6 +32,10 @@ public class ServiceIssueResponseDto {
   @Builder
   @Schema(description = "서비스 이슈 이미지")
   public static class ImageDto {
+
+    @Schema(description = "이미지 ID")
+    private Long id;
+
     @Schema(description = "이미지 원본 파일명")
     private String originalName;
 
@@ -47,6 +51,7 @@ public class ServiceIssueResponseDto {
         .createdAt(serviceIssue.getCreatedAt())
         .images(serviceIssue.getImages().stream()
             .map(image -> ImageDto.builder()
+                .id(image.getId())
                 .originalName(image.getOriginalName())
                 .url(image.getUrl())
                 .build())

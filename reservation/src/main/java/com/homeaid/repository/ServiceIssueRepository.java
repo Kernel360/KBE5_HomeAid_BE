@@ -23,4 +23,7 @@ public interface ServiceIssueRepository extends JpaRepository<ServiceIssue, Long
       "WHERE si.id = :issueId " +
       "AND r.managerId = :managerId ")
   Optional<ServiceIssue> findByIdAndManagerAccess(@Param("issueId") Long issueId, @Param("managerId") Long managerId);
+
+  @Query("SELECT si FROM ServiceIssue si LEFT JOIN FETCH si.images WHERE si.id = :issueId")
+  Optional<ServiceIssue> findByIdWithImages(@Param("issueId") Long issueId);
 }

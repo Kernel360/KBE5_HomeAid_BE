@@ -10,7 +10,8 @@ public interface ServiceIssueService {
 
   ServiceIssue getIssueByReservation(Long reservationId, Long userId);
 
-  ServiceIssue updateIssue(Long issueId, Long managerId, String content, List<MultipartFile> files);
+  ServiceIssue updateIssue(Long issueId, Long managerId, String content, List<MultipartFile> files,
+      List<Long> deleteImageIds);
 
   void deleteIssue(Long issueId, Long managerId);
 }

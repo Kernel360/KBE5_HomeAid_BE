@@ -61,7 +61,7 @@ public class ServiceIssueController {
         .body(CommonApiResponse.success(ServiceIssueResponseDto.toDto(serviceIssue)));
   }
 
-  @PutMapping(value = "manager/issues/{issueId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+  @PutMapping(value = "/manager/issues/{issueId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
   @Operation(summary = "서비스 이슈 수정", description = "매니저가 서비스 이슈를 수정합니다.")
   public ResponseEntity<CommonApiResponse<ServiceIssueResponseDto>> updateIssue(
       @PathVariable("issueId") Long issueId,
@@ -69,13 +69,14 @@ public class ServiceIssueController {
       @AuthenticationPrincipal CustomUserDetails user) {
 
     ServiceIssue serviceIssue = serviceIssueService.updateIssue(
-        issueId, user.getUserId(), requestDto.getContent(), requestDto.getFiles());
+        issueId, user.getUserId(), requestDto.getContent(), requestDto.getFiles(),
+        requestDto.getDeleteImageIds());
 
     return ResponseEntity.status(HttpStatus.OK)
         .body(CommonApiResponse.success(ServiceIssueResponseDto.toDto(serviceIssue)));
   }
 
-  @DeleteMapping("manager/issues/{issueId}")
+  @DeleteMapping("/manager/issues/{issueId}")
   @Operation(summary = "서비스 이슈 삭제", description = "매니저가 서비스 이슈를 삭제합니다.")
   public ResponseEntity<CommonApiResponse<Void>> deleteIssue(
       @PathVariable("issueId") Long issueId,

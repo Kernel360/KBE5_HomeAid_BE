@@ -68,19 +68,21 @@ public class SecurityConfig {
             session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
     http.authorizeHttpRequests(auth -> auth
-        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-        .requestMatchers(allowUrls).permitAll()
-        .requestMatchers(swaggerUrls).permitAll()
+            .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+            .requestMatchers(allowUrls).permitAll()
+            .requestMatchers(swaggerUrls).permitAll()
 //        .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
 //        .requestMatchers("/api/v1/customer/**").hasRole("CUSTOMER")
-        .requestMatchers("/api/v1/manager/**").hasRole("MANAGER")
+            .requestMatchers("/api/v1/manager/**").hasRole("MANAGER")
+            .requestMatchers("/api/v1/reservations/*/issues").hasAnyRole("MANAGER", "CUSTOMER")
 //        .requestMatchers("/api/v1/**").hasAnyRole("ADMIN", "USER", "MANAGER")
-        .anyRequest().authenticated()
+            .anyRequest().authenticated()
     );
 
     http
         .addFilterAt(signinFilter, UsernamePasswordAuthenticationFilter.class)
-        .addFilterBefore(new AccessTokenFilter(jwtTokenProvider, tokenBlacklistService), UsernamePasswordAuthenticationFilter.class);
+        .addFilterBefore(new AccessTokenFilter(jwtTokenProvider, tokenBlacklistService),
+            UsernamePasswordAuthenticationFilter.class);
 
     return http.build();
   }

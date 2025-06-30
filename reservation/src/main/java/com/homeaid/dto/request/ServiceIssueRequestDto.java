@@ -18,6 +18,8 @@ public class ServiceIssueRequestDto {
   @Schema(description = "이슈 파일들")
   private List<MultipartFile> files;
 
+  private List<Long> deleteImageIds;
+
   public static ServiceIssue toEntity(ServiceIssueRequestDto serviceIssueRequestDto) {
     return ServiceIssue.builder()
         .content(serviceIssueRequestDto.getContent())

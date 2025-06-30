@@ -21,7 +21,8 @@ public class ServiceIssueServiceImpl implements ServiceIssueService {
 
   @Override
   @Transactional
-  public void createIssue(Long reservationId, Long managerId, String content, List<MultipartFile> files) {
+  public void createIssue(Long reservationId, Long managerId, String content,
+      List<MultipartFile> files) {
 
     Reservation reservation = reservationService.validateReservation(reservationId);
     reservationService.validateManagerAccess(reservation, managerId);
@@ -48,13 +49,13 @@ public class ServiceIssueServiceImpl implements ServiceIssueService {
 
   @Override
   @Transactional
-  public ServiceIssue updateIssue(Long issueId, Long managerId, String content, List<MultipartFile> files) {
+  public ServiceIssue updateIssue(Long issueId, Long managerId, String content,
+      List<MultipartFile> files, List<Long> deleteImageIds) {
 
-    ServiceIssue issue = findIssueById(issueId);
-    findIssueByIdAndManagerAccess(issue.getId(), managerId);
+    ServiceIssue issue = findIssueByIdAndManagerAccess(issueId, managerId);
 
     issue.updateIssue(content);
-    serviceIssueFileService.updateFiles(issue, files);
+    serviceIssueFileService.updateFiles(issue, files, deleteImageIds);
 
     return issue;
   }
@@ -66,23 +67,24 @@ public class ServiceIssueServiceImpl implements ServiceIssueService {
     ServiceIssue issue = findIssueById(issueId);
     findIssueByIdAndManagerAccess(issueId, managerId);
 
-    serviceIssueRepository.delete(issue);
     serviceIssueFileService.deleteFiles(issue);
+    serviceIssueRepository.delete(issue);
   }
 
   private ServiceIssue findIssueById(Long issueId) {
-    return serviceIssueRepository.findById(issueId)
+    return serviceIssueRepository.findByIdWithImages(issueId)
         .orElseThrow(() -> new CustomException(ServiceIssueErrorCode.SERVICE_ISSUE_NOT_FOUND));
   }
 
   private ServiceIssue findByReservationId(Long reservationId) {
     return serviceIssueRepository.findByReservationId(reservationId)
-    .orElseThrow(() -> new CustomException(ServiceIssueErrorCode.SERVICE_ISSUE_NOT_FOUND));
+        .orElseThrow(() -> new CustomException(ServiceIssueErrorCode.SERVICE_ISSUE_NOT_FOUND));
   }
 
-  private void findIssueByIdAndManagerAccess(Long issueId, Long managerId) {
-    serviceIssueRepository.findByIdAndManagerAccess(issueId, managerId)
-        .orElseThrow(() -> new CustomException(ServiceIssueErrorCode.UNAUTHORIZED_SERVICE_ISSUE_ACCESS));
+  private ServiceIssue findIssueByIdAndManagerAccess(Long issueId, Long managerId) {
+    return serviceIssueRepository.findByIdAndManagerAccess(issueId, managerId)
+        .orElseThrow(
+            () -> new CustomException(ServiceIssueErrorCode.UNAUTHORIZED_SERVICE_ISSUE_ACCESS));
   }
 
   private void existsByReservationId(Long reservationId) {

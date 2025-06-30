@@ -8,7 +8,8 @@ public interface ServiceIssueFileService {
 
   void uploadFiles(ServiceIssue serviceIssue, List<MultipartFile> files);
 
-  void updateFiles(ServiceIssue serviceIssue, List<MultipartFile> files);
+  void updateFiles(ServiceIssue serviceIssue, List<MultipartFile> files, List<Long> deleteImageIds);
 
   void deleteFiles(ServiceIssue serviceIssue);
+
 }
