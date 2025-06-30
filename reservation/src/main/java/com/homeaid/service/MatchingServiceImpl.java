@@ -94,6 +94,16 @@ public class MatchingServiceImpl implements MatchingService {
             NotificationEventType.MATCHING_ACCEPTED_BY_MANAGER
             : NotificationEventType.MATCHING_REJECTED_BY_MANAGER;
 
+    if (notificationEventType.equals(NotificationEventType.MATCHING_ACCEPTED_BY_MANAGER)) {
+      RequestAlert requestAlert = RequestAlert.builder()
+              .notificationEventType(NotificationEventType.MATCHING_ACCEPTED_BY_MANAGER_FOR_CUSTOMER)
+              .targetId(matching.getReservation().getCustomerId())
+              .targetRole(UserRole.CUSTOMER)
+              .relatedEntityId(matching.getReservation().getId())
+              .build();
+      sseNotificationService.createAlertByRequestAlert(requestAlert); //고객 알람용
+    }
+
     RequestAlert requestAdminAlert = RequestAlert.builder()
             .notificationEventType(notificationEventType)
             .targetRole(UserRole.ADMIN)
