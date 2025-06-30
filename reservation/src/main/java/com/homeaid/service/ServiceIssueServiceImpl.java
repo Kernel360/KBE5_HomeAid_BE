@@ -6,9 +6,9 @@ import com.homeaid.exception.CustomException;
 import com.homeaid.exception.ServiceIssueErrorCode;
 import com.homeaid.repository.ServiceIssueRepository;
 import java.util.List;
-import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 @Service
@@ -47,10 +47,11 @@ public class ServiceIssueServiceImpl implements ServiceIssueService {
   }
 
   @Override
+  @Transactional
   public ServiceIssue updateIssue(Long issueId, Long managerId, String content, List<MultipartFile> files) {
 
     ServiceIssue issue = findIssueById(issueId);
-    findIssueByIdAndManagerAccess(issueId, managerId);
+    findIssueByIdAndManagerAccess(issue.getId(), managerId);
 
     issue.updateIssue(content);
     serviceIssueFileService.updateFiles(issue, files);
@@ -59,6 +60,7 @@ public class ServiceIssueServiceImpl implements ServiceIssueService {
   }
 
   @Override
+  @Transactional
   public void deleteIssue(Long issueId, Long managerId) {
 
     ServiceIssue issue = findIssueById(issueId);
@@ -69,7 +71,7 @@ public class ServiceIssueServiceImpl implements ServiceIssueService {
   }
 
   private ServiceIssue findIssueById(Long issueId) {
-    return serviceIssueRepository.findByReservationId(issueId)
+    return serviceIssueRepository.findById(issueId)
         .orElseThrow(() -> new CustomException(ServiceIssueErrorCode.SERVICE_ISSUE_NOT_FOUND));
   }
 
@@ -79,7 +81,7 @@ public class ServiceIssueServiceImpl implements ServiceIssueService {
   }
 
   private void findIssueByIdAndManagerAccess(Long issueId, Long managerId) {
-    serviceIssueRepository.findByIdAndUserAccess(issueId, managerId)
+    serviceIssueRepository.findByIdAndManagerAccess(issueId, managerId)
         .orElseThrow(() -> new CustomException(ServiceIssueErrorCode.UNAUTHORIZED_SERVICE_ISSUE_ACCESS));
   }
 
