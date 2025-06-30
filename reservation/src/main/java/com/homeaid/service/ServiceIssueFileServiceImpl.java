@@ -55,7 +55,6 @@ public class ServiceIssueFileServiceImpl implements ServiceIssueFileService {
       String s3Key = image.getS3Key();
       s3Service.deleteFile(s3Key);
     }
-
     images.clear();
   }
 }

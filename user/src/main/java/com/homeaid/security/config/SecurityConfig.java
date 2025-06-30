@@ -43,7 +43,6 @@ public class SecurityConfig {
       "/api/v1/users/**",
       "/api/v1/users/my/**",
       "api/v1/reservations/**",
-      "api/v1/**", // TODO api 수정 필요
       "api/v1/managers/**",
       "api/v1/reviews/**"
   };
@@ -74,7 +73,7 @@ public class SecurityConfig {
         .requestMatchers(swaggerUrls).permitAll()
 //        .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
 //        .requestMatchers("/api/v1/customer/**").hasRole("CUSTOMER")
-//        .requestMatchers("/api/v1/managers/**").hasRole("MANAGER")
+        .requestMatchers("/api/v1/manager/**").hasRole("MANAGER")
 //        .requestMatchers("/api/v1/**").hasAnyRole("ADMIN", "USER", "MANAGER")
         .anyRequest().authenticated()
     );

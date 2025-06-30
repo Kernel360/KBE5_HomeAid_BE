@@ -218,7 +218,7 @@ public class ReservationServiceImpl implements ReservationService {
 
   @Override
   public void validateManagerAccess(Reservation reservation, Long managerId) {
-    if (!reservation.getCustomerId().equals(managerId)) {
+    if (!reservation.getManagerId().equals(managerId)) {
       throw new CustomException(ReservationErrorCode.RESERVATION_MANAGER_MISMATCH);
     }
   }
