@@ -6,16 +6,16 @@ import com.homeaid.domain.Manager;
 import com.homeaid.domain.Matching;
 import com.homeaid.domain.Reservation;
 import com.homeaid.domain.ReservationItem;
+import com.homeaid.domain.enumerate.NotificationEventType;
 import com.homeaid.domain.enumerate.ReservationStatus;
+import com.homeaid.domain.enumerate.UserRole;
+import com.homeaid.dto.RequestAlert;
 import com.homeaid.dto.response.ReservationResponseDto;
 import com.homeaid.exception.CustomException;
 import com.homeaid.exception.MatchingErrorCode;
 import com.homeaid.exception.ReservationErrorCode;
 import com.homeaid.exception.UserErrorCode;
-import com.homeaid.repository.CustomerRepository;
-import com.homeaid.repository.ManagerRepository;
-import com.homeaid.repository.MatchingRepository;
-import com.homeaid.repository.ReservationRepository;
+import com.homeaid.repository.*;
 import com.homeaid.serviceoption.domain.ServiceOption;
 import com.homeaid.serviceoption.repository.ServiceOptionRepository;
 import java.util.List;
@@ -43,6 +43,7 @@ public class ReservationServiceImpl implements ReservationService {
   private final MatchingRepository matchingRepository;
 
   private final ServiceOptionRepository serviceOptionRepository;
+  private final SseNotificationService sseNotificationService;
 
   @Override
   @Transactional
@@ -50,7 +51,17 @@ public class ReservationServiceImpl implements ReservationService {
     ServiceOption serviceOption = serviceOptionRepository.findById(serviceOptionId)
         .orElseThrow(() -> new CustomException(ReservationErrorCode.RESERVATION_NOT_FOUND));
     reservation.addItem(serviceOption);
-    return reservationRepository.save(reservation);
+
+    Reservation savedReservation = reservationRepository.save(reservation);
+
+    RequestAlert requestAlert = RequestAlert.builder()
+            .notificationEventType(NotificationEventType.RESERVATION_CREATED)
+            .targetRole(UserRole.ADMIN)
+            .relatedEntityId(savedReservation.getId())
+            .build();
+    sseNotificationService.createAdminAlertByRequestAlert(requestAlert);
+
+    return savedReservation;
   }
 
   @Override
