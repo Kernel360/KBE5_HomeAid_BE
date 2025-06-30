@@ -6,6 +6,7 @@ import com.homeaid.dto.RequestAlert;
 import com.homeaid.dto.ResponseAlert;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -18,7 +19,6 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 @Component
-@RequiredArgsConstructor
 @Slf4j
 public class SseNotificationService {
 
@@ -26,6 +26,13 @@ public class SseNotificationService {
     private final Map<Long, SseEmitter> connections = new ConcurrentHashMap<>();
     private final Set<Long> adminIds = ConcurrentHashMap.newKeySet();
     private final NotificationService notificationService;
+    private final Long SSE_TIMEOUT;
+
+    public SseNotificationService(NotificationService notificationService,
+                                  @Value("${sse.timeout}") Long sseTimeout) {
+        this.notificationService = notificationService;
+        this.SSE_TIMEOUT = sseTimeout;
+    }
 
     public SseEmitter createConnection(Long userId, UserRole userRole) {
         log.info("connection before {}", connections.size());
@@ -41,23 +48,23 @@ public class SseNotificationService {
             }
         }
 
-        SseEmitter emitter = new SseEmitter(120_000L); // 2분 타임아웃
+        SseEmitter emitter = new SseEmitter(SSE_TIMEOUT); // 2분 타임아웃
 
         if (userRole == UserRole.ADMIN) {
             adminIds.add(userId);
         }
         // 연결 정리 이벤트 처리
         emitter.onCompletion(() -> {
-            connections.remove(userId);
+            removeConnection(userId);
             log.info("Connection onCompletion closed id: {}", userId);
         });
         emitter.onTimeout(() -> {
-            connections.remove(userId);
+            removeConnection(userId);
             log.info("Connection timed out id: {}", userId);
             emitter.complete();
         });
         emitter.onError(e -> {
-            connections.remove(userId);
+            removeConnection(userId);
             log.info("Connection error closed id: {}", userId);
         });
         connections.put(userId, emitter);
@@ -77,7 +84,7 @@ public class SseNotificationService {
                         .data(ResponseAlert.toDto(notification)));
             } catch (IOException e) {
                 log.info("SseEmitter sending error");
-                connections.remove(targetId);
+                removeConnection(targetId);
                 emitter.complete();
             }
         }
@@ -115,7 +122,7 @@ public class SseNotificationService {
                     .name("unread-notification")
                     .data(notifications.stream().map(ResponseAlert::toDto)));
         } catch (IOException e) {
-            connections.remove(userId);
+            removeConnection(userId);
         }
         return emitter;
     }
@@ -171,7 +178,7 @@ public class SseNotificationService {
                                 .name("new-notification")
                                 .data(notifications.stream().map(ResponseAlert::toDto)));
                     } catch (IOException e) {
-                        connections.remove(adminId);
+                        removeConnection(adminId);
                     }
                 });
         notifications.forEach(Notification::markAsSent);
@@ -187,7 +194,7 @@ public class SseNotificationService {
                         .name("disconnect")
                         .data("Server initiated disconnect"));
 
-                connections.remove(userId);
+                removeConnection(userId);
                 log.info("emitter disconnected");
                 log.info("emitter 확인: {}", emitter);
 
@@ -195,5 +202,9 @@ public class SseNotificationService {
                 log.warn("SSE 정상 종료 실패 - userId: {}", userId, e);
             }
         }
+    }
+
+    private void removeConnection(Long userId) {
+        connections.remove(userId);
     }
 }
