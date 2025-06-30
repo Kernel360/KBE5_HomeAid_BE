@@ -2,6 +2,7 @@ package com.homeaid.boardreply.service;
 
 import com.homeaid.boardreply.dto.response.BoardReplyListResponseDto;
 import com.homeaid.boardreply.dto.response.InquiryDetailResponseDto;
+import com.homeaid.boardreply.dto.response.InquiryWithReplyResponseDto;
 import com.homeaid.domain.BoardReply;
 import com.homeaid.domain.enumerate.UserRole;
 import com.homeaid.dto.response.UserBoardListResponseDto;
@@ -30,4 +31,7 @@ public interface AdminInquiryService {
 
   // 답변 삭제
   void deleteReply(Long boardId, Long replyId, Long adminId);
+
+  // 문의글 + 답변
+  InquiryWithReplyResponseDto getBoardWithReply(Long boardId);
 }
