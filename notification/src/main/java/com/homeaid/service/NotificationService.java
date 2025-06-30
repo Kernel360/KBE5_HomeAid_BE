@@ -30,12 +30,12 @@ public class NotificationService {
 
     //연결시 사용자의 읽지 않은 알림들
     public List<Notification> getUnReadAlerts(Long userId) {
-        return notificationRepository.findByTargetIdAndStatus(userId, NotificationStatus.UNREAD);
+        return notificationRepository.findByTargetIdAndStatusOrderByCreatedAtDesc(userId, NotificationStatus.UNREAD);
     }
 
     //연결시 관리자의 읽지 않은 알림들
     public List<Notification> getUnReadAdminAlerts(UserRole userType) {
-        return notificationRepository.findByTargetRoleAndStatus(userType, NotificationStatus.UNREAD);
+        return notificationRepository.findByTargetRoleAndStatusOrderByCreatedAtDesc(userType, NotificationStatus.UNREAD);
     }
 
     public List<Notification> getUnReadAlerts(Set<Long> connectionIds, LocalDateTime recentCutoff, LocalDateTime sendCutoff) {
