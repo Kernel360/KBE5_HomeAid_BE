@@ -11,10 +11,11 @@ public enum NotificationEventType {
     RESERVATION_CANCELLED("예약이 취소되었습니다"),
 
     // 매칭 관련
-    MATCHING_CREATED("새로운 매칭이 생성되었습니다"),
+    MATCHING_CREATED("고객님의 청소 요청 도착 \n지금 수락하거나 거절할 수 있습니다"),
     MATCHING_ACCEPTED_BY_CUSTOMER("고객이 매칭을 최종수락했습니다"),
     MATCHING_REJECTED_BY_CUSTOMER("고객이 매칭을 거절하였습니다"),
     MATCHING_ACCEPTED_BY_MANAGER("매니저가 매칭을 수락하였습니다"),
+    MATCHING_ACCEPTED_BY_MANAGER_FOR_CUSTOMER("매니저님이 예약을 수락했습니다. \n결제를 완료하고 예약을 확정하세요"),
     MATCHING_REJECTED_BY_MANAGER("매니저가 매칭을 거절하였습니다"),
 
     // 작업 관련
