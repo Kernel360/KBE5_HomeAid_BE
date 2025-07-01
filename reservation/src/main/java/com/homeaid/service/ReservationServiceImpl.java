@@ -75,12 +75,18 @@ public class ReservationServiceImpl implements ReservationService {
 
     Long finalMatchingId = reservation.getFinalMatchingId();
 
+    Manager manager = null;
+    if (reservation.getManagerId() != null) {
+      manager = managerRepository.findById(reservation.getManagerId())
+          .orElseThrow(() -> new CustomException(UserErrorCode.MANAGER_NOT_FOUND));
+    }
+
     if (finalMatchingId != null) {
       Matching matching = matchingRepository.findById(finalMatchingId)
           .orElseThrow(() -> new CustomException(MatchingErrorCode.MATCHING_NOT_FOUND));
-      return ReservationResponseDto.toDto(reservation, matching.getStatus());
+      return ReservationResponseDto.toDto(reservation, matching.getStatus(), (manager != null) ? manager.getName() : null);
     } else {
-      return ReservationResponseDto.toDto(reservation, null);
+      return ReservationResponseDto.toDto(reservation, null, (manager != null) ? manager.getName() : null);
     }
   }
 

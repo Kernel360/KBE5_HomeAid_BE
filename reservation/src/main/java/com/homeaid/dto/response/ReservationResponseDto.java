@@ -79,7 +79,7 @@ public class ReservationResponseDto {
         .build();
   }
 
-  public static ReservationResponseDto toDto(Reservation reservation, MatchingStatus matchingStatus) {
+  public static ReservationResponseDto toDto(Reservation reservation, MatchingStatus matchingStatus, String managerName) {
     return ReservationResponseDto.builder()
         .reservationId(reservation.getId())
         .status(reservation.getStatus())
@@ -91,6 +91,7 @@ public class ReservationResponseDto {
             reservation.getRequestedDate(),
             reservation.getRequestedTime()
         ))
+        .matchedManagerName(managerName)
         .address(reservation.getAddress())
         .addressDetail(reservation.getAddressDetail())
         .matchingStatus(matchingStatus)
