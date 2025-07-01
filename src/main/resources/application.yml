@@ -83,4 +83,13 @@ management:
 logging:
   level:
     root: INFO
-    com.homeaid: DEBUG
+    com.homeaid.global: WARN
+    com.homeaid.admin: INFO
+    com.homeaid.user: INFO
+    com.homeaid.reservation: INFO
+    com.homeaid.review: INFO
+    com.homeaid.payment: DEBUG
+    com.homeaid.board: DEBUG
+    com.homeaid.worklog: INFO
+
+
