@@ -21,6 +21,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestPart;
@@ -30,7 +31,7 @@ import org.springframework.web.multipart.MultipartFile;
 @Tag(name = "Manager Controller", description = "매니저 API")
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/managers/profile")
+@RequestMapping("/api/v1/manager/profile")
 public class ManagerController {
 
   private final ManagerService managerService;
@@ -94,10 +95,31 @@ public class ManagerController {
 
     Long managerId = user.getUserId();
 
-    Manager manager = managerService.getUploadManagerFiles(managerId);
+    Manager manager = managerService.getManagerFiles(managerId);
     ManagerDocumentListResponseDto documentsList = ManagerDocumentListResponseDto.toDto(manager);
 
     return ResponseEntity.status(HttpStatus.OK)
         .body(CommonApiResponse.success(documentsList));
+  }
+
+  @Operation(
+      summary = "매니저 신분 및 자격 증빙서류 수정",
+      description = "매니저의 신분 및 자격을 증빙하기 위한 기존 서류를 수정합니다. (신분증, 범죄경력조회서, 건강검진서)"
+  )
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "증빙서류 수정 성공"),
+      @ApiResponse(responseCode = "400", description = "수정할 파일이 비어있음"),
+      @ApiResponse(responseCode = "404", description = "매니저를 찾을 수 없음")
+  })
+  @PutMapping(value = "/certifications", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+  public ResponseEntity<CommonApiResponse<Void>> updateCertifications(
+      @RequestPart(required = false) MultipartFile idFile,
+      @RequestPart(required = false) MultipartFile criminalRecordFile,
+      @RequestPart(required = false) MultipartFile healthCertificateFile,
+      @AuthenticationPrincipal CustomUserDetails user
+  ) throws IOException {
+      Long managerId = user.getUserId();
+      managerService.updateManagerFiles(managerId, idFile, criminalRecordFile, healthCertificateFile);
+      return ResponseEntity.ok(CommonApiResponse.success(null));
   }
 }

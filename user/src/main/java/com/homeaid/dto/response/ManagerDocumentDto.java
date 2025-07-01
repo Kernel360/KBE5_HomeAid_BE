@@ -19,7 +19,7 @@ public record ManagerDocumentDto(
         document.getId(),
         document.getDocumentType(),
         document.getOriginalName(),
-        document.getDocumentUrl(),
+        document.getUrl(),
         document.getFileExtension(),
         formattedSize,
         document.getCreatedAt()

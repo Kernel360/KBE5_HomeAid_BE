@@ -78,8 +78,8 @@ public class ManagerDocumentServiceImpl implements ManagerDocumentService {
 
 
   // 파일 확장자 추출
-  private String getFileExtension(String filename) {
-    if (filename == null || !filename.contains(".")) return "";
-    return filename.substring(filename.lastIndexOf(".") + 1);
+  private String getFileExtension(String originalFilename) {
+    if (originalFilename == null || !originalFilename.contains(".")) return "";
+    return originalFilename.substring(originalFilename.lastIndexOf(".") + 1);
   }
 }
