@@ -26,7 +26,8 @@ public class ManagerDocumentServiceImpl implements ManagerDocumentService {
         .filter(param -> param.file() != null && !param.file().isEmpty())
         .map(param -> {
           try {
-            FileUploadResult result = s3Service.uploadFile(param.documentType(), param.packageName(), param.file());
+            FileUploadResult result = s3Service.uploadFile(param.documentType(),
+                param.packageName(), param.file());
 
             return ManagerDocument.builder()
                 .documentType(param.documentType())
@@ -50,14 +51,16 @@ public class ManagerDocumentServiceImpl implements ManagerDocumentService {
     return files.stream()
         .filter(param -> param.file() != null && !param.file().isEmpty())
         .map(param -> {
-          managerDocumentRepository.findByManagerIdAndDocumentType(manager.getId(), param.documentType())
+          managerDocumentRepository.findByManagerIdAndDocumentType(manager.getId(),
+                  param.documentType())
               .ifPresent(existing -> {
                 s3Service.deleteFile(existing.getS3Key());
                 managerDocumentRepository.delete(existing);
               });
 
           try {
-            FileUploadResult result = s3Service.uploadFile(param.documentType(), param.packageName(), param.file());
+            FileUploadResult result = s3Service.uploadFile(param.documentType(),
+                param.packageName(), param.file());
 
             return ManagerDocument.builder()
                 .documentType(param.documentType())
@@ -79,7 +82,9 @@ public class ManagerDocumentServiceImpl implements ManagerDocumentService {
 
   // 파일 확장자 추출
   private String getFileExtension(String originalFilename) {
-    if (originalFilename == null || !originalFilename.contains(".")) return "";
+    if (originalFilename == null || !originalFilename.contains(".")) {
+      return "";
+    }
     return originalFilename.substring(originalFilename.lastIndexOf(".") + 1);
   }
 }

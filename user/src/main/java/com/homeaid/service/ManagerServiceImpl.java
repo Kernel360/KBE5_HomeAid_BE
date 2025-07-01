@@ -2,7 +2,6 @@ package com.homeaid.service;
 
 import com.homeaid.common.enumerate.DocumentType;
 import com.homeaid.common.request.UploadFileParam;
-import com.homeaid.common.response.FileUploadResult;
 import com.homeaid.domain.Manager;
 import com.homeaid.domain.ManagerAvailability;
 import com.homeaid.domain.ManagerDocument;
@@ -11,19 +10,16 @@ import com.homeaid.domain.ManagerServiceOption;
 import com.homeaid.domain.enumerate.Weekday;
 import com.homeaid.dto.request.ManagerDetailInfoRequestDto;
 import com.homeaid.exception.CustomException;
-import com.homeaid.exception.ErrorCode;
 import com.homeaid.exception.UserErrorCode;
 import com.homeaid.repository.ManagerAvailabilityRepository;
 import com.homeaid.repository.ManagerDocumentRepository;
 import com.homeaid.repository.ManagerRepository;
 import com.homeaid.repository.ManagerServiceOptionRepository;
-import com.homeaid.util.S3Service;
-import java.io.IOException;
 import com.homeaid.util.RegionValidator;
+import java.io.IOException;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -58,7 +54,6 @@ public class ManagerServiceImpl implements ManagerService {
             .build())
         .collect(Collectors.toList());
     managerServiceOptionRepository.saveAll(preferences);
-
 
     // 2. 가능한 요일 조건 및 선호 지역 저장
     List<ManagerAvailability> availabilities = dto.getAvailabilities().stream()
@@ -103,7 +98,8 @@ public class ManagerServiceImpl implements ManagerService {
   }
 
   @Override
-  public void uploadManagerFiles(Long managerId, MultipartFile idFile, MultipartFile criminalFile, MultipartFile healthFile)
+  public void uploadManagerFiles(Long managerId, MultipartFile idFile, MultipartFile criminalFile,
+      MultipartFile healthFile)
       throws IOException {
 
     Manager manager = getManagerById(managerId);
@@ -119,14 +115,15 @@ public class ManagerServiceImpl implements ManagerService {
   }
 
   @Override
-  public void updateManagerFiles(Long managerId, MultipartFile idFile, MultipartFile criminalFile, MultipartFile healthFile) throws IOException {
+  public void updateManagerFiles(Long managerId, MultipartFile idFile, MultipartFile criminalFile,
+      MultipartFile healthFile) throws IOException {
     Manager manager = getManagerById(managerId);
 
     List<UploadFileParam> fileParams = List.of(
-        new UploadFileParam(DocumentType.ID_CARD, S3_PACKAGE_NAME_ID, idFile),
-        new UploadFileParam(DocumentType.CRIMINAL_RECORD, S3_PACKAGE_NAME_CRIMINAL, criminalFile),
-        new UploadFileParam(DocumentType.HEALTH_CERTIFICATE, S3_PACKAGE_NAME_HEALTH, healthFile)
-    ).stream()
+            new UploadFileParam(DocumentType.ID_CARD, S3_PACKAGE_NAME_ID, idFile),
+            new UploadFileParam(DocumentType.CRIMINAL_RECORD, S3_PACKAGE_NAME_CRIMINAL, criminalFile),
+            new UploadFileParam(DocumentType.HEALTH_CERTIFICATE, S3_PACKAGE_NAME_HEALTH, healthFile)
+        ).stream()
         .filter(param -> param.file() != null && !param.file().isEmpty())
         .toList();
 
@@ -173,5 +170,5 @@ public class ManagerServiceImpl implements ManagerService {
     return managerRepository.findById(id)
         .orElseThrow(() -> new CustomException(UserErrorCode.MANAGER_NOT_FOUND));
   }
-  
+
 }

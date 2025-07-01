@@ -14,7 +14,10 @@ public interface ManagerService {
       throws IOException;
 
   Manager getManagerFiles(Long managerId);
-  void updateManagerFiles(Long managerId, MultipartFile idFile, MultipartFile criminalFile, MultipartFile healthFile)
+
+  void updateManagerFiles(Long managerId, MultipartFile idFile, MultipartFile criminalFile,
+      MultipartFile healthFile)
       throws IOException;
+
   Manager getManagerById(Long id);
 }

@@ -58,7 +58,8 @@ public class ManagerDocument {
   private Manager manager;
 
   @Builder
-  public ManagerDocument(DocumentType documentType, String originalName, String s3Key, String url,String fileExtension, Long fileSize,
+  public ManagerDocument(DocumentType documentType, String originalName, String s3Key, String url,
+      String fileExtension, Long fileSize,
       Manager manager) {
     this.documentType = documentType;
     this.originalName = originalName;

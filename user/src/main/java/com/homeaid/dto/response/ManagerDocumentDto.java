@@ -13,6 +13,7 @@ public record ManagerDocumentDto(
     String fileSize,
     LocalDateTime createdAt
 ) {
+
   public static ManagerDocumentDto toDto(ManagerDocument document) {
     String formattedSize = String.format("%.2f MB", document.getFileSize() / 1024.0 / 1024.0);
     return new ManagerDocumentDto(
