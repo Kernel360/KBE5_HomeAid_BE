@@ -2,7 +2,6 @@ package com.homeaid.service;
 
 import com.homeaid.common.enumerate.DocumentType;
 import com.homeaid.common.request.UploadFileParam;
-import com.homeaid.common.response.FileUploadResult;
 import com.homeaid.domain.Manager;
 import com.homeaid.domain.ManagerAvailability;
 import com.homeaid.domain.ManagerDocument;
@@ -11,19 +10,16 @@ import com.homeaid.domain.ManagerServiceOption;
 import com.homeaid.domain.enumerate.Weekday;
 import com.homeaid.dto.request.ManagerDetailInfoRequestDto;
 import com.homeaid.exception.CustomException;
-import com.homeaid.exception.ErrorCode;
 import com.homeaid.exception.UserErrorCode;
 import com.homeaid.repository.ManagerAvailabilityRepository;
 import com.homeaid.repository.ManagerDocumentRepository;
 import com.homeaid.repository.ManagerRepository;
 import com.homeaid.repository.ManagerServiceOptionRepository;
-import com.homeaid.util.S3Service;
-import java.io.IOException;
 import com.homeaid.util.RegionValidator;
+import java.io.IOException;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -39,7 +35,7 @@ public class ManagerServiceImpl implements ManagerService {
 
   private final RegionValidator regionValidator;
   private final ManagerDocumentRepository managerDocumentRepository;
-  private final S3Service s3Service;
+  private final ManagerDocumentService managerDocumentService;
 
   private static final String S3_PACKAGE_NAME_ID = "USERS/MANAGERS/ID_FILE/";
   private static final String S3_PACKAGE_NAME_CRIMINAL = "USERS/MANAGERS/CRIMINAL_FILE/";
@@ -58,7 +54,6 @@ public class ManagerServiceImpl implements ManagerService {
             .build())
         .collect(Collectors.toList());
     managerServiceOptionRepository.saveAll(preferences);
-
 
     // 2. 가능한 요일 조건 및 선호 지역 저장
     List<ManagerAvailability> availabilities = dto.getAvailabilities().stream()
@@ -103,40 +98,49 @@ public class ManagerServiceImpl implements ManagerService {
   }
 
   @Override
-  public void uploadManagerFiles(Long managerId, MultipartFile idFile, MultipartFile criminalFile,
+  public Manager uploadManagerFiles(Long managerId, MultipartFile idFile, MultipartFile criminalFile,
       MultipartFile healthFile)
       throws IOException {
 
     Manager manager = getManagerById(managerId);
 
-    List<FileUploadResult> managerDocuments = Stream.of(
-            new UploadFileParam(DocumentType.ID_CARD, S3_PACKAGE_NAME_ID, idFile),
-            new UploadFileParam(DocumentType.CRIMINAL_RECORD, S3_PACKAGE_NAME_CRIMINAL, criminalFile),
-            new UploadFileParam(DocumentType.HEALTH_CERTIFICATE, S3_PACKAGE_NAME_HEALTH, healthFile)
-        ).filter(param -> !param.file().isEmpty())
-        .map(param -> {
-          try {
-            return s3Service.uploadFile(param.documentType(), param.packageName(), param.file());
-          } catch (IOException e) {
-            throw new CustomException(ErrorCode.FILE_UPLOAD_ERROR);
-          }
-        })
-        .collect(Collectors.toList());
+    List<UploadFileParam> fileParams = List.of(
+        new UploadFileParam(DocumentType.ID_CARD, S3_PACKAGE_NAME_ID, idFile),
+        new UploadFileParam(DocumentType.CRIMINAL_RECORD, S3_PACKAGE_NAME_CRIMINAL, criminalFile),
+        new UploadFileParam(DocumentType.HEALTH_CERTIFICATE, S3_PACKAGE_NAME_HEALTH, healthFile)
+    );
 
-    List<ManagerDocument> documents = managerDocuments.stream()
-        .map(meta -> ManagerDocument.builder()
-            .documentType(meta.getDocumentType())
-            .documentS3Key(meta.getS3Key())
-            .documentUrl(meta.getUrl())
-            .manager(manager)
-            .build())
-        .collect(Collectors.toList());
-
+    List<ManagerDocument> documents = managerDocumentService.upload(manager, fileParams);
     managerDocumentRepository.saveAll(documents);
+
+    return manager;
   }
 
   @Override
-  public Manager getUploadManagerFiles(Long managerId) {
+  public Manager updateManagerFiles(Long managerId, MultipartFile idFile, MultipartFile criminalFile,
+      MultipartFile healthFile) throws IOException {
+    Manager manager = getManagerById(managerId);
+
+    List<UploadFileParam> fileParams = List.of(
+            new UploadFileParam(DocumentType.ID_CARD, S3_PACKAGE_NAME_ID, idFile),
+            new UploadFileParam(DocumentType.CRIMINAL_RECORD, S3_PACKAGE_NAME_CRIMINAL, criminalFile),
+            new UploadFileParam(DocumentType.HEALTH_CERTIFICATE, S3_PACKAGE_NAME_HEALTH, healthFile)
+        ).stream()
+        .filter(param -> param.file() != null && !param.file().isEmpty())
+        .toList();
+
+    if (fileParams.isEmpty()) {
+      return manager;
+    }
+
+    List<ManagerDocument> updatedDocuments = managerDocumentService.update(manager, fileParams);
+    managerDocumentRepository.saveAll(updatedDocuments);
+
+    return manager;
+  }
+
+  @Override
+  public Manager getManagerFiles(Long managerId) {
     Manager manager = getManagerById(managerId);
 
     return manager;
@@ -170,5 +174,5 @@ public class ManagerServiceImpl implements ManagerService {
     return managerRepository.findById(id)
         .orElseThrow(() -> new CustomException(UserErrorCode.MANAGER_NOT_FOUND));
   }
-  
+
 }

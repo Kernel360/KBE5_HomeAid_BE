@@ -25,7 +25,7 @@ public class WorkLogServiceImpl implements WorkLogService {
 
   private final WorkLogRepository workLogRepository;
   private final ReservationRepository reservationRepository;
-  private final static int CHECK_RANGE_DISTANCE_METER = 500; //500미터
+  private final static int CHECK_RANGE_DISTANCE_METER = 1000; //500미터
   private final MatchingRepository matchingRepository;
 
   @Transactional
@@ -75,6 +75,7 @@ public class WorkLogServiceImpl implements WorkLogService {
    * @return 예약 위치와 체크인 위치의 차이가 CHECK_RANGE_DISTANCE_METER 범위 안에 있으면 true
    */
   private boolean isValidDistance(Long reservationId, Double latitude, Double longitude) {
+    System.out.println(latitude + "+TTHhH+H+h+===" + longitude);
     Reservation reservation = reservationRepository.findById(reservationId)
         .orElseThrow(() -> new CustomException(ReservationErrorCode.RESERVATION_NOT_FOUND));
     double calculatedDistance = GeoUtils.calculateDistanceInMeters(reservation.getLatitude(),
