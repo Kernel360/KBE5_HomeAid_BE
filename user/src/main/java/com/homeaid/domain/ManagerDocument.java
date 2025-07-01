@@ -35,25 +35,37 @@ public class ManagerDocument {
   @Column(name = "document_type")
   private DocumentType documentType;
 
+  @Column(name = "original_name", nullable = false)
+  private String originalName;
+
   @Column(name = "document_s3_key")
   private String documentS3Key;
 
   @Column(name = "document_url")
   private String documentUrl; // 신분증, 범죄 경력 조회서, 보건증 및 건강검진서
 
+  @Column(name = "file_size", nullable = false)
+  private Long fileSize;
+
+  @Column(name = "file_extention", nullable = false)
+  private String fileExtension;
+
   @CreatedDate
-  private LocalDateTime uploadedAt;
+  private LocalDateTime createdAt;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "manager_id")
   private Manager manager;
 
   @Builder
-  public ManagerDocument(DocumentType documentType, String documentS3Key, String documentUrl,
+  public ManagerDocument(DocumentType documentType, String originalName, String documentS3Key, String documentUrl, Long fileSize, String fileExtension,
       Manager manager) {
     this.documentType = documentType;
+    this.originalName = originalName;
     this.documentS3Key = documentS3Key;
     this.documentUrl = documentUrl;
+    this.fileSize = fileSize;
+    this.fileExtension = fileExtension;
     this.manager = manager;
   }
 }
