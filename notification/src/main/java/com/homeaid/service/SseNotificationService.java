@@ -4,7 +4,6 @@ import com.homeaid.domain.Notification;
 import com.homeaid.domain.enumerate.UserRole;
 import com.homeaid.dto.RequestAlert;
 import com.homeaid.dto.ResponseAlert;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
@@ -35,7 +34,6 @@ public class SseNotificationService {
     }
 
     public SseEmitter createConnection(Long userId, UserRole userRole) {
-        log.info("connection before {}", connections.size());
 
         SseEmitter existingEmitter = connections.get(userId);
         if (existingEmitter != null) {
@@ -43,8 +41,6 @@ public class SseNotificationService {
                 existingEmitter.complete();
             } catch (Exception e) {
                 log.info("이미 존재하는 Emitter 연결 해제 실패");
-                log.error(e.getMessage());
-
             }
         }
 
@@ -56,19 +52,15 @@ public class SseNotificationService {
         // 연결 정리 이벤트 처리
         emitter.onCompletion(() -> {
             removeConnection(userId);
-            log.info("Connection onCompletion closed id: {}", userId);
         });
         emitter.onTimeout(() -> {
             removeConnection(userId);
-            log.info("Connection timed out id: {}", userId);
             emitter.complete();
         });
         emitter.onError(e -> {
             removeConnection(userId);
-            log.info("Connection error closed id: {}", userId);
         });
         connections.put(userId, emitter);
-        log.info("connection count: {}", connections.size());
 
         return emitter;
     }
@@ -136,7 +128,6 @@ public class SseNotificationService {
         LocalDateTime sendCutoff = LocalDateTime.now().minusMinutes(5);
 
         if (connectionIds.isEmpty()) {
-            log.info("스케쥴러 연결된 아이디 없음");
             return;
         }
 
@@ -161,7 +152,6 @@ public class SseNotificationService {
 
             } catch (IOException e) {
                 zombieConnections.add(userId);
-                log.info("좀비 연결 발견: {}", userId);
             }
         });
 
@@ -195,9 +185,6 @@ public class SseNotificationService {
                         .data("Server initiated disconnect"));
 
                 removeConnection(userId);
-                log.info("emitter disconnected");
-                log.info("emitter 확인: {}", emitter);
-
             } catch (Exception e) {
                 log.warn("SSE 정상 종료 실패 - userId: {}", userId, e);
             }

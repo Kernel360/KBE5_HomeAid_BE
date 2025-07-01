@@ -45,11 +45,9 @@ public class NotificationService {
     @Transactional
     public void updateMarkSentAt(List<Notification> notifications) {
         notifications.forEach(Notification::markAsSent);
-        log.info("✅ {} 개의 알림이 lastSentAt 업데이트됨", notifications.size());
     }
 
     public List<Notification> getUnreadAdminAlerts(LocalDateTime recentCutoff, LocalDateTime sendCutoff) {
-        log.info("관리자 안읽은 알림");
         return notificationRepository.findUnsetAdminAlerts(recentCutoff, sendCutoff);
     }
 
