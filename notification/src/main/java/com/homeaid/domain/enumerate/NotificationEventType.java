@@ -21,7 +21,7 @@ public enum NotificationEventType {
     // 작업 관련
     WORK_REMINDER("작업 예정 알림"),
     WORK_CHECKIN("매니저가 청소 작업을 시작했습니다"),
-    WORK_CHECKOUT("매니저가 청소 작업을 마무리했습니다"),
+    WORK_CHECKOUT("매니저가 청소 작업을 마무리했습니다\n리뷰를 작성해 의견을 남겨주세요"),
     WORK_COMPLETED("매니저가 해당 예약의 작업을 완수했습니다"),
 
     // 시스템 관련
