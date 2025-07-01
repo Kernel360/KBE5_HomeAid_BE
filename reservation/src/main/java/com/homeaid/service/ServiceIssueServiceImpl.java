@@ -7,6 +7,7 @@ import com.homeaid.exception.ServiceIssueErrorCode;
 import com.homeaid.repository.ServiceIssueRepository;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -34,7 +35,13 @@ public class ServiceIssueServiceImpl implements ServiceIssueService {
         .build();
 
     serviceIssueFileService.uploadFiles(issue, files);
-    serviceIssueRepository.save(issue);
+
+    try {
+      serviceIssueRepository.save(issue);
+    } catch (DataIntegrityViolationException e) {
+      // unique 제약조건 위반 처리
+      throw new CustomException(ServiceIssueErrorCode.SERVICE_ISSUE_ALREADY_EXISTS);
+    }
   }
 
   @Override
