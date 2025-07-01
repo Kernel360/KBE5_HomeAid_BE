@@ -9,13 +9,13 @@ public interface ManagerService {
 
   void saveManagerDetailInfo(Long managerId, ManagerDetailInfoRequestDto requestDto);
 
-  void uploadManagerFiles(Long managerId, MultipartFile idFile, MultipartFile criminalFile,
+  Manager uploadManagerFiles(Long managerId, MultipartFile idFile, MultipartFile criminalFile,
       MultipartFile healthFile)
       throws IOException;
 
   Manager getManagerFiles(Long managerId);
 
-  void updateManagerFiles(Long managerId, MultipartFile idFile, MultipartFile criminalFile,
+  Manager updateManagerFiles(Long managerId, MultipartFile idFile, MultipartFile criminalFile,
       MultipartFile healthFile)
       throws IOException;
 

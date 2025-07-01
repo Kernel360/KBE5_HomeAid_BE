@@ -60,7 +60,7 @@ public class ManagerController {
       @ApiResponse(responseCode = "404", description = "매니저를 찾을 수 없음")
   })
   @PostMapping(value = "/certifications", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-  public ResponseEntity<CommonApiResponse<Void>> uploadCertifications(
+  public ResponseEntity<CommonApiResponse<ManagerDocumentListResponseDto>> uploadCertifications(
       @RequestPart MultipartFile idFile,
       @RequestPart MultipartFile criminalRecordFile,
       @RequestPart MultipartFile healthCertificateFile,
@@ -72,10 +72,11 @@ public class ManagerController {
     }
 
     Long managerId = user.getUserId();
-    managerService.uploadManagerFiles(managerId, idFile, criminalRecordFile, healthCertificateFile);
+    Manager manager = managerService.uploadManagerFiles(managerId, idFile, criminalRecordFile,
+        healthCertificateFile);
+    ManagerDocumentListResponseDto documentsList = ManagerDocumentListResponseDto.toDto(manager);
 
-    return ResponseEntity.status(HttpStatus.CREATED)
-        .body(CommonApiResponse.success(null));
+    return ResponseEntity.status(HttpStatus.CREATED).body(CommonApiResponse.success(documentsList));
   }
 
 
@@ -112,14 +113,17 @@ public class ManagerController {
       @ApiResponse(responseCode = "404", description = "매니저를 찾을 수 없음")
   })
   @PutMapping(value = "/certifications", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-  public ResponseEntity<CommonApiResponse<Void>> updateCertifications(
+  public ResponseEntity<CommonApiResponse<ManagerDocumentListResponseDto>> updateCertifications(
       @RequestPart(required = false) MultipartFile idFile,
       @RequestPart(required = false) MultipartFile criminalRecordFile,
       @RequestPart(required = false) MultipartFile healthCertificateFile,
       @AuthenticationPrincipal CustomUserDetails user
   ) throws IOException {
-      Long managerId = user.getUserId();
-      managerService.updateManagerFiles(managerId, idFile, criminalRecordFile, healthCertificateFile);
-      return ResponseEntity.ok(CommonApiResponse.success(null));
+    Long managerId = user.getUserId();
+    Manager manager = managerService.updateManagerFiles(managerId, idFile, criminalRecordFile, healthCertificateFile);
+    ManagerDocumentListResponseDto documentsList = ManagerDocumentListResponseDto.toDto(manager);
+
+    return ResponseEntity.status(HttpStatus.OK)
+        .body(CommonApiResponse.success(documentsList));
   }
 }

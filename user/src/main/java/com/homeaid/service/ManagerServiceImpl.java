@@ -98,7 +98,7 @@ public class ManagerServiceImpl implements ManagerService {
   }
 
   @Override
-  public void uploadManagerFiles(Long managerId, MultipartFile idFile, MultipartFile criminalFile,
+  public Manager uploadManagerFiles(Long managerId, MultipartFile idFile, MultipartFile criminalFile,
       MultipartFile healthFile)
       throws IOException {
 
@@ -112,10 +112,12 @@ public class ManagerServiceImpl implements ManagerService {
 
     List<ManagerDocument> documents = managerDocumentService.upload(manager, fileParams);
     managerDocumentRepository.saveAll(documents);
+
+    return manager;
   }
 
   @Override
-  public void updateManagerFiles(Long managerId, MultipartFile idFile, MultipartFile criminalFile,
+  public Manager updateManagerFiles(Long managerId, MultipartFile idFile, MultipartFile criminalFile,
       MultipartFile healthFile) throws IOException {
     Manager manager = getManagerById(managerId);
 
@@ -128,11 +130,13 @@ public class ManagerServiceImpl implements ManagerService {
         .toList();
 
     if (fileParams.isEmpty()) {
-      return;
+      return manager;
     }
 
     List<ManagerDocument> updatedDocuments = managerDocumentService.update(manager, fileParams);
     managerDocumentRepository.saveAll(updatedDocuments);
+
+    return manager;
   }
 
   @Override
