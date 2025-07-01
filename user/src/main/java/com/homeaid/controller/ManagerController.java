@@ -71,7 +71,6 @@ public class ManagerController {
     }
 
     Long managerId = user.getUserId();
-
     managerService.uploadManagerFiles(managerId, idFile, criminalRecordFile, healthCertificateFile);
 
     return ResponseEntity.status(HttpStatus.CREATED)
