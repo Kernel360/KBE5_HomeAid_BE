@@ -50,16 +50,14 @@ public class ServiceIssueFileServiceImpl implements ServiceIssueFileService {
   @Override
   public void updateFiles(ServiceIssue serviceIssue, List<MultipartFile> files,
       List<Long> deleteImageIds) {
-    log.info("📌 삭제 요청된 이미지 ID들: {}", deleteImageIds);
-    log.info("🎯 현재 서비스 이슈의 이미지 ID들: {}",
-        serviceIssue.getImages().stream().map(ServiceIssueImage::getId).toList());
+    log.debug("삭제 요청된 이미지 ID들: {}", deleteImageIds);
+    log.debug("현재 서비스 이슈의 이미지 ID들: {}", serviceIssue.getImages().stream().map(ServiceIssueImage::getId).toList());
 
     List<ServiceIssueImage> toRemove = serviceIssue.getImages().stream()
         .filter(img -> deleteImageIds != null && deleteImageIds.contains(img.getId()))
         .toList();
 
-    log.info("🗑️ 삭제 대상 이미지 ID들: {}",
-        toRemove.stream().map(ServiceIssueImage::getId).toList());
+    log.debug("삭제 대상 이미지 ID들: {}", toRemove.stream().map(ServiceIssueImage::getId).toList());
 
     toRemove.forEach(img -> s3Service.deleteFile(img.getS3Key()));
     serviceIssue.getImages().removeAll(toRemove);
