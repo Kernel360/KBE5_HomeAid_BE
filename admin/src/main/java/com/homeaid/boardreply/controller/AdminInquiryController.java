@@ -4,6 +4,7 @@ import com.homeaid.boardreply.dto.request.BoardReplyCreateRequestDto;
 import com.homeaid.boardreply.dto.request.BoardReplyUpdateRequestDto;
 import com.homeaid.boardreply.dto.response.BoardReplyListResponseDto;
 import com.homeaid.boardreply.dto.response.InquiryDetailResponseDto;
+import com.homeaid.boardreply.dto.response.InquiryWithReplyResponseDto;
 import com.homeaid.boardreply.service.AdminInquiryService;
 import com.homeaid.common.response.CommonApiResponse;
 import com.homeaid.common.response.PagedResponseDto;
@@ -127,7 +128,7 @@ public class AdminInquiryController {
   // ✅ 답변 수정
   @PutMapping("/board/{boardId}/reply/{replyId}")
   @Operation(summary = "[관리자] 답변 수정")
-  public ResponseEntity<CommonApiResponse<BoardReplyListResponseDto>> updateReply(
+  public ResponseEntity<CommonApiResponse<InquiryDetailResponseDto>> updateReply(
       @PathVariable Long boardId,
       @PathVariable Long replyId,
       @RequestBody @Valid BoardReplyUpdateRequestDto requestDto,
@@ -137,8 +138,9 @@ public class AdminInquiryController {
     BoardReply requestReply = BoardReplyUpdateRequestDto.toEntity(requestDto);
     BoardReply updatedReply = adminInquiryService.updateReply(boardId, replyId, adminId, requestReply);
 
-    return ResponseEntity.ok(CommonApiResponse.success(BoardReplyListResponseDto.toDto(updatedReply,
-        updatedReply.getUser() != null ? updatedReply.getUser().getName() : null)));
+    String userName = updatedReply.getUser() != null ? updatedReply.getUser().getName() : null;
+
+    return ResponseEntity.ok(CommonApiResponse.success(InquiryDetailResponseDto.from(updatedReply, userName)));
   }
 
   // ✅ 답변 삭제
@@ -152,5 +154,13 @@ public class AdminInquiryController {
     Long adminId = admin.getUserId();
     adminInquiryService.deleteReply(boardId, replyId, adminId);
     return ResponseEntity.ok(CommonApiResponse.success());
+  }
+
+  @GetMapping("/board/{boardId}/with-reply")
+  @Operation(summary = "문의글 + 답변 통합 조회", description = "특정 문의글과 그에 대한 답변을 함께 조회합니다.")
+  public ResponseEntity<CommonApiResponse<InquiryWithReplyResponseDto>> getBoardWithReply(
+      @PathVariable Long boardId) {
+    InquiryWithReplyResponseDto dto = adminInquiryService.getBoardWithReply(boardId);
+    return ResponseEntity.ok(CommonApiResponse.success(dto));
   }
 }

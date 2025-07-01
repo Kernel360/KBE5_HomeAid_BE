@@ -2,6 +2,7 @@ package com.homeaid.boardreply.service;
 
 import com.homeaid.boardreply.dto.response.BoardReplyListResponseDto;
 import com.homeaid.boardreply.dto.response.InquiryDetailResponseDto;
+import com.homeaid.boardreply.dto.response.InquiryWithReplyResponseDto;
 import com.homeaid.boardreply.exception.BoardReplyErrorCode;
 import com.homeaid.boardreply.repository.AdminBoardReplyRepository;
 import com.homeaid.domain.BoardReply;
@@ -11,7 +12,6 @@ import com.homeaid.dto.response.UserBoardListResponseDto;
 import com.homeaid.exception.BoardErrorCode;
 import com.homeaid.exception.CustomException;
 import com.homeaid.repository.UserBoardRepository;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -111,6 +111,43 @@ public class AdminInquiryServiceImpl implements AdminInquiryService {
 
     validateAdminAccess(adminId, reply);
     adminBoardReplyRepository.delete(reply);
+  }
+
+  // 문의글 + 답변 조회
+  @Override
+  @Transactional(readOnly = true)
+  public InquiryWithReplyResponseDto getBoardWithReply(Long boardId) {
+    UserBoard board = findBoardOrThrow(boardId);
+    BoardReply reply = findReplyOrNull(boardId);
+
+    UserBoardListResponseDto boardDto = UserBoardListResponseDto.toDto(board);
+    InquiryDetailResponseDto replyDto = convertReplyToDto(reply);
+
+    return InquiryWithReplyResponseDto.builder()
+        .board(boardDto)
+        .reply(replyDto)
+        .build();
+  }
+
+  private UserBoard findBoardOrThrow(Long boardId) {
+    return userBoardRepository.findById(boardId)
+        .orElseThrow(() -> new CustomException(BoardErrorCode.BOARD_NOT_FOUND));
+  }
+
+  private BoardReply findReplyOrNull(Long boardId) {
+    return adminBoardReplyRepository.findByBoardId(boardId).orElse(null);
+  }
+
+  private InquiryDetailResponseDto convertReplyToDto(BoardReply reply) {
+    if (reply == null) {
+      return null;
+    }
+
+    String replyUserName = null;
+    if (reply.getUser() != null) {
+      replyUserName = reply.getUser().getName();
+    }
+    return InquiryDetailResponseDto.from(reply, replyUserName);
   }
 
   // 유효성 검사
