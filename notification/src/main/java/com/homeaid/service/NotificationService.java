@@ -6,13 +6,13 @@ import com.homeaid.domain.enumerate.UserRole;
 import com.homeaid.exception.CustomException;
 import com.homeaid.exception.NotificationErrorCode;
 import com.homeaid.repository.NotificationRepository;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Slf4j
@@ -20,6 +20,7 @@ import java.util.Set;
 public class NotificationService {
     private final NotificationRepository notificationRepository;
 
+    @Transactional
     public void createNotification(Notification notification) {
         try {
             notificationRepository.save(notification);
@@ -29,6 +30,7 @@ public class NotificationService {
     }
 
     //연결시 사용자의 읽지 않은 알림들
+    @Transactional(readOnly = true)
     public List<Notification> getUnReadAlerts(Long userId) {
         return notificationRepository.findByTargetIdAndStatus(userId, NotificationStatus.UNREAD);
     }
