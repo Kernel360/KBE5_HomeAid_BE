@@ -51,7 +51,6 @@ public class NotificationController {
     @PostMapping("/disconnect")
     public ResponseEntity<CommonApiResponse<Void>> disconnect(@AuthenticationPrincipal CustomUserDetails user) {
         sseNotificationService.gracefulDisconnect(user.getUserId());
-
         return ResponseEntity.ok(CommonApiResponse.success());
     }
 }

@@ -4,13 +4,13 @@ import com.homeaid.domain.Notification;
 import com.homeaid.domain.enumerate.UserRole;
 import com.homeaid.dto.RequestAlert;
 import com.homeaid.dto.ResponseAlert;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -33,6 +33,7 @@ public class SseNotificationService {
         this.notificationService = notificationService;
         this.SSE_TIMEOUT = sseTimeout;
     }
+
 
     public SseEmitter createConnection(Long userId, UserRole userRole) {
         log.info("connection before {}", connections.size());
@@ -116,6 +117,7 @@ public class SseNotificationService {
     }
 
     //sse 연결시 알람 전송
+    @Transactional
     public SseEmitter sendAlertByConnection(List<Notification> notifications, SseEmitter emitter, Long userId) {
         try {
             emitter.send(SseEmitter.event()
@@ -188,18 +190,14 @@ public class SseNotificationService {
         SseEmitter emitter = connections.get(userId);
         if (emitter != null) {
             try {
-
-                // 클라이언트에 종료 신호 전송
                 emitter.send(SseEmitter.event()
-                        .name("disconnect")
-                        .data("Server initiated disconnect"));
-
+                    .name("disconnect")
+                    .data("Server initiated disconnect"));
+            } catch (IOException | IllegalStateException e) {
+                log.warn("SSE 전송 중단됨 - 연결이 이미 끊겼거나 전송 실패. userId: {}", userId, e);
+            } finally {
                 removeConnection(userId);
-                log.info("emitter disconnected");
-                log.info("emitter 확인: {}", emitter);
-
-            } catch (Exception e) {
-                log.warn("SSE 정상 종료 실패 - userId: {}", userId, e);
+                log.info("SSE 연결 제거 완료 - userId: {}", userId);
             }
         }
     }
