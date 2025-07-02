@@ -3,14 +3,17 @@ package com.homeaid.util;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
+import com.amazonaws.services.s3.model.S3Object;
+import com.amazonaws.services.s3.model.S3ObjectInputStream;
+import com.amazonaws.util.IOUtils;
 import com.homeaid.common.enumerate.DocumentType;
 import com.homeaid.common.response.FileUploadResult;
 import com.homeaid.exception.CustomException;
 import com.homeaid.exception.ErrorCode;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -30,7 +33,7 @@ public class S3Service {
     this.amazonS3 = amazonS3;
   }
 
-  // 단일 파일 업로드
+  // 파일 업로드
   public FileUploadResult uploadFile(DocumentType documentType, String packageName,
       MultipartFile file) throws IOException {
 
@@ -49,63 +52,51 @@ public class S3Service {
           metadata);
       // S3에 파일 업로드
       amazonS3.putObject(putObjectRequest);
+    } catch (IOException e) {
+      throw new CustomException(ErrorCode.FILE_UPLOAD_ERROR);
     }
     log.info("파일 업로드 성공 - key: {}, url: {}", fileName, getPublicUrl(fileName));
     return new FileUploadResult(documentType, fileName, getPublicUrl(fileName));
   }
 
-  // 다중 파일 업로드
-  public List<FileUploadResult> uploadMultiFile(DocumentType documentType, String packageName,
-      List<MultipartFile> multipartFile) {
-
-    List<FileUploadResult> fileList = new ArrayList<>();
-
-    for (MultipartFile file : multipartFile) {
-      if (file == null || file.isEmpty()) {
-        continue;
-      }
-
-      String fileName = packageName + createFileName(file);
-
-      ObjectMetadata objectMetadata = new ObjectMetadata();
-      objectMetadata.setContentLength(file.getSize());
-      objectMetadata.setContentType(file.getContentType());
-
-      try (InputStream inputStream = file.getInputStream()) {
-        amazonS3.putObject(new PutObjectRequest(bucket, fileName, inputStream, objectMetadata)
-        );
-      } catch (IOException e) {
-        throw new CustomException(ErrorCode.FILE_UPLOAD_ERROR);
-      }
-
-      fileList.add(new FileUploadResult(documentType, fileName, getPublicUrl(fileName)));
-    }
-
-    return fileList;
-  }
-
   // 파일 삭제
-  public void deleteFile(String fileKey) {
+  public void deleteFile(String fileKey) throws FileNotFoundException {
+    // S3 파일 유무 확인
+    validateFileExists(fileKey);
+
     try {
-      boolean isObjectExist = amazonS3.doesObjectExist(bucket, fileKey);
+      amazonS3.deleteObject(bucket, fileKey);
+      log.debug("파일 삭제 성공 - key: {}", fileKey);
 
-      if (isObjectExist) {
-        amazonS3.deleteObject(bucket, fileKey);
-        log.debug("파일 삭제 성공 - key: {}", fileKey);
-
-      } else {
-        log.error(fileKey + " 를 찾을 수 없음");
-      }
     } catch (Exception e) {
       log.error("파일 삭제 실패 - key: {}", fileKey, e);
       throw new CustomException(ErrorCode.FILE_DELETE_ERROR);
     }
   }
 
+  // 파일 다운로드
+  public byte[] getFile(String fileKey) throws FileNotFoundException {
+
+    // S3 파일 유무 확인
+    validateFileExists(fileKey);
+
+    S3Object s3Object = amazonS3.getObject(bucket, fileKey);
+    S3ObjectInputStream s3ObjectContent = s3Object.getObjectContent();
+
+    try {
+      log.debug("파일 다운로드 - key: {}", fileKey);
+      return IOUtils.toByteArray(s3ObjectContent);
+
+    } catch (IOException e) {
+      log.error("파일 다운로드 실패 - key: {}", fileKey, e);
+      throw new FileNotFoundException();
+    }
+  }
+
   // 파일명 생성
   private String createFileName(MultipartFile file) {
     String originalName = file.getOriginalFilename();
-    String safeName = originalName.replaceAll("[^a-zA-Z0-9.\\-]", "_");
+    String safeName = Objects.requireNonNull(originalName).replaceAll("[^a-zA-Z0-9.\\-]", "_");
     return UUID.randomUUID() + "_" + safeName;
   }
 
@@ -115,11 +106,18 @@ public class S3Service {
         fileName);
   }
 
-  // 공용 파일 유효성 검증
+  // 파일 유효성 검증
   private void validateFile(MultipartFile file) {
     if (file == null || file.isEmpty()) {
       log.error("파일이 존재하지 않음 - file: {}", file);
       throw new CustomException(ErrorCode.FILE_EMPTY);
+    }
+  }
+
+  // S3에서 파일 존재 여부 검증
+  private void validateFileExists(String fileKey) throws FileNotFoundException {
+    if (!amazonS3.doesObjectExist(bucket, fileKey)) {
+      throw new FileNotFoundException();
     }
   }
 }
