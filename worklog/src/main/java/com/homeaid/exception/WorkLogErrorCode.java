@@ -13,6 +13,7 @@ public enum WorkLogErrorCode implements BaseErrorCode {
     INVALID_WORKLOG_STATUS(HttpStatus.BAD_REQUEST, "INVALID_WORKLOG_STATUS", "작업 상태가 유효하지 않습니다."),
     ALREADY_COMPLETED_CHECKIN(HttpStatus.BAD_REQUEST, "ALREADY_COMPLETED_WORKLOG", "이미 완료된 체크인입니다."),
     ALREADY_COMPLETED_CHECKOUT(HttpStatus.BAD_REQUEST, "ALREADY_COMPLETED_WORKLOG", "이미 완료된 체크아웃입니다."),
+    INVALID_WORK_DATE(HttpStatus.BAD_REQUEST, "INVALID_WORK_DATE_TIME", "체크인은 작업시작 10분 전 후로 가능합니다."),
 
     // 403 FORBIDDEN
     CHECKOUT_MANAGER_MISMATCH(HttpStatus.FORBIDDEN, "INVALID_WORKLOG_WORKER", "체크인한 매니저와 체크아웃을 시도한 매니저가 일치하지 않습니다."),

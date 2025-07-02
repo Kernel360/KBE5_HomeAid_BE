@@ -1,11 +1,9 @@
 package com.homeaid.service;
 
-import com.homeaid.domain.Matching;
 import com.homeaid.domain.Reservation;
 import com.homeaid.domain.WorkLog;
 import com.homeaid.domain.enumerate.WorkType;
 import com.homeaid.exception.CustomException;
-import com.homeaid.exception.MatchingErrorCode;
 import com.homeaid.exception.ReservationErrorCode;
 import com.homeaid.exception.WorkLogErrorCode;
 import com.homeaid.repository.MatchingRepository;
@@ -18,6 +16,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 @RequiredArgsConstructor
 @Service
@@ -37,6 +39,10 @@ public class WorkLogServiceImpl implements WorkLogService {
     //존재한 예약건에 대해 요청한 매니저 아이디가 체크인을 한적이있는지 검증
     if (workLogRepository.existsWorkLogByManagerIdAndReservationId(userId, reservationId)) {
       throw new CustomException(WorkLogErrorCode.ALREADY_COMPLETED_CHECKIN);
+    }
+
+    if (!isValidWorkDateAndTime(reservation.getRequestedDate(), reservation.getRequestedTime())) {
+      throw new CustomException(WorkLogErrorCode.INVALID_WORK_DATE);
     }
 
     if (!isValidDistance(reservationId, latitude, longitude)) {
@@ -96,6 +102,16 @@ public class WorkLogServiceImpl implements WorkLogService {
 
   public void updateReservationStatusCompleted(Reservation reservation) {
     reservation.updateStatusCompleted();
+  }
+
+  private boolean isValidWorkDateAndTime(LocalDate requestedDate, LocalTime requestedTime) {
+    LocalDateTime now = LocalDateTime.now();
+    LocalDateTime requestedDateTime = LocalDateTime.of(requestedDate, requestedTime);
+
+    LocalDateTime lowerBound = requestedDateTime.minusMinutes(10);
+    LocalDateTime upperBound = requestedDateTime.plusMinutes(10);
+
+    return !now.isBefore(lowerBound) && !now.isAfter(upperBound);
   }
 
 
