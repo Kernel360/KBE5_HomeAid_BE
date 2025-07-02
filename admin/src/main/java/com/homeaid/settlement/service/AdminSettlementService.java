@@ -1,6 +1,7 @@
 package com.homeaid.settlement.service;
 
 import com.homeaid.settlement.domain.Settlement;
+import com.homeaid.settlement.dto.SettlementWithManagerResponseDto;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -21,6 +22,10 @@ public interface AdminSettlementService {
   // 지급 처리
   void pay(Long settlementId);
 
+  // 개별 매니저의 주간 정산 생성
   Settlement createWeeklySettlementForManager(Long managerId, LocalDate weekStart, LocalDate weekEnd);
+
+  // 모든 활성 매니저의 주간 정산 생성
+  void createSettlementsForAllManagers(LocalDate weekStart, LocalDate weekEnd);
 
 }

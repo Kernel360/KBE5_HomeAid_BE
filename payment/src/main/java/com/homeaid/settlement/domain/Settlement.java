@@ -1,8 +1,11 @@
 package com.homeaid.settlement.domain;
 
+import com.homeaid.settlement.domain.enumerate.SettlementStatus;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -54,12 +57,20 @@ public class Settlement {
   @Column
   private LocalDateTime paidAt; // 지급일
 
+  @Enumerated(EnumType.STRING)
+  @Column(nullable = false)
+  private SettlementStatus status;
+
   public void setConfirmedAt(LocalDateTime confirmedAt) {
     this.confirmedAt = confirmedAt;
   }
 
   public void setPaidAt(LocalDateTime paidAt) {
     this.paidAt = paidAt;
+  }
+
+  public void setStatus(SettlementStatus status) {
+    this.status = status;
   }
 
 }
