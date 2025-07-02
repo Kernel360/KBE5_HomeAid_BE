@@ -2,6 +2,7 @@ package com.homeaid.settlement.controller;
 
 import com.homeaid.common.response.CommonApiResponse;
 import com.homeaid.settlement.domain.Settlement;
+import com.homeaid.settlement.dto.SettlementWithManagerResponseDto;
 import com.homeaid.settlement.dto.response.SettlementResponseDto;
 import com.homeaid.settlement.service.AdminSettlementService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -49,7 +50,6 @@ public class AdminSettlementController {
     Settlement settlement = adminSettlementService.createWeeklySettlementForManager(managerId, weekStart, weekEnd);
     return ResponseEntity.ok(CommonApiResponse.success(SettlementResponseDto.from(settlement)));
   }
-
 
   @GetMapping
   @Operation(summary = "[관리자] 전체 정산 내역 조회")
@@ -118,9 +118,10 @@ public class AdminSettlementController {
       @ApiResponse(responseCode = "400", description = "이미 승인됨",
           content = @Content(schema = @Schema(implementation = CommonApiResponse.class)))
   })
-  public ResponseEntity<CommonApiResponse<Void>> confirmSettlement(@PathVariable Long settlementId) {
+  public ResponseEntity<CommonApiResponse<SettlementResponseDto>> confirmSettlement(@PathVariable Long settlementId) {
     adminSettlementService.confirm(settlementId);
-    return ResponseEntity.ok(CommonApiResponse.success());
+    Settlement updated = adminSettlementService.findById(settlementId);
+    return ResponseEntity.ok(CommonApiResponse.success(SettlementResponseDto.from(updated)));
   }
 
   @PostMapping("/{settlementId}/pay")
@@ -131,8 +132,25 @@ public class AdminSettlementController {
       @ApiResponse(responseCode = "400", description = "미승인 상태거나 이미 지급됨",
           content = @Content(schema = @Schema(implementation = CommonApiResponse.class)))
   })
-  public ResponseEntity<CommonApiResponse<Void>> paySettlement(@PathVariable Long settlementId) {
+  public ResponseEntity<CommonApiResponse<SettlementResponseDto>> paySettlement(@PathVariable Long settlementId) {
     adminSettlementService.pay(settlementId);
-    return ResponseEntity.ok(CommonApiResponse.success());
+    Settlement updated = adminSettlementService.findById(settlementId);
+    return ResponseEntity.ok(CommonApiResponse.success(SettlementResponseDto.from(updated)));
   }
+
+  @GetMapping("/{settlementId}/manager-detail")
+  @Operation(summary = "[관리자] 매니저 정산 상세조회", description = "정산 정보와 매니저 상세 정보를 함께 조회합니다.")
+  @ApiResponses(value = {
+      @ApiResponse(responseCode = "200", description = "매니저 정산 상세조회 성공",
+          content = @Content(schema = @Schema(implementation = SettlementWithManagerResponseDto.class))),
+      @ApiResponse(responseCode = "404", description = "정산 정보 또는 매니저 정보 없음",
+          content = @Content(schema = @Schema(implementation = CommonApiResponse.class)))
+  })
+  public ResponseEntity<CommonApiResponse<SettlementWithManagerResponseDto>> getSettlementWithManager(
+      @PathVariable Long settlementId) {
+    SettlementWithManagerResponseDto dto = adminSettlementService.getSettlementWithManager(settlementId);
+    return ResponseEntity.ok(CommonApiResponse.success(dto));
+  }
+
+
 }

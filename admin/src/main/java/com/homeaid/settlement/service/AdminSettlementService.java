@@ -28,4 +28,6 @@ public interface AdminSettlementService {
   // 모든 활성 매니저의 주간 정산 생성
   void createSettlementsForAllManagers(LocalDate weekStart, LocalDate weekEnd);
 
+  // 관리자 매니저 정산 상세조회
+  SettlementWithManagerResponseDto getSettlementWithManager(Long settlementId);
 }
