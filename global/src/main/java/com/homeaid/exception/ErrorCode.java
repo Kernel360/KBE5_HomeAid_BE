@@ -25,6 +25,8 @@ public enum ErrorCode implements BaseErrorCode {
 
   // 404 NOT FOUND
   RESOURCE_NOT_FOUND(HttpStatus.NOT_FOUND, "RESOURCE_NOT_FOUND", "요청한 리소스를 찾을 수 없습니다."),
+  FILE_TOO_LARGE(HttpStatus.BAD_REQUEST, "FILE_TOO_LARGE", "파일 크기가 허용된 최대 크기를 초과했습니다."),
+  FILE_NOT_FOUND(HttpStatus.NOT_FOUND, "FILE_NOT_FOUND", "파일을 찾을 수 없습니다."),
 
   // 405 METHOD NOT ALLOWED
   METHOD_NOT_ALLOWED(HttpStatus.METHOD_NOT_ALLOWED, "METHOD_NOT_ALLOWED", "허용되지 않은 HTTP 메서드입니다."),
@@ -38,6 +40,7 @@ public enum ErrorCode implements BaseErrorCode {
   FILE_UPLOAD_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "FILE_UPLOAD_ERROR", "파일 업로드 중 에러가 발생했습니다."),
   FILE_DELETE_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "FILE_DELETE_ERROR", "파일 삭제 중 에러가 발생했습니다."),
   FILE_DOWNLOAD_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "FILE_DOWNLOAD_ERROR", "파일 다운로드 중 에러가 발생했습니다.");
+
 
   private final HttpStatus status;
   private final String code;

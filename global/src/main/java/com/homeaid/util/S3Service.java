@@ -7,6 +7,7 @@ import com.amazonaws.services.s3.model.S3Object;
 import com.amazonaws.services.s3.model.S3ObjectInputStream;
 import com.amazonaws.util.IOUtils;
 import com.homeaid.common.enumerate.DocumentType;
+import com.homeaid.common.response.FileDownloadResult;
 import com.homeaid.common.response.FileUploadResult;
 import com.homeaid.exception.CustomException;
 import com.homeaid.exception.ErrorCode;
@@ -88,6 +89,36 @@ public class S3Service {
       log.debug("파일 다운로드 - key: {}, size: {} bytes", fileKey, content.length);
 
       return content;
+
+    } catch (IOException e) {
+      log.error("파일 다운로드 실패 - key: {}", fileKey, e);
+      throw new CustomException(ErrorCode.FILE_DOWNLOAD_ERROR);
+    }
+  }
+
+  public FileDownloadResult downloadFile(String fileKey) {
+    log.debug("파일 다운로드 시작 - key: {}", fileKey);
+
+    try (S3Object s3Object = amazonS3.getObject(bucket, fileKey);
+         S3ObjectInputStream inputStream = s3Object.getObjectContent()) {
+
+      ObjectMetadata metadata = s3Object.getObjectMetadata();
+      long contentLength = metadata.getContentLength();
+
+      // 파일 크기 제한 (optional constant check)
+      if (contentLength > 50 * 1024 * 1024) { // 예: 50MB
+        throw new CustomException(ErrorCode.FILE_TOO_LARGE);
+      }
+
+      byte[] content = IOUtils.toByteArray(inputStream);
+
+      return FileDownloadResult.builder()
+          .content(content)
+          .contentType(metadata.getContentType())
+          .contentLength(contentLength)
+          .lastModified(metadata.getLastModified())
+          .s3Key(fileKey)
+          .build();
 
     } catch (IOException e) {
       log.error("파일 다운로드 실패 - key: {}", fileKey, e);
