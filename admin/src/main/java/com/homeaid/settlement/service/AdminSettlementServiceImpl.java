@@ -4,7 +4,7 @@ import com.homeaid.domain.Manager;
 import com.homeaid.domain.enumerate.ManagerStatus;
 import com.homeaid.domain.enumerate.ReservationStatus;
 import com.homeaid.payment.domain.Payment;
-import com.homeaid.payment.domain.PaymentStatus;
+import com.homeaid.payment.domain.enumerate.PaymentStatus;
 import com.homeaid.repository.ManagerRepository;
 import com.homeaid.payment.repository.PaymentRepository;
 import com.homeaid.settlement.domain.Settlement;

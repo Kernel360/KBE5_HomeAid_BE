@@ -3,7 +3,7 @@ package com.homeaid.payment.service;
 import com.homeaid.domain.User;
 import com.homeaid.dto.response.ReservationResponseDto;
 import com.homeaid.payment.domain.Payment;
-import com.homeaid.payment.domain.PaymentStatus;
+import com.homeaid.payment.domain.enumerate.PaymentStatus;
 import com.homeaid.domain.Reservation;
 import com.homeaid.payment.dto.request.PaymentRequestDto;
 import com.homeaid.payment.dto.response.PaymentResponseDto;

@@ -1,8 +1,8 @@
 package com.homeaid.payment.dto.response;
 
 import com.homeaid.payment.domain.Payment;
-import com.homeaid.payment.domain.PaymentMethod;
-import com.homeaid.payment.domain.PaymentStatus;
+import com.homeaid.payment.domain.enumerate.PaymentMethod;
+import com.homeaid.payment.domain.enumerate.PaymentStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
