@@ -1,6 +1,8 @@
 package com.homeaid.settlement.domain;
 
+import com.homeaid.exception.CustomException;
 import com.homeaid.settlement.domain.enumerate.SettlementStatus;
+import com.homeaid.settlement.exception.SettlementErrorCode;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;
@@ -71,6 +73,22 @@ public class Settlement {
 
   public void setStatus(SettlementStatus status) {
     this.status = status;
+  }
+
+  public void approve() {
+    if (this.status != SettlementStatus.PENDING) {
+      throw new CustomException(SettlementErrorCode.ALREADY_CONFIRMED);
+    }
+    this.confirmedAt = LocalDateTime.now();
+    this.status = SettlementStatus.APPROVED;
+  }
+
+  public void pay() {
+    if (this.status != SettlementStatus.APPROVED) {
+      throw new CustomException(SettlementErrorCode.NOT_CONFIRMED);
+    }
+    this.paidAt = LocalDateTime.now();
+    this.status = SettlementStatus.PAID;
   }
 
 }

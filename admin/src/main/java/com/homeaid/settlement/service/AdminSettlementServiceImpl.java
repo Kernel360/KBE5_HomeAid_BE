@@ -35,12 +35,9 @@ public class AdminSettlementServiceImpl implements AdminSettlementService {
   // 개별 매니저 주간 정산 생성 - 수동
   @Override
   public Settlement createWeeklySettlementForManager(Long managerId, LocalDate weekStart, LocalDate weekEnd) {
-    // 매니저 존재 검증
     settlementValidator.validateManagerExists(managerId);
-    // 이미 해당 기간에 정산 생성 여부 검증
     settlementValidator.validateNotAlreadySettled(managerId, weekStart, weekEnd);
 
-    // 해당 주차 결제 내역 조회
     List<Payment> validPayments = getValidPaymentsForWeek(managerId, weekStart, weekEnd);
 
     if (validPayments.isEmpty()) {
@@ -64,7 +61,6 @@ public class AdminSettlementServiceImpl implements AdminSettlementService {
         ).toList();
   }
 
-  // 정산 엔티티 생성 및 저장 - 상태는 PENDING으로 저장
   private Settlement saveSettlement(List<Payment> validPayments, LocalDate weekStart, LocalDate weekEnd) {
     int totalPaid = validPayments.stream()
         .mapToInt(Payment::getAmount)
@@ -97,69 +93,64 @@ public class AdminSettlementServiceImpl implements AdminSettlementService {
         Settlement settlement = createWeeklySettlementForManager(managerId, weekStart, weekEnd);
         log.info("[정산 생성 성공] managerId={}, settlementId={}", managerId, settlement.getId());
       } catch (CustomException e) {
-        log.warn("[정산 생성 실패] managerId={}, 이유={}", managerId, e.getMessage());
+        log.error("[정산 생성 실패] managerId={}, 이유={}", managerId, e.getMessage(), e);
       }
     }
   }
 
-  // 전체 정산 조회
   @Override
   public List<Settlement> findAll(String status, LocalDate start, LocalDate end) {
-    if (start != null && end != null) {
-      return adminSettlementRepository.findBySettlementWeekStartBetween(start, end);
+    if ((start != null && end == null) || (start == null && end != null)) {
+      throw new CustomException(SettlementErrorCode.INVALID_REQUEST); // start 또는 end가 한쪽만 있을 때 예외
+    }
+    if (start != null && end != null && start.isAfter(end)) {
+      throw new CustomException(SettlementErrorCode.INVALID_DATE_RANGE);
     }
     return adminSettlementRepository.findAll();
   }
 
-  // 단건 정산 조회
   @Override
   public Settlement findById(Long settlementId) {
     return adminSettlementRepository.findById(settlementId)
         .orElseThrow(() -> new CustomException(SettlementErrorCode.INVALID_REQUEST));
   }
 
-  // 매니저별 정산 내역 조회
   @Override
   public List<Settlement> findByManagerId(Long managerId) {
     return adminSettlementRepository.findAllByManagerId(managerId);
   }
 
-
-  // 정산 승인 처리 - PENDING인 경우에만 승인
   @Override
   public void confirm(Long settlementId) {
-    Settlement settlement = findById(settlementId);
-    if (settlement.getStatus() != SettlementStatus.PENDING) {
-      throw new CustomException(SettlementErrorCode.ALREADY_CONFIRMED);
-    }
-    settlement.setConfirmedAt(LocalDateTime.now());
-    settlement.setStatus(SettlementStatus.APPROVED);
+    Settlement settlement = settlementValidator.getOrThrow(settlementId);
+    settlement.approve();
     adminSettlementRepository.save(settlement);
+    log.info("[정산 승인 처리] settlementId={} 상태변경: PENDING -> APPROVED", settlementId);
   }
 
-  // 정산 지급 처리 - APPROVED인 경우에만 지급
   @Override
   public void pay(Long settlementId) {
-    Settlement settlement = findById(settlementId);
-    if (settlement.getStatus() != SettlementStatus.APPROVED) {
-      throw new CustomException(SettlementErrorCode.NOT_CONFIRMED);
-    }
-    settlement.setPaidAt(LocalDateTime.now());
-    settlement.setStatus(SettlementStatus.PAID);
+    Settlement settlement = settlementValidator.getOrThrow(settlementId);
+    settlement.pay();
     adminSettlementRepository.save(settlement);
+    log.info("[정산 지급 처리] settlementId={} 상태변경: APPROVED -> PAID", settlementId);
   }
 
+  // 관리자용 정산 상세 조회 서비스
   @Override
   public SettlementWithManagerResponseDto getSettlementWithManager(Long settlementId) {
-    // 정산 정보 조회 (없으면 예외 발생)
     Settlement settlement = findById(settlementId);
 
-    // 매니저 정보 조회 (없으면 예외 발생)
     Manager manager = managerRepository.findById(settlement.getManagerId())
         .orElseThrow(() -> new CustomException(SettlementErrorCode.MANAGER_NOT_FOUND));
 
-    // Settlement + Manager 결합 DTO 생성
-    return SettlementWithManagerResponseDto.from(settlement, manager);
+    List<Payment> payments = getValidPaymentsForWeek(
+        manager.getId(),
+        settlement.getSettlementWeekStart(),
+        settlement.getSettlementWeekEnd()
+    );
+
+    return SettlementWithManagerResponseDto.from(settlement, manager, payments);
   }
 
 

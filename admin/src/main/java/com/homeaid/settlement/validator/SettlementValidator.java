@@ -3,6 +3,7 @@ package com.homeaid.settlement.validator;
 import com.homeaid.domain.enumerate.ManagerStatus;
 import com.homeaid.exception.CustomException;
 import com.homeaid.repository.ManagerRepository;
+import com.homeaid.settlement.domain.Settlement;
 import com.homeaid.settlement.exception.SettlementErrorCode;
 import com.homeaid.settlement.repository.SettlementRepository;
 import java.time.LocalDate;
@@ -36,6 +37,12 @@ public class SettlementValidator {
   // 활동중인 매니저 ID 목록 조회
   public List<Long> findAllActiveManagerIds(ManagerStatus status) {
     return managerRepository.findAllIdsByStatus(status);
+  }
+
+  // 정산ID 로 조회하고 없으면 예외 발생
+  public Settlement getOrThrow(Long settlementId) {
+    return settlementRepository.findById(settlementId)
+        .orElseThrow(() -> new CustomException(SettlementErrorCode.INVALID_REQUEST));
   }
 
 }
