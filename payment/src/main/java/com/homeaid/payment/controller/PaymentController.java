@@ -3,6 +3,7 @@ package com.homeaid.payment.controller;
 import com.homeaid.common.response.CommonApiResponse;
 import com.homeaid.payment.dto.request.PaymentRequestDto;
 import com.homeaid.payment.dto.response.PaymentResponseDto;
+import com.homeaid.payment.dto.response.ReservationPaymentDetailResponseDto;
 import com.homeaid.security.user.CustomUserDetails;
 import com.homeaid.payment.service.PaymentService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -25,7 +26,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/v1/my/payments/")
+@RequestMapping("/api/v1/my/payments")
 @RequiredArgsConstructor
 @Tag(name = "Payment", description = "수요자 결제")
 public class PaymentController {
@@ -66,11 +67,25 @@ public class PaymentController {
   }
 
   @GetMapping("/{paymentId}")
-  public ResponseEntity<CommonApiResponse<PaymentResponseDto>> getPayment(
+  @Operation(summary = "예약 + 결제 상세 조회", description = "예약 정보와 결제 정보를 통합 조회합니다.")
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "조회 성공",
+          content = @Content(schema = @Schema(implementation = ReservationPaymentDetailResponseDto.class))),
+      @ApiResponse(responseCode = "403", description = "본인 결제 아님",
+          content = @Content(schema = @Schema(implementation = CommonApiResponse.class))),
+      @ApiResponse(responseCode = "404", description = "결제 내역 없음",
+          content = @Content(schema = @Schema(implementation = CommonApiResponse.class)))
+  })
+  public ResponseEntity<CommonApiResponse<ReservationPaymentDetailResponseDto>> getReservationPaymentDetail(
       @PathVariable Long paymentId,
       @AuthenticationPrincipal CustomUserDetails user) {
-    return ResponseEntity.ok(CommonApiResponse.success(paymentService.getPayment(user.getUserId(), paymentId)));
+
+    ReservationPaymentDetailResponseDto response =
+        paymentService.getReservationPaymentDetail(user.getUserId(), paymentId);
+
+    return ResponseEntity.ok(CommonApiResponse.success(response));
   }
+
 
   @GetMapping("/list")
   public ResponseEntity<CommonApiResponse<List<PaymentResponseDto>>> getAllPayments(

@@ -42,6 +42,9 @@ public class ManagerResponseDto {
   @Schema(description = "반려 사유", example = "파일이 명확하지 않습니다.")
   private String rejectionReason;
 
+  @Schema(description = "프로필 사진", example = "이미지.jpg")
+  private String profileImageUrl;
+
   public static ManagerResponseDto toDto(Manager manager) {
     return ManagerResponseDto.builder()
         .id(manager.getId())
@@ -55,6 +58,7 @@ public class ManagerResponseDto {
             ? manager.getCreatedAt().toLocalDate().toString()
             : null)
         .rejectionReason(manager.getRejectionReason())
+        .profileImageUrl(manager.getProfileImageUrl())
         .build();
   }
 }

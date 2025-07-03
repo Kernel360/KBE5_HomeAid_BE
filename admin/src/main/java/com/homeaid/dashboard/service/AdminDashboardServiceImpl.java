@@ -18,7 +18,7 @@ public class AdminDashboardServiceImpl implements AdminDashboardService {
    private final ManagerRepository managerRepository;
    private final ReservationRepository reservationRepository;
    private final PaymentRepository paymentRepository;
-  private final SettlementRepository settlementRepository;
+   private final SettlementRepository settlementRepository;
 
   public AdminDashboardStatsDto getStats() {
     long totalUsers = userRepository.countAllUsers();

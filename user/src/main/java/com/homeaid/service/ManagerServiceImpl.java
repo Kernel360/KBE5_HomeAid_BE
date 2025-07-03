@@ -7,6 +7,7 @@ import com.homeaid.domain.ManagerAvailability;
 import com.homeaid.domain.ManagerDocument;
 import com.homeaid.domain.ManagerPreferRegion;
 import com.homeaid.domain.ManagerServiceOption;
+import com.homeaid.domain.enumerate.ManagerStatus;
 import com.homeaid.domain.enumerate.Weekday;
 import com.homeaid.dto.request.ManagerDetailInfoRequestDto;
 import com.homeaid.exception.CustomException;
@@ -173,6 +174,26 @@ public class ManagerServiceImpl implements ManagerService {
   public Manager getManagerById(Long id) {
     return managerRepository.findById(id)
         .orElseThrow(() -> new CustomException(UserErrorCode.MANAGER_NOT_FOUND));
+  }
+
+  // 매니저 존재 여부 검증
+  @Override
+  public void validateManagerExists(Long managerId) {
+    if (!managerRepository.existsById(managerId)) {
+      throw new CustomException(UserErrorCode.MANAGER_NOT_FOUND);
+    }
+  }
+
+  // 매니저 존재 여부 확인 (스케줄러용 boolean 반환)
+  @Override
+  public boolean existsManager(Long managerId) {
+    return managerRepository.existsById(managerId);
+  }
+
+  // 활동중인 매니저 ID 조회
+  @Override
+  public List<Long> findAllActiveManagerIds(ManagerStatus status) {
+    return managerRepository.findAllIdsByStatus(status);
   }
 
 }

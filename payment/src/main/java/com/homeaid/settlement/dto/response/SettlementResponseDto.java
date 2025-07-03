@@ -1,6 +1,7 @@
 package com.homeaid.settlement.dto.response;
 
 import com.homeaid.settlement.domain.Settlement;
+import com.homeaid.settlement.domain.enumerate.SettlementStatus;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import lombok.Builder;
@@ -20,6 +21,7 @@ public class SettlementResponseDto {
   private LocalDateTime settledAt; // 정산 생성일
   private LocalDateTime confirmedAt; // 관리자 승인일
   private LocalDateTime paidAt;      // 관리자 지급일
+  private SettlementStatus status;
 
   public static SettlementResponseDto from(Settlement s) {
     Integer managerAmount = (int) Math.round(s.getTotalAmount() * 0.8);
@@ -36,6 +38,7 @@ public class SettlementResponseDto {
         .settledAt(s.getSettledAt())
         .confirmedAt(s.getConfirmedAt())
         .paidAt(s.getPaidAt())
+        .status(s.getStatus())
         .build();
   }
 
