@@ -76,20 +76,22 @@ public class S3Service {
 
   // 파일 다운로드
   public byte[] getFile(String fileKey) throws FileNotFoundException {
+    log.debug("파일 다운로드 시작 - key: {}", fileKey);
 
     // S3 파일 유무 확인
     validateFileExists(fileKey);
 
-    S3Object s3Object = amazonS3.getObject(bucket, fileKey);
-    S3ObjectInputStream s3ObjectContent = s3Object.getObjectContent();
+    try (S3Object s3Object = amazonS3.getObject(bucket, fileKey);
+        S3ObjectInputStream s3ObjectContent = s3Object.getObjectContent()){
 
-    try {
-      log.debug("파일 다운로드 - key: {}", fileKey);
-      return IOUtils.toByteArray(s3ObjectContent);
+      byte[] content = IOUtils.toByteArray(s3ObjectContent);
+      log.debug("파일 다운로드 - key: {}, size: {} bytes", fileKey, content.length);
+
+      return content;
 
     } catch (IOException e) {
       log.error("파일 다운로드 실패 - key: {}", fileKey, e);
-      throw new FileNotFoundException();
+      throw new CustomException(ErrorCode.FILE_DOWNLOAD_ERROR);
     }
   }
 
