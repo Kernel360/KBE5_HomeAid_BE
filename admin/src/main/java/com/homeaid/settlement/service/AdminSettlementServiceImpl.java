@@ -32,7 +32,7 @@ public class AdminSettlementServiceImpl implements AdminSettlementService {
   private final SettlementValidator settlementValidator;
   private final ManagerRepository managerRepository;
 
-  // 개별 매니저 주간 정산 생성 - 수동
+  // 관리자가 수동으로 매니저 정산 생성
   @Override
   public Settlement createWeeklySettlementForManager(Long managerId, LocalDate weekStart, LocalDate weekEnd) {
     settlementValidator.validateManagerExists(managerId);
@@ -47,20 +47,43 @@ public class AdminSettlementServiceImpl implements AdminSettlementService {
     return saveSettlement(validPayments, weekStart, weekEnd);
   }
 
-  // 유효한 결제 내역 조회 - 조건: 결제 상태는 PAID, 예약 상태는 COMPLETED
+  // 스케줄러 전용: 필요할 때만 정산 생성, 예외로 끊지 않고 상황별로 로그만 기록
+  private void createWeeklySettlementIfNecessary(Long managerId, LocalDate weekStart, LocalDate weekEnd) {
+    if (!settlementValidator.existsManager(managerId)) {
+      log.warn("[정산 스킵] 존재하지 않는 매니저 managerId={}", managerId);
+      return;
+    }
+
+    if (settlementValidator.isAlreadySettled(managerId, weekStart, weekEnd)) {
+      log.info("[정산 스킵] 이미 정산 완료 managerId={} 기간 {} ~ {}", managerId, weekStart, weekEnd);
+      return;
+    }
+
+    List<Payment> validPayments = getValidPaymentsForWeek(managerId, weekStart, weekEnd);
+
+    if (validPayments.isEmpty()) {
+      log.info("[정산 스킵] 결제 내역 없음 managerId={} 기간 {} ~ {}", managerId, weekStart, weekEnd);
+      return;
+    }
+
+    Settlement settlement = saveSettlement(validPayments, weekStart, weekEnd);
+    log.info("[정산 생성 성공] managerId={}, settlementId={}", managerId, settlement.getId());
+  }
+
+  // 결제 내역 조회 - 결제상태 PAID + 예약상태 COMPLETED
   private List<Payment> getValidPaymentsForWeek(Long managerId, LocalDate weekStart, LocalDate weekEnd) {
     LocalDateTime start = weekStart.atStartOfDay();
-    LocalDateTime end = weekEnd.plusDays(1).atStartOfDay(); // end는 다음날 0시까지 포함
+    LocalDateTime end = weekEnd.plusDays(1).atStartOfDay();
 
     List<Payment> payments = paymentRepository.findAllByReservation_ManagerIdAndPaidAtBetween(managerId, start, end);
 
     return payments.stream()
-        .filter(payment ->
-            payment.getStatus() == PaymentStatus.PAID &&
-                payment.getReservation().getStatus() == ReservationStatus.COMPLETED
-        ).toList();
+        .filter(payment -> payment.getStatus() == PaymentStatus.PAID &&
+            payment.getReservation().getStatus() == ReservationStatus.COMPLETED)
+        .toList();
   }
 
+  // Settlement 저장 로직
   private Settlement saveSettlement(List<Payment> validPayments, LocalDate weekStart, LocalDate weekEnd) {
     int totalPaid = validPayments.stream()
         .mapToInt(Payment::getAmount)
@@ -82,7 +105,7 @@ public class AdminSettlementServiceImpl implements AdminSettlementService {
     return adminSettlementRepository.save(settlement);
   }
 
-  // 전체 활성 매니저 정산 일괄 생성 - 스케줄러(WeeklySettlementScheduler)에서 호출
+  // 전체 활성 매니저 정산 일괄 생성 - 스케줄러에서 호출
   @Override
   @Transactional
   public void createSettlementsForAllManagers(LocalDate weekStart, LocalDate weekEnd) {
@@ -90,18 +113,18 @@ public class AdminSettlementServiceImpl implements AdminSettlementService {
 
     for (Long managerId : managerIds) {
       try {
-        Settlement settlement = createWeeklySettlementForManager(managerId, weekStart, weekEnd);
-        log.info("[정산 생성 성공] managerId={}, settlementId={}", managerId, settlement.getId());
-      } catch (CustomException e) {
-        log.error("[정산 생성 실패] managerId={}, 이유={}", managerId, e.getMessage(), e);
+        createWeeklySettlementIfNecessary(managerId, weekStart, weekEnd);
+      } catch (Exception e) {
+        log.error("[정산 스케줄러 실패] managerId={}, 이유={}", managerId, e.getMessage(), e);
       }
     }
   }
 
+  // 전체 조회
   @Override
   public List<Settlement> findAll(String status, LocalDate start, LocalDate end) {
     if ((start != null && end == null) || (start == null && end != null)) {
-      throw new CustomException(SettlementErrorCode.INVALID_REQUEST); // start 또는 end가 한쪽만 있을 때 예외
+      throw new CustomException(SettlementErrorCode.INVALID_REQUEST);
     }
     if (start != null && end != null && start.isAfter(end)) {
       throw new CustomException(SettlementErrorCode.INVALID_DATE_RANGE);
@@ -109,34 +132,40 @@ public class AdminSettlementServiceImpl implements AdminSettlementService {
     return adminSettlementRepository.findAll();
   }
 
+  // 단건 조회
   @Override
   public Settlement findById(Long settlementId) {
     return adminSettlementRepository.findById(settlementId)
         .orElseThrow(() -> new CustomException(SettlementErrorCode.INVALID_REQUEST));
   }
 
+  // 매니저별 조회
   @Override
   public List<Settlement> findByManagerId(Long managerId) {
     return adminSettlementRepository.findAllByManagerId(managerId);
   }
 
+  // 승인 처리
   @Override
-  public void confirm(Long settlementId) {
+  public Settlement confirm(Long settlementId) {
     Settlement settlement = settlementValidator.getOrThrow(settlementId);
     settlement.approve();
     adminSettlementRepository.save(settlement);
     log.info("[정산 승인 처리] settlementId={} 상태변경: PENDING -> APPROVED", settlementId);
+    return settlement;
   }
 
+  // 지급 처리
   @Override
-  public void pay(Long settlementId) {
+  public Settlement pay(Long settlementId) {
     Settlement settlement = settlementValidator.getOrThrow(settlementId);
     settlement.pay();
     adminSettlementRepository.save(settlement);
     log.info("[정산 지급 처리] settlementId={} 상태변경: APPROVED -> PAID", settlementId);
+    return settlement;
   }
 
-  // 관리자용 정산 상세 조회 서비스
+  // 관리자용 상세 조회
   @Override
   public SettlementWithManagerResponseDto getSettlementWithManager(Long settlementId) {
     Settlement settlement = findById(settlementId);
@@ -152,6 +181,4 @@ public class AdminSettlementServiceImpl implements AdminSettlementService {
 
     return SettlementWithManagerResponseDto.from(settlement, manager, payments);
   }
-
-
 }

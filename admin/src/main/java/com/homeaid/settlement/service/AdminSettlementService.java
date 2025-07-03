@@ -17,10 +17,10 @@ public interface AdminSettlementService {
   List<Settlement> findByManagerId(Long managerId);
 
   // 승인 처리
-  void confirm(Long settlementId);
+  Settlement confirm(Long settlementId);
 
   // 지급 처리
-  void pay(Long settlementId);
+  Settlement pay(Long settlementId);
 
   // 개별 매니저의 주간 정산 생성
   Settlement createWeeklySettlementForManager(Long managerId, LocalDate weekStart, LocalDate weekEnd);

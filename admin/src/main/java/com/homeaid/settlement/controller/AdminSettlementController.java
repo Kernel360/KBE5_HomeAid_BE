@@ -119,10 +119,10 @@ public class AdminSettlementController {
           content = @Content(schema = @Schema(implementation = CommonApiResponse.class)))
   })
   public ResponseEntity<CommonApiResponse<SettlementResponseDto>> confirmSettlement(@PathVariable Long settlementId) {
-    adminSettlementService.confirm(settlementId);
-    Settlement updated = adminSettlementService.findById(settlementId);
+    Settlement updated = adminSettlementService.confirm(settlementId);
     return ResponseEntity.ok(CommonApiResponse.success(SettlementResponseDto.from(updated)));
   }
+
 
   @PostMapping("/{settlementId}/pay")
   @Operation(summary = "[관리자] 정산 지급 처리")
@@ -133,8 +133,7 @@ public class AdminSettlementController {
           content = @Content(schema = @Schema(implementation = CommonApiResponse.class)))
   })
   public ResponseEntity<CommonApiResponse<SettlementResponseDto>> paySettlement(@PathVariable Long settlementId) {
-    adminSettlementService.pay(settlementId);
-    Settlement updated = adminSettlementService.findById(settlementId);
+    Settlement updated = adminSettlementService.pay(settlementId);
     return ResponseEntity.ok(CommonApiResponse.success(SettlementResponseDto.from(updated)));
   }
 
