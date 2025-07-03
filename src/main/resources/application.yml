@@ -35,6 +35,19 @@ spring:
         format_sql: true
         dialect: org.hibernate.dialect.MySQL8Dialect
 
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: ${GOOGLE_CLIENT_ID}
+            client-secret: ${GOOGLE_CLIENT_SECRET}
+            redirect-uri: ${GOOGLE_REDIRECT_URI} #TODO .env 파일에서 배포된 도메인으로 변경 필요
+            authorization-grant-type: authorization_code
+            scope:
+              - email
+              - profile
+
   jwt:
     secret: ${JWT_SECRET}
     access-token-expire-time: ${ACCESS_TOKEN_EXPIRE_TIME}
