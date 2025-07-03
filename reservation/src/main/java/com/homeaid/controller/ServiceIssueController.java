@@ -8,6 +8,7 @@ import com.homeaid.security.user.CustomUserDetails;
 import com.homeaid.service.ServiceIssueService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import java.io.FileNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -80,7 +81,7 @@ public class ServiceIssueController {
   @Operation(summary = "서비스 이슈 삭제", description = "매니저가 서비스 이슈를 삭제합니다.")
   public ResponseEntity<CommonApiResponse<Void>> deleteIssue(
       @PathVariable("issueId") Long issueId,
-      @AuthenticationPrincipal CustomUserDetails user) {
+      @AuthenticationPrincipal CustomUserDetails user) throws FileNotFoundException {
 
     serviceIssueService.deleteIssue(issueId, user.getUserId());
 

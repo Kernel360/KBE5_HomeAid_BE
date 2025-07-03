@@ -3,12 +3,17 @@ package com.homeaid.user.controller;
 import com.homeaid.common.response.CommonApiResponse;
 import com.homeaid.common.response.PagedResponseDto;
 import com.homeaid.domain.Manager;
+import com.homeaid.domain.ManagerDocument;
 import com.homeaid.dto.request.StatusChangeRequest;
 import com.homeaid.dto.response.ManagerDocumentListResponseDto;
 import com.homeaid.dto.response.ManagerResponseDto;
+import com.homeaid.exception.CustomException;
+import com.homeaid.exception.ErrorCode;
+import com.homeaid.repository.ManagerDocumentRepository;
 import com.homeaid.user.dto.request.AdminDocumentReviewRequest;
 import com.homeaid.user.dto.request.AdminManagerSearchRequestDto;
 import com.homeaid.user.service.AdminManagerService;
+import com.homeaid.util.S3Service;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -39,6 +44,9 @@ import org.springframework.web.bind.annotation.RestController;
 public class AdminManagerController {
 
   private final AdminManagerService adminManagerService;
+  private final S3Service s3Service;
+  private final ManagerDocumentRepository documentRepository;
+
 
   @GetMapping
   @Operation(summary = "매니저 목록 조회 (검색 포함)", description = "이름, 전화번호, 경력, 상태로 매니저를 검색합니다.")
@@ -109,5 +117,22 @@ public class AdminManagerController {
       @PathVariable Long managerId) {
     ManagerDocumentListResponseDto dto = adminManagerService.getManagerDocuments(managerId);
     return ResponseEntity.ok(CommonApiResponse.success(dto));
+  }
+
+  // 파일 다운로드
+  // ResponseEntity<byte[]>로 바로 전달해야 브라우저가 파일로 인식 가능
+  @GetMapping("/{documentId}/download")
+  public ResponseEntity<byte[]> downloadDocument(@PathVariable Long documentId) {
+    ManagerDocument doc = documentRepository.findById(documentId)
+        .orElseThrow(() -> new CustomException(ErrorCode.FILE_NOT_FOUND));
+
+    var file = s3Service.downloadFile(doc.getS3Key());
+
+    return ResponseEntity.ok()
+        .contentType(org.springframework.http.MediaType.parseMediaType(file.getContentType()))
+        .contentLength(file.getContentLength())
+        .header(org.springframework.http.HttpHeaders.CONTENT_DISPOSITION,
+            "attachment; filename=\"" + doc.getOriginalName() + "\"")
+        .body(file.getContent());
   }
 }

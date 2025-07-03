@@ -1,6 +1,7 @@
 package com.homeaid.service;
 
 import com.homeaid.domain.ServiceIssue;
+import java.io.FileNotFoundException;
 import java.util.List;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -10,6 +11,6 @@ public interface ServiceIssueFileService {
 
   void updateFiles(ServiceIssue serviceIssue, List<MultipartFile> files, List<Long> deleteImageIds);
 
-  void deleteFiles(ServiceIssue serviceIssue);
+  void deleteFiles(ServiceIssue serviceIssue) throws FileNotFoundException;
 
 }

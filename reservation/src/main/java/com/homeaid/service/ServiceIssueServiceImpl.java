@@ -5,6 +5,7 @@ import com.homeaid.domain.ServiceIssue;
 import com.homeaid.exception.CustomException;
 import com.homeaid.exception.ServiceIssueErrorCode;
 import com.homeaid.repository.ServiceIssueRepository;
+import java.io.FileNotFoundException;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -69,7 +70,7 @@ public class ServiceIssueServiceImpl implements ServiceIssueService {
 
   @Override
   @Transactional
-  public void deleteIssue(Long issueId, Long managerId) {
+  public void deleteIssue(Long issueId, Long managerId) throws FileNotFoundException {
 
     ServiceIssue issue = findIssueById(issueId);
     findIssueByIdAndManagerAccess(issueId, managerId);

@@ -124,7 +124,7 @@ public class SwaggerConfig {
   public GroupedOpenApi managerAPI() {
     return GroupedOpenApi.builder()
         .group("매니저")
-        .pathsToMatch("/api/v1/managers/**")
+        .pathsToMatch("/api/v1/managers/**", "/api/v1/manager/profile/**")
         .build();
   }
 
