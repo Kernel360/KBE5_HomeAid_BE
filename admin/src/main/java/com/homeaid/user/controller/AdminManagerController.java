@@ -20,7 +20,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import java.net.URL;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -124,16 +123,16 @@ public class AdminManagerController {
   // ResponseEntity<byte[]>로 바로 전달해야 브라우저가 파일로 인식 가능
   @GetMapping("/{documentId}/download")
   public ResponseEntity<byte[]> downloadDocument(@PathVariable Long documentId) {
-      ManagerDocument doc = documentRepository.findById(documentId)
-          .orElseThrow(() -> new CustomException(ErrorCode.FILE_NOT_FOUND));
+    ManagerDocument doc = documentRepository.findById(documentId)
+        .orElseThrow(() -> new CustomException(ErrorCode.FILE_NOT_FOUND));
 
-      var file = s3Service.downloadFile(doc.getS3Key());
+    var file = s3Service.downloadFile(doc.getS3Key());
 
-      return ResponseEntity.ok()
-          .contentType(org.springframework.http.MediaType.parseMediaType(file.getContentType()))
-          .contentLength(file.getContentLength())
-          .header(org.springframework.http.HttpHeaders.CONTENT_DISPOSITION,
-              "attachment; filename=\"" + doc.getOriginalName() + "\"")
-          .body(file.getContent());
+    return ResponseEntity.ok()
+        .contentType(org.springframework.http.MediaType.parseMediaType(file.getContentType()))
+        .contentLength(file.getContentLength())
+        .header(org.springframework.http.HttpHeaders.CONTENT_DISPOSITION,
+            "attachment; filename=\"" + doc.getOriginalName() + "\"")
+        .body(file.getContent());
   }
 }
