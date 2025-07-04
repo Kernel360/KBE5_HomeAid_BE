@@ -34,4 +34,5 @@ public enum PaymentErrorCode implements BaseErrorCode {
   private final HttpStatus status;
   private final String code;
   private final String message;
+
 }
