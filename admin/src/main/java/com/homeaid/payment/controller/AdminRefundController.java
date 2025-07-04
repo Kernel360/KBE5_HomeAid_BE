@@ -6,9 +6,12 @@ import com.homeaid.payment.dto.response.PaymentResponseDto;
 import com.homeaid.payment.dto.response.RefundResponseDto;
 import com.homeaid.payment.service.AdminRefundService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -28,12 +31,26 @@ public class AdminRefundController {
 
   @PostMapping("/{paymentId}/full")
   @Operation(summary = "전액 환불 처리")
+  @ApiResponses(value = {
+      @ApiResponse(responseCode = "200", description = "전액 환불 성공",
+          content = @Content(schema = @Schema(implementation = PaymentResponseDto.class))),
+      @ApiResponse(responseCode = "404", description = "결제 내역 없음",
+          content = @Content(schema = @Schema(implementation = CommonApiResponse.class)))
+  })
   public ResponseEntity<CommonApiResponse<PaymentResponseDto>> refundFull(@PathVariable Long paymentId) {
     return ResponseEntity.ok(CommonApiResponse.success(adminRefundService.refundFull(paymentId)));
   }
 
   @PostMapping("/{paymentId}/partial")
   @Operation(summary = "부분 환불 처리")
+  @ApiResponses(value = {
+      @ApiResponse(responseCode = "200", description = "부분 환불 성공",
+          content = @Content(schema = @Schema(implementation = PaymentResponseDto.class))),
+      @ApiResponse(responseCode = "400", description = "환불 금액 초과 등 잘못된 요청",
+          content = @Content(schema = @Schema(implementation = CommonApiResponse.class))),
+      @ApiResponse(responseCode = "404", description = "결제 내역 없음",
+          content = @Content(schema = @Schema(implementation = CommonApiResponse.class)))
+  })
   public ResponseEntity<CommonApiResponse<PaymentResponseDto>> refundPartial(
       @PathVariable Long paymentId,
       @RequestParam int refundAmount) {
@@ -41,7 +58,15 @@ public class AdminRefundController {
   }
 
   @PostMapping("/{refundId}/approve")
-  @Operation(summary = "관리자 환불 승인", description = "관리자가 환불 요청을 승인하고 승인 메시지를 입력합니다.")
+  @Operation(summary = "관리자 환불 승인")
+  @ApiResponses(value = {
+      @ApiResponse(responseCode = "200", description = "환불 승인 성공",
+          content = @Content(schema = @Schema(implementation = RefundResponseDto.class))),
+      @ApiResponse(responseCode = "400", description = "잘못된 요청 (코멘트 누락 등)",
+          content = @Content(schema = @Schema(implementation = CommonApiResponse.class))),
+      @ApiResponse(responseCode = "404", description = "환불 내역 없음",
+          content = @Content(schema = @Schema(implementation = CommonApiResponse.class)))
+  })
   public ResponseEntity<CommonApiResponse<RefundResponseDto>> approveRefund(
       @PathVariable Long refundId,
       @RequestBody @Valid RefundAdminDecisionRequestDto request) {
@@ -51,7 +76,15 @@ public class AdminRefundController {
   }
 
   @PostMapping("/{refundId}/reject")
-  @Operation(summary = "관리자 환불 거절", description = "관리자가 환불 요청을 거절하고 거절 메시지를 입력합니다.")
+  @Operation(summary = "관리자 환불 거절")
+  @ApiResponses(value = {
+      @ApiResponse(responseCode = "200", description = "환불 거절 성공",
+          content = @Content(schema = @Schema(implementation = RefundResponseDto.class))),
+      @ApiResponse(responseCode = "400", description = "잘못된 요청 (코멘트 누락 등)",
+          content = @Content(schema = @Schema(implementation = CommonApiResponse.class))),
+      @ApiResponse(responseCode = "404", description = "환불 내역 없음",
+          content = @Content(schema = @Schema(implementation = CommonApiResponse.class)))
+  })
   public ResponseEntity<CommonApiResponse<RefundResponseDto>> rejectRefund(
       @PathVariable Long refundId,
       @RequestBody @Valid RefundAdminDecisionRequestDto request) {
