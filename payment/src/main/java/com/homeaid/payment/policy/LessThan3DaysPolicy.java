@@ -6,6 +6,7 @@ import com.homeaid.payment.domain.Payment;
 import com.homeaid.payment.domain.enumerate.RefundReason;
 import com.homeaid.payment.dto.request.RefundRequestDto;
 import com.homeaid.payment.exception.PaymentErrorCode;
+import com.homeaid.payment.exception.RefundErrorCode;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import org.springframework.stereotype.Component;
@@ -24,7 +25,7 @@ public class LessThan3DaysPolicy implements RefundAmountPolicy{
     if (daysUntilReservation < 3) {
       return (int) (payment.getAmount() * 0.3);
     }
-    throw new CustomException(PaymentErrorCode.REFUND_POLICY_VIOLATION);
+    throw new CustomException(RefundErrorCode.REFUND_POLICY_VIOLATION);
   }
 
 }

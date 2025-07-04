@@ -6,6 +6,7 @@ import com.homeaid.payment.domain.Payment;
 import com.homeaid.payment.domain.enumerate.RefundReason;
 import com.homeaid.payment.dto.request.RefundRequestDto;
 import com.homeaid.payment.exception.PaymentErrorCode;
+import com.homeaid.payment.exception.RefundErrorCode;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import org.springframework.stereotype.Component;
@@ -27,7 +28,7 @@ public class AfterCompletionPolicy implements RefundAmountPolicy{
     if (daysSinceCompletion <= 3) {
       return payment.getAmount() / 2;
     }
-    throw new CustomException(PaymentErrorCode.REFUND_REQUEST_PERIOD_EXCEEDED);
+    throw new CustomException(RefundErrorCode.REFUND_REQUEST_PERIOD_EXCEEDED);
   }
 
 }

@@ -5,6 +5,7 @@ import com.homeaid.payment.domain.Payment;
 import com.homeaid.payment.domain.Refund;
 import com.homeaid.payment.domain.enumerate.RefundStatus;
 import com.homeaid.payment.exception.PaymentErrorCode;
+import com.homeaid.payment.exception.RefundErrorCode;
 import com.homeaid.payment.repository.PaymentRepository;
 import com.homeaid.payment.repository.RefundRepository;
 import lombok.RequiredArgsConstructor;
@@ -28,7 +29,7 @@ public class RefundValidator {
   public void validateDuplicateRefund(Payment payment) {
     boolean exists = refundRepository.existsByPaymentIdAndStatus(payment.getId(), RefundStatus.REQUESTED);
     if (exists) {
-      throw new CustomException(PaymentErrorCode.DUPLICATE_REFUND_REQUEST);
+      throw new CustomException(RefundErrorCode.DUPLICATE_REFUND_REQUEST);
     }
   }
 
@@ -41,7 +42,21 @@ public class RefundValidator {
   // 회원 소유의 환불 내역 조회 & 없으면 예외 발생
   public Refund getRefundOrThrow(Long refundId, Long userId) {
     return refundRepository.findByIdAndPayment_Reservation_CustomerId(refundId, userId)
-        .orElseThrow(() -> new CustomException(PaymentErrorCode.REFUND_NOT_FOUND));
+        .orElseThrow(() -> new CustomException(RefundErrorCode.REFUND_NOT_FOUND));
+  }
+
+  // 관리자
+  // 요청 상태인지 검증 (승인/거절 공통)
+  public void validateRefundStatusIsRequest(Refund refund) {
+    if (refund.getStatus() != RefundStatus.REQUESTED) {
+      throw new CustomException(RefundErrorCode.INVALID_REFUND_STATUS);
+    }
+  }
+
+  // getRefundOrThrow: 회원 소유 검증 시 사용
+  public Refund getRefundOrThrow(Long refundId) {
+    return refundRepository.findById(refundId)
+        .orElseThrow(() -> new CustomException(RefundErrorCode.REFUND_NOT_FOUND));
   }
 
 }

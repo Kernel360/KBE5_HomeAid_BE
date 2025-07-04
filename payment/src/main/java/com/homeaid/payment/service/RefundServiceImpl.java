@@ -7,6 +7,7 @@ import com.homeaid.payment.domain.enumerate.RefundStatus;
 import com.homeaid.payment.dto.request.RefundRequestDto;
 import com.homeaid.payment.dto.response.RefundResponseDto;
 import com.homeaid.payment.exception.PaymentErrorCode;
+import com.homeaid.payment.exception.RefundErrorCode;
 import com.homeaid.payment.policy.RefundPolicyCalculator;
 import com.homeaid.payment.repository.PaymentRepository;
 import com.homeaid.payment.validator.RefundValidator;
@@ -83,7 +84,7 @@ public class RefundServiceImpl implements RefundService {
 
     // 요청 상태인 환불만 철회 가능하도록 검증
     if (refund.getStatus() != RefundStatus.REQUESTED) {
-      throw new CustomException(PaymentErrorCode.CANNOT_CANCEL_REFUND);
+      throw new CustomException(RefundErrorCode.CANNOT_CANCEL_REFUND);
     }
 
     // 상태를 CANCELLED로 변경
