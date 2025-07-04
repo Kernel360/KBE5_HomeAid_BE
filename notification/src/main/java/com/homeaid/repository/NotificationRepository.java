@@ -14,9 +14,9 @@ import java.util.Set;
 @Repository
 public interface NotificationRepository extends JpaRepository<Notification, Long> {
 
-    List<Notification> findByTargetIdAndStatus(Long userId, NotificationStatus notificationStatus);
+    List<Notification> findByTargetIdAndStatusOrderByCreatedAtDesc(Long userId, NotificationStatus notificationStatus);
 
-    List<Notification> findByTargetRoleAndStatus(UserRole userType, NotificationStatus notificationStatus);
+    List<Notification> findByTargetRoleAndStatusOrderByCreatedAtDesc(UserRole userType, NotificationStatus notificationStatus);
 
     @Query("""
         SELECT
