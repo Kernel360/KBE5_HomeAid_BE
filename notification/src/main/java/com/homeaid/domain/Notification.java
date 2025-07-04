@@ -23,7 +23,7 @@ public class Notification {
     private Long id;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(name = "event_type", columnDefinition = "VARCHAR(50)")
     private NotificationEventType eventType;
 
     @Column(columnDefinition = "TEXT")
