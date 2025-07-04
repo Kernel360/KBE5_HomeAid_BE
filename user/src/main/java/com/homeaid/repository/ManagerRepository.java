@@ -1,6 +1,7 @@
 package com.homeaid.repository;
 
 import com.homeaid.domain.Manager;
+import com.homeaid.domain.enumerate.ManagerStatus;
 import java.time.LocalTime;
 import java.util.Collection;
 import java.util.List;
@@ -40,6 +41,9 @@ public interface ManagerRepository extends JpaRepository<Manager, Long> {
 
   @Query("SELECT COUNT(m) FROM Manager m WHERE m.verified = false")
   long countPendingManagers();
+
+  @Query("SELECT m.id FROM Manager m WHERE m.status = :status")
+  List<Long> findAllIdsByStatus(ManagerStatus status);
 
   Collection<Manager> findByIdIn(List<Long> managerIds);
 }

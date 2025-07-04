@@ -38,7 +38,7 @@ public class SseNotificationService {
             try {
                 existingEmitter.complete();
             } catch (Exception e) {
-                log.info("이미 존재하는 Emitter 연결 해제 실패");
+                log.error(e.getMessage());
             }
         }
 

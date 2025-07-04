@@ -48,4 +48,15 @@ public class PaymentResponseDto {
         .customerName(customerName)
         .build();
   }
+
+  public static PaymentResponseDto toDto(Payment payment) {
+    return PaymentResponseDto.builder()
+        .id(payment.getId())
+        .reservationId(payment.getReservation().getId())
+        .amount(payment.getAmount())
+        .paymentMethod(payment.getPaymentMethod())
+        .status(payment.getStatus())
+        .paidAt(payment.getPaidAt())
+        .build();
+  }
 }

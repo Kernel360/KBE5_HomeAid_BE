@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Set;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Slf4j
@@ -21,6 +22,7 @@ import java.util.Set;
 public class NotificationService {
     private final NotificationRepository notificationRepository;
 
+    @Transactional
     public void createNotification(Notification notification) {
         try {
             notificationRepository.save(notification);

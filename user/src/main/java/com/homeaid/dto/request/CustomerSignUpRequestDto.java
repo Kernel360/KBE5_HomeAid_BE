@@ -1,7 +1,6 @@
 package com.homeaid.dto.request;
 
 import com.homeaid.domain.Customer;
-import com.homeaid.domain.CustomerAddress;
 import com.homeaid.domain.enumerate.GenderType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
@@ -58,14 +57,6 @@ public class CustomerSignUpRequestDto {
   @NotNull(message = "성별은 필수 입력값입니다.")
   private GenderType gender;
 
-  @Schema(description = "주소", example = "서울시 강남구 테헤란로 123")
-  @NotBlank(message = "주소는 필수 입력값입니다.")
-  private String address;
-
-  @Schema(description = "상세 주소", example = "101동 202호")
-  @NotBlank(message = "상세 주소는 필수 입력값입니다.")
-  private String addressDetail;
-
   public static Customer toEntity(
       CustomerSignUpRequestDto customerSignUpRequestDto , String encodedPassword) {
     return Customer.addSingleAddress()
@@ -75,10 +66,6 @@ public class CustomerSignUpRequestDto {
         .phone(customerSignUpRequestDto.getPhone())
         .birth(customerSignUpRequestDto.getBirth())
         .gender(customerSignUpRequestDto.getGender())
-        .address(CustomerAddress.builder()
-            .address(customerSignUpRequestDto.getAddress())
-            .addressDetail(customerSignUpRequestDto.getAddressDetail())
-            .build())
         .build();
   }
 

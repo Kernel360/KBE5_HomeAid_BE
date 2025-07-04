@@ -19,7 +19,11 @@ public enum SettlementErrorCode implements BaseErrorCode {
   NOT_CONFIRMED(HttpStatus.BAD_REQUEST, "NOT_CONFIRMED", "승인되지 않은 정산은 지급할 수 없습니다."),
 
   INVALID_PAYMENT_STATUS(HttpStatus.BAD_REQUEST, "INVALID_PAYMENT_STATUS", "정산할 수 없는 결제 상태입니다."),
-  INVALID_RESERVATION_STATUS(HttpStatus.BAD_REQUEST, "INVALID_RESERVATION_STATUS", "정산할 수 없는 예약 상태입니다.");
+  INVALID_RESERVATION_STATUS(HttpStatus.BAD_REQUEST, "INVALID_RESERVATION_STATUS", "정산할 수 없는 예약 상태입니다."),
+  INVALID_DATE_RANGE(HttpStatus.BAD_REQUEST, "INVALID_DATE_RANGE", "조회 기간의 시작일이 종료일보다 늦습니다."),
+
+  DB_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "DB_ERROR", "정산 처리 중 데이터베이스 오류가 발생했습니다."),
+  UNKNOWN_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "UNKNOWN_ERROR", "알 수 없는 오류가 발생했습니다.");
 
   private final HttpStatus status;
   private final String code;

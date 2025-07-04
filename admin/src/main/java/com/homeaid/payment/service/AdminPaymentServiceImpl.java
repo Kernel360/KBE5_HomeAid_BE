@@ -2,8 +2,6 @@ package com.homeaid.payment.service;
 
 import com.homeaid.domain.User;
 import com.homeaid.payment.domain.Payment;
-import com.homeaid.payment.domain.PaymentStatus;
-import com.homeaid.domain.enumerate.ReservationStatus;
 import com.homeaid.payment.dto.response.PaymentResponseDto;
 import com.homeaid.exception.CustomException;
 import com.homeaid.payment.exception.PaymentErrorCode;
