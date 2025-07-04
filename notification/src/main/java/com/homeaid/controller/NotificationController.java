@@ -3,6 +3,7 @@ package com.homeaid.controller;
 import com.homeaid.common.response.CommonApiResponse;
 import com.homeaid.domain.Notification;
 import com.homeaid.domain.enumerate.UserRole;
+import com.homeaid.dto.ResponseAlert;
 import com.homeaid.security.user.CustomUserDetails;
 import com.homeaid.service.NotificationService;
 import com.homeaid.service.SseNotificationService;
@@ -14,6 +15,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
+
+import java.util.ArrayList;
 import java.util.List;
 @RestController
 @RequestMapping("/api/v1/alerts")
@@ -25,20 +28,7 @@ public class NotificationController {
 
     @GetMapping(value = "/connection", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public SseEmitter subscribe(@AuthenticationPrincipal CustomUserDetails user) {
-
-        SseEmitter sseEmitterInstance = sseNotificationService.createConnection(user.getUserId(), user.getUserRole());
-
-        List<Notification> notifications = null;
-
-        if (UserRole.ADMIN.equals(user.getUserRole())) {
-            notifications = notificationService.getUnReadAdminAlerts(UserRole.ADMIN); // 고정값 전달
-        } else {
-            notifications = notificationService.getUnReadAlerts(user.getUserId());
-        }
-
-        SseEmitter sseEmitter = sseNotificationService.sendAlertByConnection(notifications, sseEmitterInstance, user.getUserId());
-        notificationService.updateMarkSentAt(notifications);
-        return sseEmitter;
+        return sseNotificationService.createConnection(user.getUserId(), user.getUserRole());
     }
 
     @PatchMapping("/{alertId}")
@@ -53,5 +43,24 @@ public class NotificationController {
         sseNotificationService.gracefulDisconnect(user.getUserId());
 
         return ResponseEntity.ok(CommonApiResponse.success());
+    }
+
+    @GetMapping
+    public ResponseEntity<CommonApiResponse<List<ResponseAlert>>> getAllAlerts(
+            @AuthenticationPrincipal CustomUserDetails user) {
+        List<Notification> notifications = null;
+
+        if (UserRole.ADMIN.equals(user.getUserRole())) {
+            notifications = notificationService.getUnReadAdminAlerts(UserRole.ADMIN); // 고정값 전달
+        } else {
+            notifications = notificationService.getUnReadAlerts(user.getUserId());
+        }
+
+        List<ResponseAlert> responseAlerts = null;
+        if (notifications != null) {
+            responseAlerts = notifications.stream().map(ResponseAlert::toDto).toList();
+        }
+
+        return ResponseEntity.ok(CommonApiResponse.success(responseAlerts));
     }
 }

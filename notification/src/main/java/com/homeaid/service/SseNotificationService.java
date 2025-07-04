@@ -10,6 +10,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -17,7 +18,6 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Service
-@Component
 @Slf4j
 public class SseNotificationService {
 
@@ -52,35 +52,42 @@ public class SseNotificationService {
         // 연결 정리 이벤트 처리
         emitter.onCompletion(() -> {
             removeConnection(userId);
+            log.info("Connection onCompletion closed id: {}", userId);
         });
         emitter.onTimeout(() -> {
             removeConnection(userId);
+            log.info("Connection timed out id: {}", userId);
             emitter.complete();
         });
         emitter.onError(e -> {
             removeConnection(userId);
+            log.info("Connection error closed id: {}", userId);
         });
         connections.put(userId, emitter);
+        log.info("connection 추가 총 count: {}", connections.size());
 
         return emitter;
     }
 
     // 특정 사용자에게 실시간 알림 전송
-    public void sendAlertToUser(Long targetId, Notification notification) {
+    public boolean sendAlertToUser(Long targetId, ResponseAlert responseAlert) {
         SseEmitter emitter = connections.get(targetId);
 
         if (emitter != null) {
             try {
                 emitter.send(SseEmitter.event()
                         .name("new-notification")
-                        .data(ResponseAlert.toDto(notification)));
+                        .data(responseAlert));
+                log.info("emitter sent new notification {}", responseAlert);
             } catch (IOException e) {
                 log.info("SseEmitter sending error");
                 removeConnection(targetId);
                 emitter.complete();
+                return false;
             }
         }
-        notification.markAsSent();
+        return true;
+//        notification.markAsSent();
     }
 
     @Async
@@ -92,7 +99,10 @@ public class SseNotificationService {
             return;
         }
 
-        sendAlertToUser(requestAlert.getTargetId(), notification);
+        boolean sendResult = sendAlertToUser(requestAlert.getTargetId(), ResponseAlert.toDto(notification));
+        if (sendResult) {
+            notification.markAsSent();
+        }
     }
 
     @Async
@@ -120,6 +130,7 @@ public class SseNotificationService {
     }
 
     @Scheduled(fixedDelay = 30000) //60초
+    @Transactional(readOnly = true) // 읽기 전용으로 명시
     public void unSentAllNotifications() {
         Set<Long> connectionIds = connections.keySet();
 
@@ -128,16 +139,21 @@ public class SseNotificationService {
         LocalDateTime sendCutoff = LocalDateTime.now().minusMinutes(5);
 
         if (connectionIds.isEmpty()) {
+            log.info("스케쥴러 연결된 아이디 없음");
             return;
         }
-
+            log.info("스케줄러 시작");
+        try {
         List<Notification> onlineUserAlerts = notificationService.getUnReadAlerts(connectionIds, recentCutoff, sendCutoff);
         List<Notification> onlineAdminAlerts = notificationService.getUnreadAdminAlerts(recentCutoff, sendCutoff);
 
-        for (Notification alert : onlineUserAlerts) {
-            sendAlertToUser(alert.getTargetId(), alert);
+            // SSE 전송은 트랜잭션 외부에서 수행
+            processUserAlerts(onlineUserAlerts);
+            processAdminAlerts(onlineAdminAlerts);
+        } catch (Exception e) {
+            log.error("스케줄러 실행 중 오류 발생", e);
         }
-        broadcastAdminAlert(onlineAdminAlerts);
+
     }
 
     @Scheduled(fixedRate = 30000) // 30초마다
@@ -149,9 +165,9 @@ public class SseNotificationService {
                 emitter.send(SseEmitter.event()
                         .name("ping")
                         .data(System.currentTimeMillis()));
-
             } catch (IOException e) {
                 zombieConnections.add(userId);
+                log.info("좀비 연결 발견: {}", userId);
             }
         });
 
@@ -167,6 +183,8 @@ public class SseNotificationService {
                         emitter.send(SseEmitter.event()
                                 .name("new-notification")
                                 .data(notifications.stream().map(ResponseAlert::toDto)));
+                        log.info("emitter admin sent new notification");
+
                     } catch (IOException e) {
                         removeConnection(adminId);
                     }
@@ -181,17 +199,60 @@ public class SseNotificationService {
 
                 // 클라이언트에 종료 신호 전송
                 emitter.send(SseEmitter.event()
-                        .name("disconnect")
-                        .data("Server initiated disconnect"));
-
-                removeConnection(userId);
-            } catch (Exception e) {
-                log.warn("SSE 정상 종료 실패 - userId: {}", userId, e);
+                    .name("disconnect")
+                    .data("Server initiated disconnect"));
+            } catch (IOException | IllegalStateException e) {
+                log.warn("SSE 전송 중단됨 - 연결이 이미 끊겼거나 전송 실패. userId: {}", userId, e);
+            } finally {
+                emitter.complete();
+                log.info("SSE 연결 제거 완료 - userId: {}", userId);
             }
         }
     }
 
     private void removeConnection(Long userId) {
         connections.remove(userId);
+    }
+
+    // 3. SSE 전송과 DB 업데이트 분리
+    private void processUserAlerts(List<Notification> alerts) {
+        List<Notification> successfullySent = new ArrayList<>();
+
+        for (Notification alert : alerts) {
+            try {
+                boolean sent = sendAlertToUser(alert.getTargetId(), ResponseAlert.toDto(alert));
+                if (sent) {
+                    successfullySent.add(alert);
+                }
+            } catch (Exception e) {
+                log.error("알림 전송 실패: alertId={}", alert.getId(), e);
+            }
+        }
+
+        // 성공한 알림만 DB 업데이트
+        if (!successfullySent.isEmpty()) {
+            updateSentAlerts(successfullySent);
+        }
+    }
+
+    private void processAdminAlerts(List<Notification> alerts) {
+        if (!alerts.isEmpty()) {
+            try {
+                broadcastAdminAlert(alerts);
+                updateSentAlerts(alerts);
+            } catch (Exception e) {
+                log.error("관리자 알림 전송 실패", e);
+            }
+        }
+    }
+
+    // 4. DB 업데이트를 별도 트랜잭션으로 분리
+    public void updateSentAlerts(List<Notification> notifications) {
+        try {
+            notificationService.updateMarkSentAt(notifications);
+        } catch (Exception e) {
+            log.error("알림 전송 상태 업데이트 실패", e);
+            throw e; // 트랜잭션 롤백 보장
+        }
     }
 }
