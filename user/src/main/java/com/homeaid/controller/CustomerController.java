@@ -5,7 +5,7 @@ import com.homeaid.domain.CustomerAddress;
 import com.homeaid.dto.request.CustomerAddressSaveRequestDto;
 import com.homeaid.dto.request.CustomerAddressUpdateRequestDto;
 import com.homeaid.dto.response.CustomerAddressResponseDto;
-import com.homeaid.security.user.CustomUserDetails;
+import com.homeaid.auth.user.CustomUserDetails;
 import com.homeaid.service.CustomerAddressService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;

@@ -1,15 +1,15 @@
-package com.homeaid.security.auth.controller;
+package com.homeaid.auth.controller;
 
 import com.homeaid.auth.dto.TokenResponse;
 import com.homeaid.common.response.CommonApiResponse;
 import com.homeaid.domain.Customer;
 import com.homeaid.domain.Manager;
-import com.homeaid.dto.request.CustomerSignUpRequestDto;
-import com.homeaid.dto.request.ManagerSignUpRequestDto;
-import com.homeaid.dto.response.SignUpResponseDto;
-import com.homeaid.security.auth.service.AuthService;
-import com.homeaid.security.auth.service.AuthServiceImpl;
-import com.homeaid.security.util.CookieUtil;
+import com.homeaid.auth.dto.request.CustomerSignUpRequestDto;
+import com.homeaid.auth.dto.request.ManagerSignUpRequestDto;
+import com.homeaid.auth.dto.response.SignUpResponseDto;
+import com.homeaid.auth.service.AuthService;
+import com.homeaid.auth.service.AuthServiceImpl;
+import com.homeaid.auth.util.CookieUtil;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;

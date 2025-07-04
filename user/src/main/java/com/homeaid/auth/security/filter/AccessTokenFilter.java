@@ -1,12 +1,11 @@
-package com.homeaid.security.filter;
+package com.homeaid.auth.security.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.homeaid.auth.service.TokenBlacklistService;
 import com.homeaid.domain.User;
 import com.homeaid.domain.enumerate.UserRole;
-import com.homeaid.security.jwt.JwtTokenProvider;
-import com.homeaid.security.user.CustomUserDetails;
-import com.homeaid.security.user.CustomUserDetailsService;
+import com.homeaid.auth.security.jwt.JwtTokenProvider;
+import com.homeaid.auth.user.CustomUserDetails;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;

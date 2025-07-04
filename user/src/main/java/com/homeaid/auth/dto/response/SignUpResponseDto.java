@@ -1,4 +1,4 @@
-package com.homeaid.dto.response;
+package com.homeaid.auth.dto.response;
 
 import com.homeaid.domain.Customer;
 import com.homeaid.domain.Manager;

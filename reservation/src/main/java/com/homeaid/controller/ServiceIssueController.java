@@ -4,7 +4,7 @@ import com.homeaid.common.response.CommonApiResponse;
 import com.homeaid.domain.ServiceIssue;
 import com.homeaid.dto.request.ServiceIssueRequestDto;
 import com.homeaid.dto.response.ServiceIssueResponseDto;
-import com.homeaid.security.user.CustomUserDetails;
+import com.homeaid.auth.user.CustomUserDetails;
 import com.homeaid.service.ServiceIssueService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;

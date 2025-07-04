@@ -1,4 +1,4 @@
-package com.homeaid.dto.response;
+package com.homeaid.auth.dto.response;
 
 import lombok.Builder;
 import lombok.Getter;

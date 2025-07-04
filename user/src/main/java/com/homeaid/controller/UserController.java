@@ -1,17 +1,12 @@
 package com.homeaid.controller;
 
 import com.homeaid.common.response.CommonApiResponse;
-import com.homeaid.domain.Customer;
-import com.homeaid.domain.Manager;
 import com.homeaid.domain.User;
-import com.homeaid.dto.request.CustomerSignUpRequestDto;
-import com.homeaid.dto.request.ManagerSignUpRequestDto;
 import com.homeaid.dto.request.UserUpdateRequestDto;
 import com.homeaid.dto.response.UserProfileResponseDto;
-import com.homeaid.dto.response.SignUpResponseDto;
 import com.homeaid.exception.CustomException;
 import com.homeaid.exception.ErrorCode;
-import com.homeaid.security.user.CustomUserDetails;
+import com.homeaid.auth.user.CustomUserDetails;
 import com.homeaid.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
@@ -22,7 +17,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;

@@ -1,4 +1,4 @@
-package com.homeaid.security.user;
+package com.homeaid.auth.user;
 
 import com.homeaid.domain.User;
 import com.homeaid.domain.enumerate.UserRole;

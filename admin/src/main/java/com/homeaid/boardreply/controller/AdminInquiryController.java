@@ -11,7 +11,7 @@ import com.homeaid.common.response.PagedResponseDto;
 import com.homeaid.domain.BoardReply;
 import com.homeaid.domain.enumerate.UserRole;
 import com.homeaid.dto.response.UserBoardListResponseDto;
-import com.homeaid.security.user.CustomUserDetails;
+import com.homeaid.auth.user.CustomUserDetails;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;

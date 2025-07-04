@@ -1,4 +1,4 @@
-package com.homeaid.security.auth.service;
+package com.homeaid.auth.service;
 
 import com.homeaid.auth.dto.TokenResponse;
 import com.homeaid.domain.Customer;
