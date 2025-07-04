@@ -12,8 +12,10 @@ import com.homeaid.payment.repository.RefundRepository;
 import jakarta.transaction.Transactional;
 import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AdminRefundServiceImpl implements AdminRefundService {
@@ -46,48 +48,44 @@ public class AdminRefundServiceImpl implements AdminRefundService {
 
   @Override
   @Transactional
-  public RefundResponseDto approveRefund(Long refundId) {
+  public RefundResponseDto approveRefund(Long refundId, String adminComment) {
     Refund refund = refundRepository.findById(refundId)
         .orElseThrow(() -> new CustomException(PaymentErrorCode.REFUND_NOT_FOUND));
 
+    // 결제에 부분환불 적용
     refund.getPayment().applyPartialRefund(refund.getRefundAmount());
 
+    // 상태 및 관리자 코멘트 업데이트
     refund = refund.toBuilder()
         .status(RefundStatus.APPROVED)
+        .adminComment(adminComment)
         .processedAt(LocalDateTime.now())
         .build();
 
     Refund updated = refundRepository.save(refund);
 
-    return toResponseDto(updated);
+    log.info("[RefundApprove] refundId={} status=APPROVED adminComment={}", refundId, adminComment);
+
+    return RefundResponseDto.from(updated);
   }
 
   @Override
   @Transactional
-  public RefundResponseDto rejectRefund(Long refundId) {
+  public RefundResponseDto rejectRefund(Long refundId, String adminComment) {
     Refund refund = refundRepository.findById(refundId)
         .orElseThrow(() -> new CustomException(PaymentErrorCode.REFUND_NOT_FOUND));
 
     refund = refund.toBuilder()
         .status(RefundStatus.REJECTED)
+        .adminComment(adminComment)
         .processedAt(LocalDateTime.now())
         .build();
 
     Refund updated = refundRepository.save(refund);
 
-    return toResponseDto(updated);
+    log.info("[RefundReject] refundId={} status=REJECTED adminComment={}", refundId, adminComment);
+
+    return RefundResponseDto.from(updated);
   }
 
-  private RefundResponseDto toResponseDto(Refund refund) {
-    return RefundResponseDto.builder()
-        .refundId(refund.getId())
-        .paymentId(refund.getPayment().getId())
-        .refundAmount(refund.getRefundAmount())
-        .reason(refund.getReason())
-        .status(refund.getStatus())
-        .customerComment(refund.getCustomerComment())
-        .requestedAt(refund.getRequestedAt())
-        .processedAt(refund.getProcessedAt())
-        .build();
-  }
 }

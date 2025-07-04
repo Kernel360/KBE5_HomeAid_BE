@@ -24,6 +24,7 @@ public enum PaymentErrorCode implements BaseErrorCode {
 
   PAYMENT_ACCESS_DENIED(HttpStatus.FORBIDDEN, "PAYMENT_ACCESS_DENIED", "본인의 결제가 아닙니다."),
   DUPLICATE_REFUND_REQUEST(HttpStatus.NOT_FOUND, "DUPLICATE_REFUND_REQUEST", "이미 환불 요청이 진행 중인 결제입니다."),
+  CANNOT_CANCEL_REFUND(HttpStatus.NOT_FOUND,"CANNOT_CANCEL_REFUND","요청 상태가 아니어서 환불 요청을 철회할 수 없습니다."),
 
   PAYMENT_NOT_FOUND(HttpStatus.NOT_FOUND, "PAYMENT_NOT_FOUND", "결제 내역을 찾을 수 없습니다."),
   PAYMENT_INVALID_STATUS(HttpStatus.BAD_REQUEST, "PAYMENT_INVALID_STATUS", "유효하지 않은 결제 상태입니다."),

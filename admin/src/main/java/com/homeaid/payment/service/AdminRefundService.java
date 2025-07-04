@@ -8,6 +8,6 @@ public interface AdminRefundService {
   PaymentResponseDto refundFull(Long paymentId);
   PaymentResponseDto refundPartial(Long paymentId, int refundAmount);
 
-  RefundResponseDto approveRefund(Long refundId); // 환불 승인
-  RefundResponseDto rejectRefund(Long refundId);  // 환불 거절
+  RefundResponseDto approveRefund(Long refundId, String adminComment); // 환불 승인
+  RefundResponseDto rejectRefund(Long refundId, String adminComment);  // 환불 거절
 }
