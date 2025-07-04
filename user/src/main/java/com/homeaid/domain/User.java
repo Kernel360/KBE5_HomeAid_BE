@@ -20,10 +20,10 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-
 
 @Getter
 @NoArgsConstructor
@@ -81,6 +81,7 @@ public class User {
     return Boolean.TRUE.equals(this.deleted);
   }
 
+  @Setter
   @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
   private UserWithdrawalRequest withdrawalRequest;
 
@@ -116,10 +117,6 @@ public class User {
   public void profileImage(String imageUrl, String s3Key) {
     this.profileImageUrl = imageUrl;
     this.profileImageS3Key = s3Key;
-  }
-
-  public void setWithdrawalRequest(UserWithdrawalRequest request) {
-    this.withdrawalRequest = request;
   }
 
 }

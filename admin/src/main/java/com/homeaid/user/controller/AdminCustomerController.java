@@ -3,7 +3,7 @@ package com.homeaid.user.controller;
 import com.homeaid.common.response.CommonApiResponse;
 import com.homeaid.common.response.PagedResponseDto;
 import com.homeaid.domain.Customer;
-import com.homeaid.dto.request.CustomerResponseDto;
+import com.homeaid.dto.response.CustomerResponseDto;
 import com.homeaid.user.dto.request.AdminCustomerSearchRequestDto;
 import com.homeaid.user.dto.response.CustomerDetailResponseDto;
 import com.homeaid.user.service.AdminCustomerService;

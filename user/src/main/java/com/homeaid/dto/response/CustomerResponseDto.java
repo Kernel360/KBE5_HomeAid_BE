@@ -1,4 +1,4 @@
-package com.homeaid.dto.request;
+package com.homeaid.dto.response;
 
 import com.homeaid.domain.Customer;
 import io.swagger.v3.oas.annotations.media.Schema;

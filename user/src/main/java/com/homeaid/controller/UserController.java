@@ -40,34 +40,6 @@ import org.springframework.web.multipart.MultipartFile;
 public class UserController {
 
   private final UserService userService;
-  private final BCryptPasswordEncoder passwordEncoder;
-
-  @PostMapping("/signup/managers")
-  public ResponseEntity<CommonApiResponse<SignUpResponseDto>> signUpManager(
-      @RequestBody @Valid ManagerSignUpRequestDto managerSignUpRequestDto
-  ) {
-
-    String password = passwordEncoder.encode(managerSignUpRequestDto.getPassword());
-    Manager manager = userService.signUpManager(
-        ManagerSignUpRequestDto.toEntity(managerSignUpRequestDto, password) // 비밀번호 추가 수정 필요
-    );
-    return ResponseEntity.status(HttpStatus.CREATED)
-        .body(CommonApiResponse.success(SignUpResponseDto.toManagerDto(manager)));
-  }
-
-  @PostMapping("/signup/customers")
-  public ResponseEntity<CommonApiResponse<SignUpResponseDto>> signUpCustomer(
-      @RequestBody @Valid CustomerSignUpRequestDto customerSignUpRequestDto
-  ) {
-
-    String password = passwordEncoder.encode(customerSignUpRequestDto.getPassword());
-
-    Customer customer = userService.signUpCustomer(
-        CustomerSignUpRequestDto.toEntity(customerSignUpRequestDto, password) // 비밀번호 추가 수정 필요
-    );
-    return ResponseEntity.status(HttpStatus.CREATED)
-        .body(CommonApiResponse.success(SignUpResponseDto.toCustomerDto(customer)));
-  }
 
   @GetMapping("/my")
   @Operation(summary = "회원 기본 정보 조회", description = "회원정보 기본 정보 수정을 위한 회원 정보 조회")
