@@ -7,12 +7,12 @@ import com.homeaid.domain.Matching;
 import com.homeaid.domain.Reservation;
 import com.homeaid.domain.ReservationItem;
 import com.homeaid.domain.enumerate.AlertType;
+import com.homeaid.domain.enumerate.MatchingStatus;
 import com.homeaid.domain.enumerate.ReservationStatus;
 import com.homeaid.domain.enumerate.UserRole;
 import com.homeaid.dto.RequestAlert;
 import com.homeaid.dto.response.ReservationResponseDto;
 import com.homeaid.exception.CustomException;
-import com.homeaid.exception.MatchingErrorCode;
 import com.homeaid.exception.ReservationErrorCode;
 import com.homeaid.exception.UserErrorCode;
 import com.homeaid.repository.*;
@@ -70,10 +70,9 @@ public class ReservationServiceImpl implements ReservationService {
   @Override
   @Transactional(readOnly = true)
   public ReservationResponseDto getReservation(Long id) {
-    Reservation reservation = reservationRepository.findById(id)
-        .orElseThrow(() -> new CustomException(ReservationErrorCode.RESERVATION_NOT_FOUND));
+    Reservation reservation = getReservationById(id);
 
-    Long finalMatchingId = reservation.getFinalMatchingId();
+    Matching latestMatching = getLatestMatching(reservation).orElse(null);
 
     Manager manager = null;
     if (reservation.getManagerId() != null) {
@@ -81,13 +80,10 @@ public class ReservationServiceImpl implements ReservationService {
           .orElseThrow(() -> new CustomException(UserErrorCode.MANAGER_NOT_FOUND));
     }
 
-    if (finalMatchingId != null) {
-      Matching matching = matchingRepository.findById(finalMatchingId)
-          .orElseThrow(() -> new CustomException(MatchingErrorCode.MATCHING_NOT_FOUND));
-      return ReservationResponseDto.toDto(reservation, matching.getStatus(), (manager != null) ? manager.getName() : null);
-    } else {
-      return ReservationResponseDto.toDto(reservation, null, (manager != null) ? manager.getName() : null);
-    }
+    MatchingStatus status = (latestMatching != null) ? latestMatching.getStatus() : null;
+    String managerName = (manager != null) ? manager.getName() : null;
+
+    return ReservationResponseDto.toDto(reservation, status, managerName);
   }
 
   @Override
@@ -165,7 +161,8 @@ public class ReservationServiceImpl implements ReservationService {
     return reservations.map(reservation -> {
       Customer customer = customerMap.get(reservation.getCustomerId());
       if (customer == null) {
-        log.error("[예약 조회 실패] 고객 정보 없음 - reservationId={}, customerId={}", reservation.getId(), reservation.getCustomerId());
+        log.error("[예약 조회 실패] 고객 정보 없음 - reservationId={}, customerId={}", reservation.getId(),
+            reservation.getCustomerId());
         throw new CustomException(UserErrorCode.CUSTOMER_NOT_FOUND);
       }
 
@@ -194,14 +191,17 @@ public class ReservationServiceImpl implements ReservationService {
       Customer customer = customerMap.get(reservation.getCustomerId());
 
       if (customer == null) {
-        log.error("[매니저 예약 조회 실패] 고객 정보 없음 - reservationId={}, customerId={}", reservation.getId(), reservation.getCustomerId());
+        log.error("[매니저 예약 조회 실패] 고객 정보 없음 - reservationId={}, customerId={}", reservation.getId(),
+            reservation.getCustomerId());
         throw new CustomException(UserErrorCode.CUSTOMER_NOT_FOUND);
       }
 
-      Optional<Matching> matching = matchingRepository.findTopByReservationIdOrderByModifiedDateDesc(reservation.getId());
+      Optional<Matching> matching = matchingRepository.findTopByReservationIdOrderByModifiedDateDesc(
+          reservation.getId());
 
       if (matching.isPresent()) {
-        return ReservationResponseDto.toDtoForManager(reservation, customer, matching.get().getStatus());
+        return ReservationResponseDto.toDtoForManager(reservation, customer,
+            matching.get().getStatus());
       }
       return ReservationResponseDto.toDtoForManager(reservation, customer, null);
     });
@@ -255,6 +255,10 @@ public class ReservationServiceImpl implements ReservationService {
   private Reservation getReservationById(Long reservationId) {
     return reservationRepository.findById(reservationId)
         .orElseThrow(() -> new CustomException(ReservationErrorCode.RESERVATION_NOT_FOUND));
+  }
+
+  private Optional<Matching> getLatestMatching(Reservation reservation) {
+    return reservation.getLatestMatching();
   }
 
 }

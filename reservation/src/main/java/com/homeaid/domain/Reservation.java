@@ -13,13 +13,16 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
+import jakarta.persistence.OrderBy;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -57,7 +60,9 @@ public class Reservation {
   private Long managerId;
 
   @Setter
-  private Long finalMatchingId;
+  @OneToOne
+  @JoinColumn(name = "final_matching_id")
+  private Matching finalMatchingId;
 
   private Double latitude;
 
@@ -67,7 +72,8 @@ public class Reservation {
 
   private String addressDetail;
 
-  @OneToMany(mappedBy = "reservation", cascade = CascadeType.ALL, orphanRemoval = true)
+  @OneToMany(mappedBy = "reservation", cascade = CascadeType.ALL)
+  @OrderBy("createdDate DESC")
   private List<Matching> matchingList = new ArrayList<>();
 
   @Column(columnDefinition = "TEXT")
@@ -135,6 +141,10 @@ public class Reservation {
 
   public void failedMatching() {
     this.status = ReservationStatus.REQUESTED;
+  }
+
+  public Optional<Matching> getLatestMatching() {
+    return matchingList.stream().findFirst();
   }
 }
 

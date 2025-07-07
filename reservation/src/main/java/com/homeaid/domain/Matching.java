@@ -81,7 +81,7 @@ public class Matching {
   public void acceptByManager() {
     this.managerStatus = MatchingStatus.ACCEPTED;
     this.status = MatchingStatus.ACCEPTED;
-    this.reservation.setFinalMatchingId(this.id);
+//    this.reservation.setFinalMatchingId(this.id);
   }
 
   public void rejectByManager(String memo) {
@@ -94,6 +94,7 @@ public class Matching {
     this.customerStatus = MatchingStatus.CONFIRMED;
     this.status = MatchingStatus.CONFIRMED;
     this.matchedAt = LocalDateTime.now();
+    this.reservation.setFinalMatchingId(this);
   }
 
   public void rejectByCustomer(String memo) {
