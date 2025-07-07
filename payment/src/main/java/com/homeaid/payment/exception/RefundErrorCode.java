@@ -13,6 +13,7 @@ public enum RefundErrorCode implements BaseErrorCode {
 
   REFUND_NOT_FOUND(HttpStatus.NOT_FOUND, "REFUND_NOT_FOUND","환불 내역을 찾을 수 없습니다."),
 
+  PAYMENT_REFUND_NOT_ALLOWED(HttpStatus.BAD_REQUEST, "PAYMENT_REFUND_NOT_ALLOWED", "현재 예약 상태에서는 환불이 불가능합니다."),
   REFUND_POLICY_VIOLATION(HttpStatus.BAD_REQUEST, "REFUND_POLICY_VIOLATION", "환불 정책에 맞지 않습니다."),
   REFUND_REQUEST_PERIOD_EXCEEDED(HttpStatus.BAD_REQUEST, "REFUND_REQUEST_PERIOD_EXCEEDED", "환불 요청 가능 기간이 지났습니다."),
   INVALID_REFUND_REASON(HttpStatus.BAD_REQUEST, "INVALID_REFUND_REASON", "잘못된 환불 사유입니다."),
