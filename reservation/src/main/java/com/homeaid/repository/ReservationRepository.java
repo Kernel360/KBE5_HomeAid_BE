@@ -75,4 +75,7 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
   Double getAverageProcessingMinutes(@Param("year") int year, @Param("month") Integer month, @Param("day") Integer day
   );
 
+  @Query("SELECT r FROM Reservation r WHERE (:status IS NULL OR r.status = :status)")
+  Page<Reservation> findByOptionalStatus(@Param("status") ReservationStatus status, Pageable pageable);
+
 }

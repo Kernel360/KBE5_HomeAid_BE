@@ -51,7 +51,7 @@ public class ReservationServiceImpl implements ReservationService {
   @Override
   @Transactional
   public Reservation createReservation(Reservation reservation, Long serviceOptionId) {
-    log.info("[예약 생성] customerId={}, serviceOptionId={}", reservation.getCustomerId(),
+    log.info("[예약 생성] customerId={}, serviceOptionId={}", reservation.getCustomer().getId(),
         serviceOptionId);
 
     ServiceOption serviceOption = getServiceOptionById(serviceOptionId);
@@ -74,14 +74,12 @@ public class ReservationServiceImpl implements ReservationService {
 
     Matching latestMatching = getLatestMatching(reservation).orElse(null);
 
-    Manager manager = null;
-    if (reservation.getManagerId() != null) {
-      manager = managerRepository.findById(reservation.getManagerId())
-          .orElseThrow(() -> new CustomException(UserErrorCode.MANAGER_NOT_FOUND));
+    String managerName = null;
+    if (latestMatching != null) {
+      managerName = latestMatching.getManager().getName();
     }
 
     MatchingStatus status = (latestMatching != null) ? latestMatching.getStatus() : null;
-    String managerName = (manager != null) ? manager.getName() : null;
 
     return ReservationResponseDto.toDto(reservation, status, managerName);
   }
@@ -92,7 +90,7 @@ public class ReservationServiceImpl implements ReservationService {
       Long serviceOptionId) {
     Reservation originReservation = getReservationById(reservationId);
 
-    if (!originReservation.getCustomerId().equals(userId)) {
+    if (!originReservation.getCustomer().getId().equals(userId)) {
       log.warn("[예약 수정 실패] 권한 없음 - reservationId={}, userId={}", reservationId, userId);
       throw new CustomException(ReservationErrorCode.UNAUTHORIZED_RESERVATION_ACCESS);
     }
@@ -120,7 +118,7 @@ public class ReservationServiceImpl implements ReservationService {
 
     Reservation reservation = getReservationById(reservationId);
 
-    if (!reservation.getCustomerId().equals(userId)) {
+    if (!reservation.getCustomer().getId().equals(userId)) {
       log.warn("[예약 삭제 실패] 권한 없음 - reservationId={}, userId={}", reservationId, userId);
       throw new CustomException(ReservationErrorCode.UNAUTHORIZED_RESERVATION_ACCESS);
     }
@@ -131,43 +129,19 @@ public class ReservationServiceImpl implements ReservationService {
   @Override
   @Transactional(readOnly = true)
   public Page<ReservationResponseDto> getReservations(Pageable pageable, ReservationStatus status) {
-    Page<Reservation> reservations = (status != null)
-        ? reservationRepository.findByStatus(status, pageable)
-        : reservationRepository.findAll(pageable);
 
-    // 고객 ID 모으기
-    List<Long> customerIds = reservations.stream()
-        .map(Reservation::getCustomerId)
-        .distinct()
-        .toList();
-
-    // 매니저 ID 모으기 (nullable 처리 필요)
-    List<Long> managerIds = reservations.stream()
-        .map(Reservation::getManagerId)
-        .filter(Objects::nonNull)
-        .distinct()
-        .toList();
-
-    // 일괄 조회
-    Map<Long, Customer> customerMap = customerRepository.findByIdIn(customerIds).stream()
-        .collect(Collectors.toMap(Customer::getId, Function.identity()));
-
-    Map<Long, Manager> managerMap = managerRepository.findByIdIn(managerIds).stream()
-        .collect(Collectors.toMap(Manager::getId, Function.identity()));
+    Page<Reservation> reservations = reservationRepository.findByOptionalStatus(status, pageable);
 
     return reservations.map(reservation -> {
-      Customer customer = customerMap.get(reservation.getCustomerId());
-      if (customer == null) {
-        log.error("[예약 조회 실패] 고객 정보 없음 - reservationId={}, customerId={}", reservation.getId(),
-            reservation.getCustomerId());
-        throw new CustomException(UserErrorCode.CUSTOMER_NOT_FOUND);
+
+      Matching latestMatching = getLatestMatching(reservation).orElse(null);
+      String managerName = null;
+      if (latestMatching != null) {
+        managerName = latestMatching.getManager().getName();
       }
 
-      Manager manager = reservation.getManagerId() != null
-          ? managerMap.get(reservation.getManagerId())
-          : null;
-
-      return ReservationResponseDto.toDto(reservation, customer, manager);
+      return ReservationResponseDto.toDto(reservation, reservation.getCustomer().getName(),
+          managerName);
     });
   }
 
@@ -185,11 +159,11 @@ public class ReservationServiceImpl implements ReservationService {
     Map<Long, Customer> customerMap = batchGetCustomersFromReservations(reservations);
 
     return reservations.map(reservation -> {
-      Customer customer = customerMap.get(reservation.getCustomerId());
+      Customer customer = customerMap.get(reservation.getCustomer().getId());
 
       if (customer == null) {
         log.error("[매니저 예약 조회 실패] 고객 정보 없음 - reservationId={}, customerId={}", reservation.getId(),
-            reservation.getCustomerId());
+            reservation.getCustomer().getId());
         throw new CustomException(UserErrorCode.CUSTOMER_NOT_FOUND);
       }
 
@@ -200,13 +174,14 @@ public class ReservationServiceImpl implements ReservationService {
         return ReservationResponseDto.toDtoForManager(reservation, customer,
             matching.get().getStatus());
       }
+      
       return ReservationResponseDto.toDtoForManager(reservation, customer, null);
     });
   }
 
   private Map<Long, Customer> batchGetCustomersFromReservations(Page<Reservation> reservations) {
     List<Long> customerIds = reservations.stream()
-        .map(Reservation::getCustomerId)
+        .map(reservation -> reservation.getCustomer().getId())
         .distinct()
         .toList();
 
@@ -237,7 +212,7 @@ public class ReservationServiceImpl implements ReservationService {
   @Override
   public void validateUserAccess(Reservation reservation, Long userId) {
     boolean isManager = userId.equals(reservation.getManagerId());
-    boolean isCustomer = userId.equals(reservation.getCustomerId());
+    boolean isCustomer = userId.equals(reservation.getCustomer().getId());
 
     if (!isManager && !isCustomer) {
       throw new CustomException(ReservationErrorCode.USER_ACCESS_DENIED);
