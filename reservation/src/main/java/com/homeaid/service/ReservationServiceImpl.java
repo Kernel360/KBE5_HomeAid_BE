@@ -50,12 +50,16 @@ public class ReservationServiceImpl implements ReservationService {
 
   @Override
   @Transactional
-  public Reservation createReservation(Reservation reservation, Long serviceOptionId) {
+  public Reservation createReservation(Reservation reservation, Long userId, Long serviceOptionId) {
     log.info("[예약 생성] customerId={}, serviceOptionId={}", reservation.getCustomer().getId(),
         serviceOptionId);
 
+    Customer customer = customerRepository.findById(userId).orElseThrow(() -> new CustomException(UserErrorCode.CUSTOMER_NOT_FOUND));
+
     ServiceOption serviceOption = getServiceOptionById(serviceOptionId);
+
     reservation.addItem(serviceOption);
+    reservation.setCustomer(customer);
 
     Reservation savedReservation = reservationRepository.save(reservation);
 
@@ -174,7 +178,7 @@ public class ReservationServiceImpl implements ReservationService {
         return ReservationResponseDto.toDtoForManager(reservation, customer,
             matching.get().getStatus());
       }
-      
+
       return ReservationResponseDto.toDtoForManager(reservation, customer, null);
     });
   }

@@ -72,6 +72,7 @@ public class Reservation {
 
   private String addressDetail;
 
+  @Setter
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "customer_id")
   private Customer customer;
@@ -97,10 +98,10 @@ public class Reservation {
   private LocalDateTime deletedDate;
 
   @Builder
-  public Reservation(LocalDate requestedDate, LocalTime requestedTime, Long customerId, Double latitude, Double longitude, String address, String addressDetail, Integer totalPrice, Integer duration) {
+  public Reservation(LocalDate requestedDate, LocalTime requestedTime, Customer customer, Double latitude, Double longitude, String address, String addressDetail, Integer totalPrice, Integer duration) {
     this.requestedDate = requestedDate;
     this.requestedTime = requestedTime;
-    this.customerId = customerId;
+    this.customer = customer;
     this.latitude = latitude;
     this.longitude = longitude;
     this.address = address;

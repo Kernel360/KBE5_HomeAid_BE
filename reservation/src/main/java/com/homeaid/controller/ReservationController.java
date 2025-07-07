@@ -6,6 +6,7 @@ import com.homeaid.common.response.PagedResponseDto;
 import com.homeaid.domain.Reservation;
 import com.homeaid.domain.enumerate.ReservationStatus;
 import com.homeaid.dto.request.ReservationRequestDto;
+import com.homeaid.dto.request.UpdateReservationRequestDto;
 import com.homeaid.dto.response.ReservationResponseDto;
 import com.homeaid.auth.user.CustomUserDetails;
 import com.homeaid.service.ReservationService;
@@ -54,7 +55,7 @@ public class ReservationController {
       @RequestBody @Valid ReservationRequestDto reservationRequestDto) {
 
     Reservation reservation = reservationService.createReservation(
-        ReservationRequestDto.toEntity(reservationRequestDto, user.getUserId()),
+        ReservationRequestDto.toEntity(reservationRequestDto), user.getUserId(),
         reservationRequestDto.getOptionId());
 
     return ResponseEntity.status(HttpStatus.CREATED)
@@ -95,7 +96,7 @@ public class ReservationController {
     Reservation updated = reservationService.updateReservation(
         user.getUserId(),
         reservationId,
-        ReservationRequestDto.toEntity(reservationRequestDto), reservationRequestDto.getOptionId());
+        UpdateReservationRequestDto.toEntity(reservationRequestDto), reservationRequestDto.getOptionId());
 
     return ResponseEntity.ok(CommonApiResponse.success(ReservationResponseDto.toDto(updated)));
   }
