@@ -44,7 +44,8 @@ public class SecurityConfig {
       "/api/v1/users/my/**",
       "api/v1/reservations/**",
       "api/v1/managers/**",
-      "api/v1/reviews/**"
+      "api/v1/reviews/**",
+      "api/v1/alerts/connection"
   };
 
   private final String[] swaggerUrls = {
