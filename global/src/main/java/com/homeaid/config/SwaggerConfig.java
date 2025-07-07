@@ -153,4 +153,14 @@ public class SwaggerConfig {
         .pathsToMatch("/api/v1/my/withdrawal/**")
         .build();
   }
+
+  @Bean
+  public GroupedOpenApi refundAPI() {
+    return GroupedOpenApi.builder()
+        .group("refunds")
+        .displayName("환불")
+        .pathsToMatch("/api/v1/my/refunds/**")
+        .build();
+  }
 }
+// eyJhbGciOiJIUzI1NiJ9.eyJ1c2VySWQiOjIyLCJyb2xlIjoiQ1VTVE9NRVIiLCJpYXQiOjE3NTE2MDQ4NTQsImV4cCI6MTc1MTYwODQ1NH0.jx0hZkO8LbwGdBCsiqw8KsiEGK6X6HtgQHl0czIC3jU
