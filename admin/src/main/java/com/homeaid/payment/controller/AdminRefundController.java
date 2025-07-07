@@ -2,7 +2,6 @@ package com.homeaid.payment.controller;
 
 import com.homeaid.common.response.CommonApiResponse;
 import com.homeaid.payment.dto.RefundAdminDecisionRequestDto;
-import com.homeaid.payment.dto.request.RefundPartialFlexibleRequestDto;
 import com.homeaid.payment.dto.response.PaymentResponseDto;
 import com.homeaid.payment.dto.response.RefundResponseDto;
 import com.homeaid.payment.service.AdminRefundService;
@@ -43,8 +42,12 @@ public class AdminRefundController {
       @ApiResponse(responseCode = "404", description = "결제 내역 없음",
           content = @Content(schema = @Schema(implementation = CommonApiResponse.class)))
   })
-  public ResponseEntity<CommonApiResponse<PaymentResponseDto>> refundFull(@PathVariable Long paymentId) {
-    return ResponseEntity.ok(CommonApiResponse.success(adminRefundService.refundFull(paymentId)));
+  public ResponseEntity<CommonApiResponse<PaymentResponseDto>> refundFull(
+      @PathVariable Long paymentId,
+      @RequestBody @Valid RefundAdminDecisionRequestDto decisionRequest) {
+
+    PaymentResponseDto response = adminRefundService.refundFull(paymentId, decisionRequest);
+    return ResponseEntity.ok(CommonApiResponse.success(response));
   }
 
   @PostMapping("/{paymentId}/partial")
@@ -59,9 +62,9 @@ public class AdminRefundController {
   })
   public ResponseEntity<CommonApiResponse<PaymentResponseDto>> refundPartial(
       @PathVariable Long paymentId,
-      @RequestBody @Valid RefundPartialFlexibleRequestDto request) {
+      @RequestBody @Valid RefundAdminDecisionRequestDto decisionRequest) {
 
-    PaymentResponseDto response = adminRefundService.refundPartial(paymentId, request);
+    PaymentResponseDto response = adminRefundService.refundPartial(paymentId, decisionRequest);
     return ResponseEntity.ok(CommonApiResponse.success(response));
   }
 

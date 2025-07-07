@@ -11,6 +11,8 @@ public enum PaymentErrorCode implements BaseErrorCode {
 
   PAYMENT_ALREADY_PAID(HttpStatus.CONFLICT, "PAYMENT_ALREADY_PAID", "이미 결제가 완료된 예약입니다."),
   PAYMENT_ALREADY_REFUNDED(HttpStatus.CONFLICT, "PAYMENT_ALREADY_REFUNDED", "이미 환불이 완료된 결제입니다."),
+  ALREADY_FULLY_REFUNDED(HttpStatus.CONFLICT, "ALREADY_FULLY_REFUNDED", "이미 전액 환불된 결제입니다."),
+  ALREADY_HAS_APPROVED_REFUND(HttpStatus.CONFLICT, "ALREADY_HAS_APPROVED_REFUND", "이미 승인/완료된 환불 내역이 존재합니다."),
 
   PAYMENT_ACCESS_DENIED(HttpStatus.FORBIDDEN, "PAYMENT_ACCESS_DENIED", "본인의 결제가 아닙니다."),
 

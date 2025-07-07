@@ -22,4 +22,6 @@ public interface RefundRepository extends JpaRepository<Refund, Long> {
   // Refund 테이블에서 Payment로 조인 → 다시 Payment의 Reservation → Reservation의 customerId를 기준으로 조회
   Page<Refund> findByPayment_Reservation_CustomerId(Long customerId, Pageable pageable);
 
+  // 관리자가 환불을 시도할 때 중복 환불 여부 체크
+  boolean existsByPayment_IdAndStatusIn(Long paymentId, List<RefundStatus> statuses);
 }
