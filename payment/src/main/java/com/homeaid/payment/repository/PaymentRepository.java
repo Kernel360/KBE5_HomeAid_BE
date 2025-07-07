@@ -11,7 +11,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface PaymentRepository extends JpaRepository<Payment, Long> {
 
-  List<Payment> findAllByReservation_ManagerIdAndPaidAtBetween(Long managerId, LocalDateTime start, LocalDateTime end);
+  //List<Payment> findAllByReservation_ManagerIdAndPaidAtBetween(Long managerId, LocalDateTime start, LocalDateTime end);
   boolean existsByReservationId(Long reservationId); // 중복 결제 방지
 
   @Query("SELECT p FROM Payment p WHERE p.reservation.customerId = :customerId")
@@ -39,4 +39,8 @@ public interface PaymentRepository extends JpaRepository<Payment, Long> {
       "FROM Payment p " +
       "WHERE YEAR(p.paidAt) = :year AND MONTH(p.paidAt) = :month AND p.status = com.homeaid.payment.domain.enumerate.PaymentStatus.PAID")
   Object findPaymentMethodSums(@Param("year") int year, @Param("month") int month);
+
+  List<Payment> findAllByReservation_ManagerIdAndPaidAtBetween(Long managerId, LocalDateTime start, LocalDateTime end);
+
+
 }
