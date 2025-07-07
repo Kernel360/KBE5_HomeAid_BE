@@ -90,8 +90,7 @@ public class ReservationServiceImpl implements ReservationService {
   @Transactional
   public Reservation updateReservation(Long reservationId, Long userId, Reservation newReservation,
       Long serviceOptionId) {
-    Reservation originReservation = reservationRepository.findById(reservationId)
-        .orElseThrow(() -> new CustomException(ReservationErrorCode.RESERVATION_NOT_FOUND));
+    Reservation originReservation = getReservationById(reservationId);
 
     if (!originReservation.getCustomerId().equals(userId)) {
       log.warn("[예약 수정 실패] 권한 없음 - reservationId={}, userId={}", reservationId, userId);
@@ -103,8 +102,7 @@ public class ReservationServiceImpl implements ReservationService {
       throw new CustomException(ReservationErrorCode.RESERVATION_CANNOT_UPDATE);
     }
 
-    ServiceOption serviceOption = serviceOptionRepository.findById(serviceOptionId)
-        .orElseThrow(() -> new CustomException(ReservationErrorCode.SERVICE_OPTION_NOT_FOUND));
+    ServiceOption serviceOption = getServiceOptionById(serviceOptionId);
 
     originReservation.updateReservation(newReservation, serviceOption.getPrice(),
         newReservation.getDuration());
@@ -120,8 +118,7 @@ public class ReservationServiceImpl implements ReservationService {
   @Transactional
   public void deleteReservation(Long reservationId, Long userId) {
 
-    Reservation reservation = reservationRepository.findById(reservationId)
-        .orElseThrow(() -> new CustomException(ReservationErrorCode.RESERVATION_NOT_FOUND));
+    Reservation reservation = getReservationById(reservationId);
 
     if (!reservation.getCustomerId().equals(userId)) {
       log.warn("[예약 삭제 실패] 권한 없음 - reservationId={}, userId={}", reservationId, userId);
