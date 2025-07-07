@@ -1,17 +1,13 @@
 package com.homeaid.payment.service;
 
-import com.homeaid.domain.Reservation;
 import com.homeaid.payment.domain.Payment;
 import com.homeaid.payment.domain.Refund;
 import com.homeaid.payment.domain.enumerate.RefundStatus;
 import com.homeaid.payment.dto.request.RefundRequestDto;
 import com.homeaid.payment.dto.response.RefundResponseDto;
-import com.homeaid.payment.exception.PaymentErrorCode;
 import com.homeaid.payment.exception.RefundErrorCode;
 import com.homeaid.payment.policy.RefundPolicyCalculator;
-import com.homeaid.payment.repository.PaymentRepository;
 import com.homeaid.payment.validator.RefundValidator;
-import com.homeaid.repository.ReservationRepository;
 import com.homeaid.payment.repository.RefundRepository;
 import com.homeaid.exception.CustomException;
 import lombok.extern.slf4j.Slf4j;
@@ -21,9 +17,7 @@ import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 
 @Slf4j
 @Service
@@ -31,7 +25,6 @@ import java.time.temporal.ChronoUnit;
 public class RefundServiceImpl implements RefundService {
 
   private final RefundRepository refundRepository;
-  private final PaymentRepository paymentRepository;
   private final RefundValidator refundValidator;
   private final RefundPolicyCalculator refundPolicyCalculator;
 
