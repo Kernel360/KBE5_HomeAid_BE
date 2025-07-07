@@ -9,10 +9,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import java.io.IOException;
-import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -106,30 +104,6 @@ public class SseNotificationService {
         updateSentAlerts(Collections.singletonList(notification));
     }
 
-    @Scheduled(fixedDelay = 30000) //60초
-    @Transactional(readOnly = true) // 읽기 전용으로 명시
-    public void unSentAllNotifications() {
-        Set<Long> connectionIds = connections.keySet();
-
-        // 최근 10분 내 생성 + 5분 이상 전송 안한 알림
-        LocalDateTime recentCutoff = LocalDateTime.now().minusMinutes(10);
-        LocalDateTime sendCutoff = LocalDateTime.now().minusMinutes(5);
-
-        if (connectionIds.isEmpty()) {
-            return;
-        }
-        try {
-            List<Notification> onlineUserAlerts = notificationService.getUnReadAlerts(connectionIds, recentCutoff, sendCutoff);
-            List<Notification> onlineAdminAlerts = notificationService.getUnreadAdminAlerts(recentCutoff, sendCutoff);
-
-            processUserAlerts(onlineUserAlerts);
-            processAdminAlerts(onlineAdminAlerts);
-        } catch (Exception e) {
-            log.error("스케줄러 실행 중 오류 발생", e);
-        }
-
-    }
-
     @Scheduled(fixedRate = 30000) // 30초마다
     public void sendHeartbeat() {
         List<Long> zombieConnections = new ArrayList<>();
@@ -177,38 +151,6 @@ public class SseNotificationService {
 
     private void removeConnection(Long userId) {
         connections.remove(userId);
-    }
-
-    // SSE DB 분리
-    private void processUserAlerts(List<Notification> alerts) {
-        List<Notification> successfullySent = new ArrayList<>();
-
-        for (Notification alert : alerts) {
-            try {
-                boolean sent = sendAlertToUser(alert.getTargetId(), ResponseAlert.toDto(alert));
-                if (sent) {
-                    successfullySent.add(alert);
-                }
-            } catch (Exception e) {
-                log.error("알림 전송 실패: alertId={}", alert.getId(), e);
-            }
-        }
-
-        // 성공한 알림만 DB 업데이트
-        if (!successfullySent.isEmpty()) {
-            updateSentAlerts(successfullySent);
-        }
-    }
-
-    private void processAdminAlerts(List<Notification> alerts) {
-        if (!alerts.isEmpty()) {
-            try {
-                broadcastAdminAlert(alerts);
-                updateSentAlerts(alerts);
-            } catch (Exception e) {
-                log.error("관리자 알림 전송 실패", e);
-            }
-        }
     }
 
     public void updateSentAlerts(List<Notification> notifications) {

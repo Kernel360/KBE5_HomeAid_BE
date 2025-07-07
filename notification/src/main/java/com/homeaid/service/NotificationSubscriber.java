@@ -1,7 +1,6 @@
 package com.homeaid.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.homeaid.dto.RequestAlert;
 import com.homeaid.exception.CustomException;
@@ -35,6 +34,7 @@ public class NotificationSubscriber implements MessageListener {
                 sseNotificationService.createAdminAlertByRequestAlert(requestAlert);
             }
         } catch (JsonProcessingException e) {
+            log.error("알림 처리 실패", e);
             throw new CustomException(NotificationErrorCode.MESSAGE_CONVERT_JSON_FAIL);
         }
 

@@ -34,7 +34,7 @@ public class MatchingServiceImpl implements MatchingService {
   private final ReservationRepository reservationRepository;
   private final MatchingRepository matchingRepository;
   private final RegionValidator regionValidator;
-  private final SseNotificationService sseNotificationService;
+  private final NotificationPublisher notificationPublisher;
 
   @Override
   @Transactional
@@ -64,7 +64,7 @@ public class MatchingServiceImpl implements MatchingService {
             .targetRole(UserRole.MANAGER)
             .relatedEntityId(matchingId)
             .build();
-    sseNotificationService.createAlertByRequestAlert(requestAlert);
+    notificationPublisher.publishNotification(requestAlert);
 
     return matchingId;
   }
@@ -101,7 +101,7 @@ public class MatchingServiceImpl implements MatchingService {
               .targetRole(UserRole.CUSTOMER)
               .relatedEntityId(matching.getReservation().getId())
               .build();
-      sseNotificationService.createAlertByRequestAlert(requestAlert); //고객 알람용
+      notificationPublisher.publishNotification(requestAlert);
     }
 
     RequestAlert requestAdminAlert = RequestAlert.builder()
@@ -110,9 +110,7 @@ public class MatchingServiceImpl implements MatchingService {
             .relatedEntityId(matching.getReservation().getId())
             .content(memo)
             .build();
-
-    sseNotificationService.createAdminAlertByRequestAlert(requestAdminAlert); //관리자 알람용
-
+    notificationPublisher.publishAdminNotification(requestAdminAlert);
   }
 
   @Override
@@ -150,7 +148,7 @@ public class MatchingServiceImpl implements MatchingService {
             .relatedEntityId(matching.getReservation().getId())
             .content(memo)
             .build();
-    sseNotificationService.createAlertByRequestAlert(requestAlert);//고객 알람용
+    notificationPublisher.publishNotification(requestAlert);
 
     RequestAlert requestAdminAlert = RequestAlert.builder()
             .notificationEventType(notificationEventType)
@@ -158,7 +156,7 @@ public class MatchingServiceImpl implements MatchingService {
             .relatedEntityId(matching.getReservation().getId())
             .content(memo)
             .build();
-    sseNotificationService.createAdminAlertByRequestAlert(requestAdminAlert);//관리자 알람용
+    notificationPublisher.publishAdminNotification(requestAdminAlert);
 
   }
 

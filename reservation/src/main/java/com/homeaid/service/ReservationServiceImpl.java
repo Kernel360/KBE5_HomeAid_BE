@@ -45,7 +45,8 @@ public class ReservationServiceImpl implements ReservationService {
   private final MatchingRepository matchingRepository;
 
   private final ServiceOptionRepository serviceOptionRepository;
-  private final SseNotificationService sseNotificationService;
+
+  private final NotificationPublisher notificationPublisher;
 
   @Override
   @Transactional
@@ -62,7 +63,7 @@ public class ReservationServiceImpl implements ReservationService {
             .targetRole(UserRole.ADMIN)
             .relatedEntityId(savedReservation.getId())
             .build();
-    sseNotificationService.createAdminAlertByRequestAlert(requestAlert);
+    notificationPublisher.publishAdminNotification(requestAlert);
 
     return savedReservation;
   }

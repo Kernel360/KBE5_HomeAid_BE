@@ -9,8 +9,8 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class NotificationPublisher {
     private final RedisTemplate<String, Object> redisTemplate;
-    static final String NOTIFICATION_CHANNEL = "notification_channel";
-    static final String NOTIFICATION_ADMIN_CHANNEL = "notification_admin_channel";
+    public static final String NOTIFICATION_CHANNEL = "notification_channel";
+    public static final String NOTIFICATION_ADMIN_CHANNEL = "notification_admin_channel";
 
     public void publishNotification(RequestAlert alert) {
         redisTemplate.convertAndSend(NOTIFICATION_CHANNEL, alert);

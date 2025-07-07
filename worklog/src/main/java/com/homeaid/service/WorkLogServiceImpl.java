@@ -27,7 +27,7 @@ public class WorkLogServiceImpl implements WorkLogService {
   private final ReservationRepository reservationRepository;
   private final static int CHECK_RANGE_DISTANCE_METER = 1000; //500미터
   private final MatchingRepository matchingRepository;
-  private final SseNotificationService sseNotificationService;
+  private final NotificationPublisher notificationPublisher;
 
   @Transactional
   @Override
@@ -51,7 +51,7 @@ public class WorkLogServiceImpl implements WorkLogService {
             .notificationEventType(NotificationEventType.WORK_CHECKIN)
             .relatedEntityId(reservationId)
             .build();
-    sseNotificationService.createAlertByRequestAlert(requestAlert);
+    notificationPublisher.publishNotification(requestAlert);
 
     return workLogRepository.save(workLog);
   }
@@ -76,7 +76,7 @@ public class WorkLogServiceImpl implements WorkLogService {
             .notificationEventType(NotificationEventType.WORK_CHECKOUT)
             .relatedEntityId(reservationId)
             .build();
-    sseNotificationService.createAlertByRequestAlert(requestAlert);
+    notificationPublisher.publishNotification(requestAlert);
   }
 
   @Override
