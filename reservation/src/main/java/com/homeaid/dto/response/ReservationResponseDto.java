@@ -2,7 +2,6 @@ package com.homeaid.dto.response;
 
 
 import com.homeaid.domain.Customer;
-import com.homeaid.domain.Manager;
 import com.homeaid.domain.Reservation;
 import com.homeaid.domain.enumerate.MatchingStatus;
 import com.homeaid.domain.enumerate.ReservationStatus;
@@ -86,7 +85,7 @@ public class ReservationResponseDto {
         .totalPrice(reservation.getTotalPrice())
         .totalDuration(reservation.getDuration())
         .serviceOptionName(reservation.getItem().getServiceOptionName())
-        .customerId(reservation.getCustomerId())
+        .customerId(reservation.getCustomer().getId())
         .startTime(LocalDateTime.of(
             reservation.getRequestedDate(),
             reservation.getRequestedTime()
@@ -105,7 +104,7 @@ public class ReservationResponseDto {
         .totalPrice(reservation.getTotalPrice())
         .totalDuration(reservation.getDuration())
         .serviceOptionName(reservation.getItem().getServiceOptionName())
-        .customerId(reservation.getCustomerId())
+        .customerId(reservation.getCustomer().getId())
         .managerId(reservation.getManagerId())
         .requestedDate(reservation.getRequestedDate())
         .requestedTime(reservation.getRequestedTime())

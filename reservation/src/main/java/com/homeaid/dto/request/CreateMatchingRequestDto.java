@@ -1,7 +1,5 @@
 package com.homeaid.dto.request;
 
-import com.homeaid.domain.Matching;
-import com.homeaid.domain.enumerate.MatchingStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
@@ -20,12 +18,5 @@ public class CreateMatchingRequestDto {
   @Schema(description = "매니저 ID", example = "2")
   private Long managerId;
 
-  public static Matching toEntity() {
-    return Matching.builder()
-        .status(MatchingStatus.REQUESTED)
-        .managerStatus(MatchingStatus.REQUESTED)
-        .customerStatus(MatchingStatus.REQUESTED)
-        .build();
-  }
 
 }

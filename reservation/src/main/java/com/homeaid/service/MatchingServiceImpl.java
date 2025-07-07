@@ -38,8 +38,7 @@ public class MatchingServiceImpl implements MatchingService {
 
   @Override
   @Transactional
-  public Long createMatching(Long managerId, Long reservationId,
-      Matching matching) {
+  public void createMatching(Long managerId, Long reservationId) {
 
     Manager manager = managerRepository.findById(managerId)
         .orElseThrow(() -> new CustomException(
@@ -49,14 +48,9 @@ public class MatchingServiceImpl implements MatchingService {
         .orElseThrow(() -> new CustomException(
             ReservationErrorCode.RESERVATION_NOT_FOUND));
 
-    matching.setReservationAndManagerAndMatchingRound(reservation, manager,
-        calculateNextMatchingRound(reservationId));
-
-    reservation.setManagerId(manager.getId());
-
-    reservation.updateStatusMatching();
+    Matching newMatching = reservation.createMatching(manager);
     
-    Long matchingId = matchingRepository.save(matching).getId();
+    reservationRepository.save(reservation);
 
     RequestAlert createdAlert = RequestAlert.createAlert(AlertType.JOB_OFFER, managerId, UserRole.MANAGER, matchingId, null);
     notificationPublisher.publishNotification(createdAlert);

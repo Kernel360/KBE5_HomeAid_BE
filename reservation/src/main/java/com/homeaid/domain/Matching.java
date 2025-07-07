@@ -23,6 +23,7 @@ public class Matching {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
+  @Setter
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "reservation_id", nullable = false)
   private Reservation reservation;
@@ -37,17 +38,17 @@ public class Matching {
 
   @Enumerated(EnumType.STRING)
   @Column(nullable = false)
-  private MatchingStatus status; // ex. CONFIRMED, REJECTED
+  private MatchingStatus status;
 
 
   @Enumerated(EnumType.STRING)
   @Column(nullable = false)
-  private MatchingStatus managerStatus; // REQUESTED, ACCEPTED, REJECTED
+  private MatchingStatus managerStatus;
 
 
   @Enumerated(EnumType.STRING)
   @Column(nullable = false)
-  private MatchingStatus customerStatus; // WAITING, CONFIRMED, REJECTED
+  private MatchingStatus customerStatus;
 
   private LocalDateTime matchedAt;
 
@@ -65,23 +66,36 @@ public class Matching {
   private LocalDateTime modifiedDate;
 
 
-  public void setReservationAndManagerAndMatchingRound(Reservation reservation, Manager manager, int matchingRound) {
-    this.reservation = reservation;
-    this.manager = manager;
-    this.matchingRound = matchingRound;
+//  public void setReservationAndManagerAndMatchingRound(Reservation reservation, Manager manager,
+//      int matchingRound) {
+//    this.reservation = reservation;
+//    this.manager = manager;
+//    this.matchingRound = matchingRound;
+//  }
+
+  public static Matching create(Manager manger, int matchingRound) {
+    return Matching.builder()
+        .status(MatchingStatus.REQUESTED)
+        .managerStatus(MatchingStatus.REQUESTED)
+        .customerStatus(MatchingStatus.REQUESTED)
+        .manager(manger)
+        .matchingRound(matchingRound)
+        .build();
   }
 
   @Builder
-  public Matching(MatchingStatus status, MatchingStatus managerStatus, MatchingStatus customerStatus) {
+  public Matching(MatchingStatus status, MatchingStatus managerStatus,
+      MatchingStatus customerStatus, Manager manager, int matchingRound) {
     this.status = status;
     this.managerStatus = managerStatus;
     this.customerStatus = customerStatus;
+    this.manager = manager;
+    this.matchingRound = matchingRound;
   }
 
   public void acceptByManager() {
     this.managerStatus = MatchingStatus.ACCEPTED;
     this.status = MatchingStatus.ACCEPTED;
-//    this.reservation.setFinalMatchingId(this.id);
   }
 
   public void rejectByManager(String memo) {

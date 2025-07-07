@@ -46,13 +46,13 @@ public class MatchingController {
 
   @PostMapping("/admin/matchings")
   @Operation(summary = "매칭 생성", description = "관리자가 예약과 매니저 정보를 기반으로 매칭을 생성합니다.")
-  public ResponseEntity<CommonApiResponse<Long>> createMatching(
+  public ResponseEntity<CommonApiResponse<Void>> createMatching(
       @Valid @RequestBody CreateMatchingRequestDto matchingRequestDto) {
 
-    Long matchingId = matchingService.createMatching(matchingRequestDto.getManagerId(),
-        matchingRequestDto.getReservationId(), CreateMatchingRequestDto.toEntity());
+    matchingService.createMatching(matchingRequestDto.getManagerId(),
+        matchingRequestDto.getReservationId());
     return ResponseEntity.status(HttpStatus.CREATED)
-        .body(CommonApiResponse.success(matchingId));
+        .body(CommonApiResponse.success());
   }
 
   @PatchMapping("/manager/matchings/{reservationId}/to-customer")

@@ -151,5 +151,14 @@ public class Reservation {
   public Optional<Matching> getLatestMatching() {
     return matchingList.stream().findFirst();
   }
+
+  public Matching createMatching(Manager manager) {
+    Matching newMatching = Matching.create(manager, matchingList.size());
+    newMatching.setReservation(this);
+    updateStatusMatching();
+    this.matchingList.add(newMatching);
+    return newMatching;
+  }
+
 }
 

@@ -11,7 +11,7 @@ import org.springframework.data.domain.Pageable;
 
 public interface MatchingService {
 
-  Long createMatching(Long managerId, Long reservationId, Matching matching);
+  void createMatching(Long managerId, Long reservationId);
 
   void respondToMatchingAsManager(Long userId, Long reservationId, ManagerAction action, String memo);
 
