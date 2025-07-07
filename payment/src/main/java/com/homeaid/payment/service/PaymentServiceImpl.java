@@ -93,6 +93,17 @@ public class PaymentServiceImpl implements PaymentService {
         .collect(Collectors.toList());
   }
 
+  @Override
+  @Transactional(readOnly = true)
+  public PaymentResponseDto getPaymentDetail(Long customerId, Long paymentId) {
+    Payment payment = paymentRepository.findById(paymentId)
+        .orElseThrow(() -> new CustomException(PaymentErrorCode.PAYMENT_NOT_FOUND));
+
+    paymentValidator.validatePaymentOwnership(payment, customerId);
+
+    return toDtoWithNames(payment);
+  }
+
   private PaymentResponseDto toDtoWithNames(Payment payment) {
     String customerName = getCustomerName(payment.getReservation().getCustomerId());
     return PaymentResponseDto.toDto(payment, customerName);
