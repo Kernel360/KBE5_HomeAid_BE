@@ -2,7 +2,6 @@ package com.homeaid.service;
 
 
 import com.homeaid.domain.Customer;
-import com.homeaid.domain.Manager;
 import com.homeaid.domain.Matching;
 import com.homeaid.domain.Reservation;
 import com.homeaid.domain.ReservationItem;
@@ -20,7 +19,6 @@ import com.homeaid.serviceoption.domain.ServiceOption;
 import com.homeaid.serviceoption.repository.ServiceOptionRepository;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -39,8 +37,6 @@ public class ReservationServiceImpl implements ReservationService {
   private final ReservationRepository reservationRepository;
 
   private final CustomerRepository customerRepository;
-
-  private final ManagerRepository managerRepository;
 
   private final MatchingRepository matchingRepository;
 
