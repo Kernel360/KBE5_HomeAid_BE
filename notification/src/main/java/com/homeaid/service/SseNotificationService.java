@@ -103,6 +103,7 @@ public class SseNotificationService {
         }
 
         broadcastAdminAlert(Collections.singletonList(notification));
+        updateSentAlerts(Collections.singletonList(notification));
     }
 
     @Scheduled(fixedDelay = 30000) //60초
@@ -161,7 +162,6 @@ public class SseNotificationService {
                         removeConnection(adminId);
                     }
                 });
-        notifications.forEach(Notification::markAsSent);
     }
 
     public void gracefulDisconnect(Long userId) {
