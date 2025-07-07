@@ -166,19 +166,31 @@ public class AdminSettlementServiceImpl implements AdminSettlementService {
   }
 
   // 관리자용 상세 조회
-  @Override
   public SettlementWithManagerResponseDto getSettlementWithManager(Long settlementId) {
+    // Settlement 조회
     Settlement settlement = findById(settlementId);
 
+    // Manager 조회
     Manager manager = managerRepository.findById(settlement.getManagerId())
         .orElseThrow(() -> new CustomException(SettlementErrorCode.MANAGER_NOT_FOUND));
 
-    List<Payment> payments = getValidPaymentsForWeek(
-        manager.getId(),
-        settlement.getSettlementWeekStart(),
-        settlement.getSettlementWeekEnd()
-    );
+    // Settlement 기간 기준으로 결제내역 조회
+    List<Payment> payments = getPaymentsForSettlement(settlement);
 
     return SettlementWithManagerResponseDto.from(settlement, manager, payments);
+  }
+
+  private List<Payment> getPaymentsForSettlement(Settlement settlement) {
+    LocalDateTime start = settlement.getSettlementWeekStart().atStartOfDay();
+    LocalDateTime end = settlement.getSettlementWeekEnd().atTime(23, 59, 59);
+
+    List<Payment> payments = paymentRepository.findAllByReservation_ManagerIdAndPaidAtBetween(
+        settlement.getManagerId(), start, end);
+
+    if (payments.isEmpty()) {
+      throw new CustomException(SettlementErrorCode.NO_PAYMENTS_FOUND);
+    }
+
+    return payments;
   }
 }
