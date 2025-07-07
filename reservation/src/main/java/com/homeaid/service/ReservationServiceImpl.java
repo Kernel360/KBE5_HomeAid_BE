@@ -51,9 +51,10 @@ public class ReservationServiceImpl implements ReservationService {
   @Override
   @Transactional
   public Reservation createReservation(Reservation reservation, Long serviceOptionId) {
-    log.info("[예약 생성] customerId={}, serviceOptionId={}", reservation.getCustomerId(), serviceOptionId);
-    ServiceOption serviceOption = serviceOptionRepository.findById(serviceOptionId)
-        .orElseThrow(() -> new CustomException(ReservationErrorCode.RESERVATION_NOT_FOUND));
+    log.info("[예약 생성] customerId={}, serviceOptionId={}", reservation.getCustomerId(),
+        serviceOptionId);
+
+    ServiceOption serviceOption = getServiceOptionById(serviceOptionId);
     reservation.addItem(serviceOption);
 
     Reservation savedReservation = reservationRepository.save(reservation);
@@ -245,4 +246,15 @@ public class ReservationServiceImpl implements ReservationService {
       throw new CustomException(ReservationErrorCode.USER_ACCESS_DENIED);
     }
   }
+
+  private ServiceOption getServiceOptionById(Long serviceOptionId) {
+    return serviceOptionRepository.findById(serviceOptionId)
+        .orElseThrow(() -> new CustomException(ReservationErrorCode.RESERVATION_NOT_FOUND));
+  }
+
+  private Reservation getReservationById(Long reservationId) {
+    return reservationRepository.findById(reservationId)
+        .orElseThrow(() -> new CustomException(ReservationErrorCode.RESERVATION_NOT_FOUND));
+  }
+
 }
