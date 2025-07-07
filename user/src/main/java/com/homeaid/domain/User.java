@@ -49,6 +49,7 @@ public class User {
   @Column(unique = true, nullable = false)
   private String phone;
 
+  @Column
   private LocalDate birth;
 
   @Enumerated(EnumType.STRING)
@@ -63,6 +64,10 @@ public class User {
   @Column(name = "profile_image_s3_key") // 삭제를 위한 S3 키
   private String profileImageS3Key;
 
+  private String provider; // ex: google
+
+  private String providerId; // 구글 로그인 유저의 고유 ID
+
   @Column(nullable = false)
   private Boolean deleted = false;
 
@@ -72,6 +77,18 @@ public class User {
 
   @LastModifiedDate
   private LocalDateTime updatedAt;
+
+  public static User createOAuth2User(String provider, String providerId, String email, String name,
+                                      String imageUrl, UserRole userRole) {
+      User user = new User();
+      user.provider = provider;
+      user.providerId = providerId;
+      user.email = email;
+      user.name = name;
+      user.profileImageUrl = imageUrl;
+      user.role = userRole;
+      return user;
+  }
 
   public void delete() {
     this.deleted = true;
@@ -87,7 +104,6 @@ public class User {
 
   public User(String email, String password, String name, String phone, LocalDate birth,
       GenderType gender, UserRole role) {
-
     this.email = email;
     this.password = password;
     this.name = name;
@@ -103,12 +119,6 @@ public class User {
     this.role = role;
   }
 
-//  public User(String email, UserRole role, String encodedPassword) {
-//    this.email = email;
-//    this.password = encodedPassword;
-//    this.role = role;
-//  }
-
   public void updateInfo(String name, String email, String phone) {
     this.name = name;
     this.email = email;
@@ -119,4 +129,19 @@ public class User {
     this.profileImageS3Key = s3Key;
   }
 
+  public void AdditionalOAuthInfo(String phone, LocalDate birth, GenderType gender, UserRole role) {
+    this.phone = phone;
+    this.birth = birth;
+    this.gender = gender;
+    this.role = role;
+  }
+
+  public void updateOAuthProfile(String name, String picture) {
+    this.name = name;
+    this.profileImageUrl = picture;
+  }
+
+  public boolean isProfileComplete() {
+    return this.phone != null && this.birth != null;
+  }
 }

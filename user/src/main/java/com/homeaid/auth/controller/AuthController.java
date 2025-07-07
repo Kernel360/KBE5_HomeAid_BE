@@ -1,6 +1,7 @@
 package com.homeaid.auth.controller;
 
 import com.homeaid.auth.dto.TokenResponse;
+import com.homeaid.auth.dto.request.AdditionalUserInfoDto;
 import com.homeaid.common.response.CommonApiResponse;
 import com.homeaid.domain.Customer;
 import com.homeaid.domain.Manager;
@@ -10,6 +11,10 @@ import com.homeaid.auth.dto.response.SignUpResponseDto;
 import com.homeaid.auth.service.AuthService;
 import com.homeaid.auth.service.AuthServiceImpl;
 import com.homeaid.auth.util.CookieUtil;
+import com.homeaid.domain.User;
+import com.homeaid.exception.CustomException;
+import com.homeaid.exception.UserErrorCode;
+import com.homeaid.repository.UserRepository;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -18,6 +23,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.CookieValue;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -30,6 +36,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthController {
 
   private final AuthService authService;
+  private final UserRepository userRepository;
   private final BCryptPasswordEncoder passwordEncoder;
   private final AuthServiceImpl authServiceImpl;
   private final CookieUtil cookieUtil;
@@ -62,6 +69,16 @@ public class AuthController {
     );
     return ResponseEntity.status(HttpStatus.CREATED)
         .body(CommonApiResponse.success(SignUpResponseDto.toCustomerDto(customer)));
+  }
+
+  @PatchMapping("/oauth/additional-profile")
+  public ResponseEntity<Void> updateAdditionalUserInfo(@RequestBody AdditionalUserInfoDto dto) {
+    User user = userRepository.findByEmail(dto.getEmail())
+        .orElseThrow(() -> new CustomException(UserErrorCode.USER_NOT_FOUND));
+
+    user.AdditionalOAuthInfo(dto.getPhone(), dto.getBirth(), dto.getGender(), dto.getUserRole());
+    userRepository.save(user);
+    return ResponseEntity.ok().build();
   }
 
   @PostMapping("/logout")

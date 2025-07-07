@@ -27,7 +27,6 @@ import org.springframework.web.filter.OncePerRequestFilter;
 public class AccessTokenFilter extends OncePerRequestFilter {
 
   private final JwtTokenProvider jwtTokenProvider;
-//  private final CustomUserDetailsService customUserDetailsService;
   private final ObjectMapper objectMapper = new ObjectMapper();
   private static final String TOKEN_PREFIX = "Bearer ";
   private final TokenBlacklistService tokenBlacklistService;
