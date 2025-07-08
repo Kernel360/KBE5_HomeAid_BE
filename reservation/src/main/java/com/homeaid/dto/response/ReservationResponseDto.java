@@ -56,10 +56,13 @@ public class ReservationResponseDto {
   @Schema(description = "매칭된 매니저 이름", example = "김매니저")
   private String matchedManagerName;
 
-  private MatchingStatus matchingStatus;
-
+  @Schema(description = "서비스 옵션 이름", example = "청소")
   private String serviceOptionName;
 
+  @Schema(description = "매칭 상태", example = "REQUESTED")
+  private MatchingStatus matchingStatus;
+
+  @Schema(description = "고객 메모", example = "집에 개가 있어요.")
   private String customerMemo;
 
   public static ReservationResponseDto toDto(Reservation reservation, String customerName, String managerName) {

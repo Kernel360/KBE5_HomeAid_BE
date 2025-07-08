@@ -10,6 +10,7 @@ import com.homeaid.domain.enumerate.MatchingStatus;
 import com.homeaid.domain.enumerate.ReservationStatus;
 import com.homeaid.domain.enumerate.UserRole;
 import com.homeaid.dto.RequestAlert;
+import com.homeaid.dto.response.ReservationByManagerResponseDto;
 import com.homeaid.dto.response.ReservationResponseDto;
 import com.homeaid.exception.CustomException;
 import com.homeaid.exception.ReservationErrorCode;
@@ -50,7 +51,8 @@ public class ReservationServiceImpl implements ReservationService {
     log.info("[예약 생성] customerId={}, serviceOptionId={}", reservation.getCustomer().getId(),
         serviceOptionId);
 
-    Customer customer = customerRepository.findById(userId).orElseThrow(() -> new CustomException(UserErrorCode.CUSTOMER_NOT_FOUND));
+    Customer customer = customerRepository.findById(userId)
+        .orElseThrow(() -> new CustomException(UserErrorCode.CUSTOMER_NOT_FOUND));
 
     ServiceOption serviceOption = getServiceOptionById(serviceOptionId);
 
@@ -153,7 +155,8 @@ public class ReservationServiceImpl implements ReservationService {
 
   @Override
   @Transactional(readOnly = true)
-  public Page<ReservationResponseDto> getReservationsByManager(Long managerId, Pageable pageable) {
+  public Page<ReservationByManagerResponseDto> getReservationsByManager(Long managerId,
+      Pageable pageable) {
     Page<Reservation> reservations = reservationRepository.findAllByManagerId(managerId, pageable);
 
     Map<Long, Customer> customerMap = batchGetCustomersFromReservations(reservations);
@@ -167,15 +170,10 @@ public class ReservationServiceImpl implements ReservationService {
         throw new CustomException(UserErrorCode.CUSTOMER_NOT_FOUND);
       }
 
-      Optional<Matching> matching = matchingRepository.findTopByReservationIdOrderByModifiedDateDesc(
-          reservation.getId());
+      Optional<Matching> matching = getLatestMatching(reservation);
 
-      if (matching.isPresent()) {
-        return ReservationResponseDto.toDtoForManager(reservation, customer,
-            matching.get().getStatus());
-      }
-
-      return ReservationResponseDto.toDtoForManager(reservation, customer, null);
+      return ReservationByManagerResponseDto.toDto(reservation, customer, matching.get()
+          .getStatus());
     });
   }
 
