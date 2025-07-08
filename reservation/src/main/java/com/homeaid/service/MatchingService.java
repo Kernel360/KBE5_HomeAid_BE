@@ -21,5 +21,5 @@ public interface MatchingService {
 
   Page<Matching> getMatchingListByManager(Long userId, Pageable pageable);
 
-  Matching getMatchingByManager(Long reservationId, Long userId);
+  Matching getMatchingByManager(Long matchingId, Long userId);
 }

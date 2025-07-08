@@ -3,7 +3,7 @@ package com.homeaid.service;
 
 import com.homeaid.domain.Reservation;
 import com.homeaid.domain.enumerate.ReservationStatus;
-import com.homeaid.dto.response.ReservationByManagerResponseDto;
+import com.homeaid.dto.response.ManagerReservationResponseDto;
 import com.homeaid.dto.response.ReservationResponseDto;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -23,7 +23,7 @@ public interface ReservationService {
 
   Page<Reservation> getReservationsByCustomer(Long userId, Pageable pageable);
 
-  Page<ReservationByManagerResponseDto> getReservationsByManager(Long userId, Pageable pageable);
+  Page<ManagerReservationResponseDto> getReservationsByManager(Long userId, Pageable pageable);
 
   Reservation validateReservation(Long reservationId);
 

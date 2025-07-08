@@ -20,7 +20,6 @@ import com.homeaid.repository.ReservationRepository;
 import com.homeaid.util.RegionValidator;
 import java.time.LocalTime;
 import java.util.List;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -167,6 +166,7 @@ public class MatchingServiceImpl implements MatchingService {
 
   // 매니저 매칭 전체 조회
   @Override
+  @Transactional(readOnly = true)
   public Page<Matching> getMatchingListByManager(Long userId, Pageable pageable) {
     if (managerRepository.findById(userId).isEmpty()) {
       throw new CustomException(UserErrorCode.MANAGER_NOT_FOUND);
@@ -176,11 +176,9 @@ public class MatchingServiceImpl implements MatchingService {
 
   // 매니저 매칭 단건 조회
   @Override
-  public Matching getMatchingByManager(Long reservationId, Long userId) {
-    if (managerRepository.findById(userId).isEmpty()) {
-      throw new CustomException(UserErrorCode.MANAGER_NOT_FOUND);
-    }
-    return matchingRepository.findTopByReservationIdOrderByModifiedDateDesc(reservationId).get();
+  @Transactional(readOnly = true)
+  public Matching getMatchingByManager(Long matchingId, Long userId) {
+    return getMatchingById(matchingId);
   }
 
   private Reservation findReservationById(Long reservationId) {

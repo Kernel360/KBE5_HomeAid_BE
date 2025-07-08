@@ -117,19 +117,4 @@ public class ReservationResponseDto {
         .build();
   }
 
-  public static ReservationResponseDto toDtoForManager(Reservation reservation, Customer customer, MatchingStatus matchingStatus) {
-    return ReservationResponseDto.builder()
-        .reservationId(reservation.getId())
-        .status(reservation.getStatus())
-        .serviceOptionName(reservation.getItem().getServiceOptionName())
-        .startTime(LocalDateTime.of(
-            reservation.getRequestedDate(),
-            reservation.getRequestedTime()
-        ))
-        .matchingStatus(matchingStatus)
-        .customerName(customer.getName())
-        .build();
-  }
-
-
 }

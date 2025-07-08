@@ -6,6 +6,7 @@ import com.homeaid.domain.Matching;
 import com.homeaid.dto.request.CreateMatchingRequestDto;
 import com.homeaid.dto.request.MatchingCustomerResponseDto;
 import com.homeaid.dto.request.MatchingManagerResponseDto;
+import com.homeaid.dto.response.ManagerMatchingResponseDto;
 import com.homeaid.dto.response.MatchingRecommendationResponseDto;
 import com.homeaid.dto.response.MatchingResponseDto;
 import com.homeaid.auth.user.CustomUserDetails;
@@ -129,7 +130,7 @@ public class MatchingController {
   }
 
   // 매니저 담당 매칭 상세 조회
-  @GetMapping("manager/matchings/{reservationId}")
+  @GetMapping("/manager/matchings/{matchingId}")
   @Operation(summary = "매니저 매칭 단건 조회", description = "매니저 매칭 단건 조회")
   @ApiResponses(value = {
       @ApiResponse(responseCode = "200", description = "매니저 매칭 단건 조회 성공",
@@ -141,15 +142,15 @@ public class MatchingController {
       @ApiResponse(responseCode = "404", description = "해당 매니저의 매칭 존재하지 않음",
           content = @Content(schema = @Schema(implementation = CommonApiResponse.class)))
   })
-  public ResponseEntity<CommonApiResponse<MatchingResponseDto>> getMatching(
+  public ResponseEntity<CommonApiResponse<ManagerMatchingResponseDto>> getMatching(
       @Parameter(description = "조회할 매칭 ID", example = "1")
-      @PathVariable(name = "reservationId") Long reservationId,
+      @PathVariable(name = "matchingId") Long matchingId,
       @AuthenticationPrincipal CustomUserDetails customUserDetails
   ) {
     Long userId = customUserDetails.getUserId();
     return ResponseEntity.ok(
         CommonApiResponse.success(
-            MatchingResponseDto.toDtoForManagerMatching(matchingService.getMatchingByManager(reservationId, userId))));
+            ManagerMatchingResponseDto.toDto(matchingService.getMatchingByManager(matchingId, userId))));
   }
 
 

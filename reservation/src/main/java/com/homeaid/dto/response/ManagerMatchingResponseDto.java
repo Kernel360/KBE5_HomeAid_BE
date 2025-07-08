@@ -8,10 +8,10 @@ import java.time.LocalTime;
 import lombok.Builder;
 import lombok.Getter;
 
-@Getter
 @Builder
-@Schema(description = "매칭 상세 응답 DTO")
-public class MatchingResponseDto {
+@Getter
+@Schema(description = "매니저용 매칭 상세 응답 DTO")
+public class ManagerMatchingResponseDto {
 
   @Schema(description = "매칭 ID", example = "1001")
   private Long matchingId;
@@ -28,20 +28,8 @@ public class MatchingResponseDto {
   @Schema(description = "예상 소요 시간 (단위: 시간)", example = "3")
   private int estimatedDuration;
 
-  @Schema(description = "위도", example = "37.498095")
-  private Double latitude;
-
-  @Schema(description = "경도", example = "127.027610")
-  private Double longitude;
-
   @Schema(description = "고객 요청 사항", example = "주방 기름때 제거에 신경써주세요. 욕실 곰팡이도 깔끔하게 청소 부탁드립니다.")
   private String customerRequest;
-
-  @Schema(description = "매니저 매칭 상태", example = "REQUESTED, ACCEPTED, REJECTED")
-  private MatchingStatus managerStatus;
-
-  @Schema(description = "고객 매칭 상태", example = "WAITING, CONFIRMED, REJECTED")
-  private MatchingStatus customerStatus;
 
   @Schema(description = "매칭 상태", example = "REQUESTING")
   private MatchingStatus status;
@@ -52,20 +40,17 @@ public class MatchingResponseDto {
   @Schema(description = "주소", example = "서울특별시 강남구 강남대로 364 11층")
   private String fullAddress;
 
-  public static MatchingResponseDto toDto(Matching matching) {
-    return MatchingResponseDto.builder()
+  public static ManagerMatchingResponseDto toDto(Matching matching) {
+    return ManagerMatchingResponseDto.builder()
         .matchingId(matching.getId())
         .serviceType(matching.getReservation().getItem().getServiceOptionName())
         .reservedDate(matching.getReservation().getRequestedDate())
         .reservedTime(matching.getReservation().getRequestedTime())
         .estimatedDuration(matching.getReservation().getDuration())
-        .latitude(matching.getReservation().getLatitude())
-        .longitude(matching.getReservation().getLongitude())
+        .fullAddress(matching.getReservation().getAddress() + matching.getReservation().getAddressDetail())
         .customerRequest(matching.getReservation().getCustomerMemo())
-        .managerStatus(matching.getStatus())
-        .customerStatus(matching.getStatus())
-            .status(matching.getStatus())
-            .reservationId(matching.getReservation().getId())
+        .reservationId(matching.getReservation().getId())
+        .status(matching.getStatus())
         .build();
   }
 

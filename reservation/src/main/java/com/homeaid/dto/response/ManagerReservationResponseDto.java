@@ -13,7 +13,7 @@ import lombok.Getter;
 @Builder
 @Getter
 @Schema(description = "매니저용 예약 응답 DTO")
-public class ReservationByManagerResponseDto {
+public class ManagerReservationResponseDto {
 
   @Schema(description = "예약 ID", example = "101")
   private Long reservationId;
@@ -43,8 +43,8 @@ public class ReservationByManagerResponseDto {
   private MatchingStatus matchingStatus;
 
 
-  public static ReservationByManagerResponseDto toDto(Reservation reservation, Customer customer, Matching matching) {
-    return ReservationByManagerResponseDto.builder()
+  public static ManagerReservationResponseDto toDto(Reservation reservation, Customer customer, Matching matching) {
+    return ManagerReservationResponseDto.builder()
         .reservationId(reservation.getId())
         .matchingId(matching.getId())
         .status(reservation.getStatus())

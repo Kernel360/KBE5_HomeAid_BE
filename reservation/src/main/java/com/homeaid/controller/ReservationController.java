@@ -7,7 +7,7 @@ import com.homeaid.domain.Reservation;
 import com.homeaid.domain.enumerate.ReservationStatus;
 import com.homeaid.dto.request.ReservationRequestDto;
 import com.homeaid.dto.request.UpdateReservationRequestDto;
-import com.homeaid.dto.response.ReservationByManagerResponseDto;
+import com.homeaid.dto.response.ManagerReservationResponseDto;
 import com.homeaid.dto.response.ReservationResponseDto;
 import com.homeaid.auth.user.CustomUserDetails;
 import com.homeaid.service.ReservationService;
@@ -163,17 +163,17 @@ public class ReservationController {
    */
   @GetMapping("/manager")
   @Operation(summary = "매니저 담당 예약 전체 조회", description = "매니저가 담당 중인 예약을 페이지네이션으로 조회합니다.")
-  public ResponseEntity<CommonApiResponse<PagedResponseDto<ReservationByManagerResponseDto>>> getReservationsByManager(
+  public ResponseEntity<CommonApiResponse<PagedResponseDto<ManagerReservationResponseDto>>> getReservationsByManager(
       @AuthenticationPrincipal CustomUserDetails userDetails,
       @RequestParam(value = "page", defaultValue = "0") int page,
       @RequestParam(value = "size", defaultValue = "10") int size
   ) {
 
     Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdDate"));
-    Page<ReservationByManagerResponseDto> reservations = reservationService.getReservationsByManager(
+    Page<ManagerReservationResponseDto> reservations = reservationService.getReservationsByManager(
         userDetails.getUserId(), pageable);
 
-    PagedResponseDto<ReservationByManagerResponseDto> response = PagedResponseDto.fromPage(reservations);
+    PagedResponseDto<ManagerReservationResponseDto> response = PagedResponseDto.fromPage(reservations);
 
     return ResponseEntity.ok(CommonApiResponse.success(response));
   }

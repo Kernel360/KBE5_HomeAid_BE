@@ -10,7 +10,7 @@ import com.homeaid.domain.enumerate.MatchingStatus;
 import com.homeaid.domain.enumerate.ReservationStatus;
 import com.homeaid.domain.enumerate.UserRole;
 import com.homeaid.dto.RequestAlert;
-import com.homeaid.dto.response.ReservationByManagerResponseDto;
+import com.homeaid.dto.response.ManagerReservationResponseDto;
 import com.homeaid.dto.response.ReservationResponseDto;
 import com.homeaid.exception.CustomException;
 import com.homeaid.exception.ReservationErrorCode;
@@ -154,7 +154,7 @@ public class ReservationServiceImpl implements ReservationService {
 
   @Override
   @Transactional(readOnly = true)
-  public Page<ReservationByManagerResponseDto> getReservationsByManager(Long managerId,
+  public Page<ManagerReservationResponseDto> getReservationsByManager(Long managerId,
       Pageable pageable) {
     Page<Reservation> reservations = reservationRepository.findAllByManagerId(managerId, pageable);
 
@@ -171,7 +171,7 @@ public class ReservationServiceImpl implements ReservationService {
 
       Matching matching = getLatestMatching(reservation).get();
 
-      return ReservationByManagerResponseDto.toDto(reservation, customer, matching);
+      return ManagerReservationResponseDto.toDto(reservation, customer, matching);
     });
   }
 
