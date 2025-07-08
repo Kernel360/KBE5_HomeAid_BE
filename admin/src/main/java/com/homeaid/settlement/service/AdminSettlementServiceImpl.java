@@ -166,6 +166,7 @@ public class AdminSettlementServiceImpl implements AdminSettlementService {
   }
 
   // 관리자용 상세 조회
+  @Override
   public SettlementWithManagerResponseDto getSettlementWithManager(Long settlementId) {
     // Settlement 조회
     Settlement settlement = findById(settlementId);
