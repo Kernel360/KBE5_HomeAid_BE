@@ -108,7 +108,7 @@ public class MatchingServiceImpl implements MatchingService {
           throw new CustomException(MatchingErrorCode.UNAUTHORIZED_MATCHING_ACCESS);
         }
         matching.confirmByCustomer();
-        reservation.confirmMatching(matching.getManager().getId());
+        reservation.confirmMatching();
       }
 
       case REJECT -> {
@@ -186,10 +186,6 @@ public class MatchingServiceImpl implements MatchingService {
   private Reservation findReservationById(Long reservationId) {
     return reservationRepository.findById(reservationId)
         .orElseThrow(() -> new CustomException(ReservationErrorCode.RESERVATION_NOT_FOUND));
-  }
-
-  private Optional<Matching> getLatestMatching(Reservation reservation) {
-    return reservation.getLatestMatching();
   }
 
   private Matching getMatchingById(Long matchingId) {

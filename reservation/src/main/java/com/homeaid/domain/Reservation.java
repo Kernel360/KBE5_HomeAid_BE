@@ -139,13 +139,13 @@ public class Reservation {
     this.status = ReservationStatus.MATCHING;
   }
 
-  public void confirmMatching(Long managerId) {
+  public void confirmMatching() {
     this.status = ReservationStatus.MATCHED;
-    this.managerId = managerId;
   }
 
   public void failedMatching() {
     this.status = ReservationStatus.REQUESTED;
+    this.managerId = null;
   }
 
   public Optional<Matching> getLatestMatching() {
@@ -156,6 +156,7 @@ public class Reservation {
     Matching newMatching = Matching.create(manager, matchingList.size());
     newMatching.setReservation(this);
     updateStatusMatching();
+    setManagerId(manager.getId());
     this.matchingList.add(newMatching);
     return newMatching;
   }
