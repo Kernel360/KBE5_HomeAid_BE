@@ -20,6 +20,7 @@ import com.homeaid.repository.ReservationRepository;
 import com.homeaid.util.RegionValidator;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -44,18 +45,14 @@ public class MatchingServiceImpl implements MatchingService {
         .orElseThrow(() -> new CustomException(
             UserErrorCode.MANAGER_NOT_FOUND));
 
-    Reservation reservation = reservationRepository.findById(reservationId)
-        .orElseThrow(() -> new CustomException(
-            ReservationErrorCode.RESERVATION_NOT_FOUND));
+    Reservation reservation = findReservationById(reservationId);
 
     Matching newMatching = reservation.createMatching(manager);
     
     reservationRepository.save(reservation);
 
-    RequestAlert createdAlert = RequestAlert.createAlert(AlertType.JOB_OFFER, managerId, UserRole.MANAGER, matchingId, null);
+    RequestAlert createdAlert = RequestAlert.createAlert(AlertType.JOB_OFFER, managerId, UserRole.MANAGER, newMatching.getId(), null);
     notificationPublisher.publishNotification(createdAlert);
-
-    return matchingId;
   }
 
 
@@ -99,14 +96,13 @@ public class MatchingServiceImpl implements MatchingService {
   @Transactional
   public void respondToMatchingAsCustomer(Long userId, Long reservationId,
       CustomerAction action, String memo) {
-    Reservation reservation = reservationRepository.findById(reservationId).orElseThrow(() -> new CustomException(ReservationErrorCode.RESERVATION_NOT_FOUND));
+    Reservation reservation = findReservationById(reservationId);
 
-    Matching matching = matchingRepository.findById(reservation.getFinalMatchingId())
-        .orElseThrow(() -> new CustomException(MatchingErrorCode.MATCHING_NOT_FOUND));
+    Matching matching = getLatestMatching(reservation).orElse(null);
 
     switch (action) {
       case CONFIRM -> {
-        if (!reservation.getCustomerId().equals(userId)) {
+        if (!reservation.getCustomer().getId().equals(userId)) {
           throw new CustomException(MatchingErrorCode.UNAUTHORIZED_MATCHING_ACCESS);
         }
         matching.confirmByCustomer();
@@ -184,9 +180,13 @@ public class MatchingServiceImpl implements MatchingService {
     return matchingRepository.findTopByReservationIdOrderByModifiedDateDesc(reservationId).get();
   }
 
+  private Reservation findReservationById(Long reservationId) {
+    return reservationRepository.findById(reservationId)
+        .orElseThrow(() -> new CustomException(ReservationErrorCode.RESERVATION_NOT_FOUND));
+  }
 
-  private int calculateNextMatchingRound(Long reservationId) {
-    return matchingRepository.countByReservationId(reservationId) + 1;
+  private Optional<Matching> getLatestMatching(Reservation reservation) {
+    return reservation.getLatestMatching();
   }
 
 }
