@@ -3,6 +3,7 @@ package com.homeaid.payment.service;
 import com.homeaid.payment.domain.Payment;
 import com.homeaid.payment.domain.Refund;
 import com.homeaid.payment.domain.enumerate.RefundStatus;
+import com.homeaid.payment.domain.factory.RefundFactory;
 import com.homeaid.payment.dto.request.RefundRequestDto;
 import com.homeaid.payment.dto.response.RefundResponseDto;
 import com.homeaid.payment.exception.RefundErrorCode;
@@ -16,8 +17,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
-import java.time.LocalDateTime;
 
 @Slf4j
 @Service
@@ -54,16 +53,15 @@ public class RefundServiceImpl implements RefundService {
 
     int refundAmount = refundPolicyCalculator.calculate(requestDto, payment.getReservation(), payment);
 
-    Refund refund = Refund.builder()
-        .payment(payment)
-        .refundAmount(refundAmount)
-        .reason(requestDto.getReason())
-        .status(RefundStatus.REQUESTED)
-        .customerComment(requestDto.getCustomerComment())
-        .requestedAt(LocalDateTime.now())
-        .build();
+    Refund refund = RefundFactory.createCustomerRequestedRefund(
+        payment,
+        refundAmount,
+        requestDto.getReason(),
+        requestDto.getCustomerComment()
+    );
 
     Refund saved = refundRepository.save(refund);
+
     log.info("[환불요청] userId={} paymentId={} refundId={} amount={}", userId, payment.getId(), saved.getId(), refundAmount);
 
     return RefundResponseDto.from(saved);
@@ -80,12 +78,7 @@ public class RefundServiceImpl implements RefundService {
       throw new CustomException(RefundErrorCode.CANNOT_CANCEL_REFUND);
     }
 
-    // 상태를 CANCELLED로 변경
-    refund = refund.toBuilder()
-        .status(RefundStatus.CANCELLED)
-        .processedAt(LocalDateTime.now())
-        .build();
-
+    refund.cancel();
     Refund updated = refundRepository.save(refund);
 
     log.info("[환불철회] userId={} refundId={} status={}", userId, refundId, RefundStatus.CANCELLED);

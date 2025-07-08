@@ -5,6 +5,7 @@ import com.homeaid.exception.CustomException;
 import com.homeaid.payment.domain.Payment;
 import com.homeaid.payment.domain.Refund;
 import com.homeaid.payment.domain.enumerate.RefundStatus;
+import com.homeaid.payment.domain.factory.RefundFactory;
 import com.homeaid.payment.dto.RefundAdminDecisionRequestDto;
 import com.homeaid.payment.dto.response.PaymentResponseDto;
 import com.homeaid.payment.dto.response.RefundResponseDto;
@@ -12,7 +13,6 @@ import com.homeaid.payment.exception.PaymentErrorCode;
 import com.homeaid.payment.repository.PaymentRepository;
 import com.homeaid.payment.repository.RefundRepository;
 import com.homeaid.payment.validator.RefundValidator;
-import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -55,21 +55,20 @@ public class AdminRefundServiceImpl implements AdminRefundService {
   // 관리자가 수동으로 결제 전체 금액을 전액 환불
   @Override
   @Transactional
-  public PaymentResponseDto refundFull(Long paymentId, RefundAdminDecisionRequestDto decisionRequest) {
+  public PaymentResponseDto refundFull(Long paymentId, RefundAdminDecisionRequestDto dto) {
     Payment payment = getPaymentOrThrow(paymentId);
     validateNoDuplicateRefund(payment);
     ReservationStatus reservationStatus = payment.getReservation().getStatus();
 
     payment.refund(reservationStatus);
 
-    Refund refund = Refund.builder()
-        .payment(payment)
-        .refundAmount(payment.getAmount())
-        .status(RefundStatus.COMPLETED) // 관리자가 직접 처리했으니 COMPLETED로 바로 처리
-        .adminComment(decisionRequest.getAdminComment())
-        .reason(decisionRequest.getRefundReason())
-        .processedAt(LocalDateTime.now())
-        .build();
+    Refund refund = RefundFactory.createManualRefund(
+        payment,
+        payment.getAmount(),
+        dto.getRefundReason(),
+        dto.getAdminComment()
+    );
+
     refundRepository.save(refund);
 
     //log.info("[관리자 전액환불 기록] refundId={} paymentId={}", refund.getId(), paymentId);
@@ -79,24 +78,23 @@ public class AdminRefundServiceImpl implements AdminRefundService {
 
   @Override
   @Transactional
-  public PaymentResponseDto refundPartial(Long paymentId, RefundAdminDecisionRequestDto decisionRequest) {
+  public PaymentResponseDto refundPartial(Long paymentId, RefundAdminDecisionRequestDto dto) {
     Payment payment = getPaymentOrThrow(paymentId);
     validateNoDuplicateRefund(payment);
     ReservationStatus reservationStatus = payment.getReservation().getStatus();
-    int calculatedAmount = calculateRefundAmount(payment, decisionRequest);
 
+    int calculatedAmount = calculateRefundAmount(payment, dto);
     validateMaxRefundForCompleted(reservationStatus, payment, calculatedAmount);
 
     payment.applyPartialRefund(calculatedAmount);
 
-    Refund refund = Refund.builder()
-        .payment(payment)
-        .refundAmount(calculatedAmount)
-        .status(RefundStatus.COMPLETED) // 관리자가 직접 처리했으니 COMPLETED로 바로 처리
-        .adminComment(decisionRequest.getAdminComment())
-        .reason(decisionRequest.getRefundReason())
-        .processedAt(LocalDateTime.now())
-        .build();
+    Refund refund = RefundFactory.createManualRefund(
+        payment,
+        calculatedAmount,
+        dto.getRefundReason(),
+        dto.getAdminComment()
+    );
+
     refundRepository.save(refund);
 
     //log.info("[관리자 부분환불 기록] refundId={} paymentId={} refundAmount={}", refund.getId(), paymentId, calculatedAmount);
@@ -113,15 +111,12 @@ public class AdminRefundServiceImpl implements AdminRefundService {
     refundValidator.validateRefundStatusIsRequest(refund);
 
     refund.getPayment().applyPartialRefund(refund.getRefundAmount());
-    refund = refund.toBuilder()
-        .status(RefundStatus.APPROVED)
-        .adminComment(adminComment)
-        .processedAt(LocalDateTime.now())
-        .build();
 
-    Refund updated = refundRepository.save(refund);
-    log.info("[환불 승인] refundId={} status=APPROVED adminComment={}", refundId, adminComment);
-    return RefundResponseDto.from(updated);
+    Refund approved = refund.approve(adminComment);  // 도메인 로직 활용
+    refundRepository.save(approved);
+
+    log.info("[환불 승인] refundId={} status=APPROVED", refundId);
+    return RefundResponseDto.from(approved);
   }
 
   @Override
@@ -130,15 +125,11 @@ public class AdminRefundServiceImpl implements AdminRefundService {
     Refund refund = refundValidator.getRefundOrThrow(refundId);
     refundValidator.validateRefundStatusIsRequest(refund);
 
-    refund = refund.toBuilder()
-        .status(RefundStatus.REJECTED)
-        .adminComment(adminComment)
-        .processedAt(LocalDateTime.now())
-        .build();
+    Refund rejected = refund.reject(adminComment);  // 도메인 로직 활용
+    refundRepository.save(rejected);
 
-    Refund updated = refundRepository.save(refund);
-    log.info("[환불 거절] refundId={} status=REJECTED adminComment={}", refundId, adminComment);
-    return RefundResponseDto.from(updated);
+    log.info("[환불 거절] refundId={} status=REJECTED", refundId);
+    return RefundResponseDto.from(rejected);
   }
 
 

@@ -11,9 +11,11 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class RefundAdminDecisionRequestDto {
 
+  @Schema(description = "환불 사유", required = true)
   @NotNull(message = "환불 사유는 필수입니다.")
   private RefundReason refundReason;
 
+  @Schema(description = "관리자 코멘트", required = true, example = "이용 불편으로 인한 환불 처리")
   @NotBlank(message = "관리자 코멘트는 필수입니다.")
   private String adminComment;
 
