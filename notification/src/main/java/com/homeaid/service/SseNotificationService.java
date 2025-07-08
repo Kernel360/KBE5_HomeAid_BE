@@ -57,6 +57,14 @@ public class SseNotificationService {
         });
         connections.put(userId, emitter);
 
+        try {
+            emitter.send(SseEmitter.event()
+                    .name("connect")
+                    .data("Connected successfully"));
+        } catch (IOException e) {
+            emitter.completeWithError(e);
+        }
+
         return emitter;
     }
 
@@ -102,25 +110,6 @@ public class SseNotificationService {
 
         broadcastAdminAlert(Collections.singletonList(notification));
         updateSentAlerts(Collections.singletonList(notification));
-    }
-
-    @Scheduled(fixedRate = 30000) // 30초마다
-    public void sendHeartbeat() {
-        List<Long> zombieConnections = new ArrayList<>();
-
-        connections.forEach((userId, emitter) -> {
-            try {
-                emitter.send(SseEmitter.event()
-                        .name("ping")
-                        .data(System.currentTimeMillis()));
-            } catch (IOException e) {
-                zombieConnections.add(userId);
-            }
-        });
-        zombieConnections.forEach(userId -> {
-            connections.remove(userId);
-            adminIds.remove(userId);
-        });
     }
 
     public void broadcastAdminAlert(List<Notification> notifications) {
