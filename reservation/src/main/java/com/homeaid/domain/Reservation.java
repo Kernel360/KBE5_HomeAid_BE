@@ -62,7 +62,7 @@ public class Reservation {
   @Setter
   @OneToOne
   @JoinColumn(name = "final_matching_id")
-  private Matching finalMatchingId;
+  private Matching finalMatching;
 
   private Double latitude;
 

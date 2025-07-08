@@ -65,14 +65,6 @@ public class Matching {
   @LastModifiedDate
   private LocalDateTime modifiedDate;
 
-
-//  public void setReservationAndManagerAndMatchingRound(Reservation reservation, Manager manager,
-//      int matchingRound) {
-//    this.reservation = reservation;
-//    this.manager = manager;
-//    this.matchingRound = matchingRound;
-//  }
-
   public static Matching create(Manager manger, int matchingRound) {
     return Matching.builder()
         .status(MatchingStatus.REQUESTED)
@@ -108,14 +100,14 @@ public class Matching {
     this.customerStatus = MatchingStatus.CONFIRMED;
     this.status = MatchingStatus.CONFIRMED;
     this.matchedAt = LocalDateTime.now();
-    this.reservation.setFinalMatchingId(this);
+    this.reservation.setFinalMatching(this);
   }
 
   public void rejectByCustomer(String memo) {
     this.customerStatus = MatchingStatus.REJECTED;
     this.status = MatchingStatus.REJECTED;
     this.customerMemo = memo;
-    this.reservation.setFinalMatchingId(null);
+    this.reservation.setFinalMatching(null);
   }
 
   public boolean isCompleted() {

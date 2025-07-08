@@ -15,7 +15,7 @@ public class PaymentValidator {
   private final PaymentRepository paymentRepository;
 
   public void validatePaymentOwnership(Payment payment, Long customerId) {
-    if (!payment.getReservation().getCustomerId().equals(customerId)) {
+    if (!payment.getReservation().getCustomer().getId().equals(customerId)) {
       throw new CustomException(PaymentErrorCode.PAYMENT_ACCESS_DENIED);
     }
   }

@@ -48,8 +48,7 @@ public class ReservationServiceImpl implements ReservationService {
   @Override
   @Transactional
   public Reservation createReservation(Reservation reservation, Long userId, Long serviceOptionId) {
-    log.info("[예약 생성] customerId={}, serviceOptionId={}", reservation.getCustomer().getId(),
-        serviceOptionId);
+    log.info("[예약 생성] customerId={}, serviceOptionId={}", userId, serviceOptionId);
 
     Customer customer = customerRepository.findById(userId)
         .orElseThrow(() -> new CustomException(UserErrorCode.CUSTOMER_NOT_FOUND));

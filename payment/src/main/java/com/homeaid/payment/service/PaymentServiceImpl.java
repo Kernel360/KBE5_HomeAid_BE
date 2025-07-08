@@ -66,6 +66,7 @@ public class PaymentServiceImpl implements PaymentService {
   }
   // 환불 중간에 문제가 발생하면 -> 전체 작업을 롤백해야 함 -> 트랜잭션이 없다면 중간 상태가 DB에 반영될 수 있음 -> 장애 위험 발생
 
+  // 결제 단건 조회
   @Override
   @Transactional(readOnly = true)
   public ReservationPaymentDetailResponseDto getReservationPaymentDetail(Long customerId, Long paymentId) {

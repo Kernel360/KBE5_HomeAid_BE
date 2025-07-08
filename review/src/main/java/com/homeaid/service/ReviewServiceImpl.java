@@ -32,13 +32,13 @@ public class ReviewServiceImpl implements ReviewService {
     Reservation validatedReservation = validateReview(requestReview);
 
     //예약건의 고객아이디와 요청 고객의 아이디 검증
-    if (!validatedReservation.getCustomerId().equals(requestReview.getWriterId())) {
+    if (!validatedReservation.getCustomer().getId().equals(requestReview.getWriterId())) {
       throw new CustomException(ReviewErrorCode.UNAUTHORIZED_REVIEW_ACCESS);
     }
 
     //타켓 매니저 와 예약 건의 매니저 검증
     Long reservationManagerId = getFinalMatchingOfManagerId(
-        validatedReservation.getFinalMatchingId());
+        validatedReservation.getFinalMatching().getId());
     if (!reservationManagerId.equals(requestReview.getTargetId())) {
       throw new CustomException(ReviewErrorCode.UNAUTHORIZED_REVIEW_TARGET);
     }
@@ -59,13 +59,13 @@ public class ReviewServiceImpl implements ReviewService {
 
     //예약 건의 매니저와 와 요청자의 매니저 아이디 검증
     Long reservationManagerId = getFinalMatchingOfManagerId(
-        validatedReservation.getFinalMatchingId());
+        validatedReservation.getFinalMatching().getId());
     if (!reservationManagerId.equals(requestReview.getWriterId())) {
       throw new CustomException(ReviewErrorCode.UNAUTHORIZED_REVIEW_ACCESS);
     }
 
     //예약 건의 고객아이디와 요청 받은 고객아이디 검증
-    if (!validatedReservation.getCustomerId().equals(requestReview.getTargetId())) {
+    if (!validatedReservation.getCustomer().getId().equals(requestReview.getTargetId())) {
       throw new CustomException(ReviewErrorCode.UNAUTHORIZED_REVIEW_TARGET);
     }
 

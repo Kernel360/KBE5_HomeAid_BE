@@ -48,7 +48,7 @@ public class MatchingServiceImpl implements MatchingService {
     Reservation reservation = findReservationById(reservationId);
 
     Matching newMatching = reservation.createMatching(manager);
-    
+
     reservationRepository.save(reservation);
 
     RequestAlert createdAlert = RequestAlert.createAlert(AlertType.JOB_OFFER, managerId, UserRole.MANAGER, newMatching.getId(), null);
@@ -58,9 +58,9 @@ public class MatchingServiceImpl implements MatchingService {
 
   @Override
   @Transactional
-  public void respondToMatchingAsManager(Long userId, Long reservationId, ManagerAction action, String memo) {
-    Matching matching = matchingRepository.findTopByReservationIdOrderByModifiedDateDesc(reservationId)
-        .orElseThrow(() -> new CustomException(MatchingErrorCode.MATCHING_NOT_FOUND));
+  public void respondToMatchingAsManager(Long userId, Long matchingId, ManagerAction action,
+      String memo) {
+    Matching matching = getMatchingById(matchingId);
 
     if (!matching.getManager().getId().equals(userId)) {
       throw new CustomException(MatchingErrorCode.UNAUTHORIZED_MATCHING_ACCESS);
@@ -94,11 +94,13 @@ public class MatchingServiceImpl implements MatchingService {
 
   @Override
   @Transactional
-  public void respondToMatchingAsCustomer(Long userId, Long reservationId,
+  public void respondToMatchingAsCustomer(Long userId, Long matchingId,
       CustomerAction action, String memo) {
-    Reservation reservation = findReservationById(reservationId);
 
-    Matching matching = getLatestMatching(reservation).orElse(null);
+
+    Matching matching = getMatchingById(matchingId);
+
+    Reservation reservation = matching.getReservation();
 
     switch (action) {
       case CONFIRM -> {
@@ -108,6 +110,7 @@ public class MatchingServiceImpl implements MatchingService {
         matching.confirmByCustomer();
         reservation.confirmMatching(matching.getManager().getId());
       }
+
       case REJECT -> {
         if (memo == null || memo.isBlank()) {
           throw new CustomException(MatchingErrorCode.MEMO_REQUIRED_FOR_REJECTION);
@@ -146,7 +149,6 @@ public class MatchingServiceImpl implements MatchingService {
 
     String normalizedSido = regionValidator.normalizeSido(sido);
 
-
     if (!regionValidator.isValid(normalizedSido, sigungu)) {
       throw new CustomException(ReservationErrorCode.INVALID_RESERVATION_REGION);
     }
@@ -159,7 +161,8 @@ public class MatchingServiceImpl implements MatchingService {
     String optionName = reservation.getItem().getServiceOptionName();
 
     // Todo: 매니저 통계 테이블 만든 후에 조회된 매니저의 리뷰 수, 별점 등도 같이 조회
-    return managerRepository.findMatchingManagers(normalizedSido, sigungu, reservationWeekday.name(), startTime, endTime, optionName);
+    return managerRepository.findMatchingManagers(normalizedSido, sigungu,
+        reservationWeekday.name(), startTime, endTime, optionName);
   }
 
   // 매니저 매칭 전체 조회
@@ -187,6 +190,11 @@ public class MatchingServiceImpl implements MatchingService {
 
   private Optional<Matching> getLatestMatching(Reservation reservation) {
     return reservation.getLatestMatching();
+  }
+
+  private Matching getMatchingById(Long matchingId) {
+    return matchingRepository.findById(matchingId)
+        .orElseThrow(() -> new CustomException(MatchingErrorCode.MATCHING_NOT_FOUND));
   }
 
 }
