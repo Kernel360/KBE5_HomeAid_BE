@@ -1,6 +1,7 @@
 package com.homeaid.dto.response;
 
 import com.homeaid.domain.Customer;
+import com.homeaid.domain.Matching;
 import com.homeaid.domain.Reservation;
 import com.homeaid.domain.enumerate.MatchingStatus;
 import com.homeaid.domain.enumerate.ReservationStatus;
@@ -16,6 +17,9 @@ public class ReservationByManagerResponseDto {
 
   @Schema(description = "예약 ID", example = "101")
   private Long reservationId;
+
+  @Schema(description = "매칭 ID", example = "55")
+  private Long matchingId;
 
   @Schema(description = "예약 상태", example = "REQUESTED")
   private ReservationStatus status;
@@ -39,16 +43,17 @@ public class ReservationByManagerResponseDto {
   private MatchingStatus matchingStatus;
 
 
-  public static ReservationByManagerResponseDto toDto(Reservation reservation, Customer customer, MatchingStatus matchingStatus) {
+  public static ReservationByManagerResponseDto toDto(Reservation reservation, Customer customer, Matching matching) {
     return ReservationByManagerResponseDto.builder()
         .reservationId(reservation.getId())
+        .matchingId(matching.getId())
         .status(reservation.getStatus())
         .serviceOptionName(reservation.getItem().getServiceOptionName())
         .startTime(LocalDateTime.of(
             reservation.getRequestedDate(),
             reservation.getRequestedTime()
         ))
-        .matchingStatus(matchingStatus)
+        .matchingStatus(matching.getStatus())
         .customerName(customer.getName())
         .build();
   }
