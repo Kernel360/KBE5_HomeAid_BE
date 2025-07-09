@@ -1,6 +1,9 @@
 package com.homeaid.domain;
 
-import com.homeaid.worklog.domain.enumerate.*;
+
+import com.homeaid.domain.enumerate.NotificationEventType;
+import com.homeaid.domain.enumerate.NotificationStatus;
+import com.homeaid.domain.enumerate.UserRole;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
