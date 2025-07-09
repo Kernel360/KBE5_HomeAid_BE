@@ -93,4 +93,23 @@ public class PaymentController {
     return ResponseEntity.ok(CommonApiResponse.success(paymentService.getAllPayments(user.getUserId())));
   }
 
+  @GetMapping("/detail/{paymentId}")
+  @Operation(summary = "결제 상세 조회", description = "단일 결제 내역 상세 정보를 조회합니다.")
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "조회 성공",
+          content = @Content(schema = @Schema(implementation = PaymentResponseDto.class))),
+      @ApiResponse(responseCode = "403", description = "본인 결제 아님",
+          content = @Content(schema = @Schema(implementation = CommonApiResponse.class))),
+      @ApiResponse(responseCode = "404", description = "결제 내역 없음",
+          content = @Content(schema = @Schema(implementation = CommonApiResponse.class)))
+  })
+  public ResponseEntity<CommonApiResponse<PaymentResponseDto>> getPaymentDetail(
+      @PathVariable Long paymentId,
+      @AuthenticationPrincipal CustomUserDetails user) {
+
+    PaymentResponseDto response = paymentService.getPaymentDetail(user.getUserId(), paymentId);
+    return ResponseEntity.ok(CommonApiResponse.success(response));
+  }
+
+
 }

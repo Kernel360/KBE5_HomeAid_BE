@@ -3,7 +3,7 @@ package com.homeaid.payment.service;
 import com.homeaid.domain.User;
 import com.homeaid.dto.response.ReservationResponseDto;
 import com.homeaid.payment.domain.Payment;
-import com.homeaid.payment.domain.PaymentStatus;
+import com.homeaid.payment.domain.enumerate.PaymentStatus;
 import com.homeaid.domain.Reservation;
 import com.homeaid.payment.dto.request.PaymentRequestDto;
 import com.homeaid.payment.dto.response.PaymentResponseDto;
@@ -91,6 +91,17 @@ public class PaymentServiceImpl implements PaymentService {
         .sorted((p1, p2) -> p2.getPaidAt().compareTo(p1.getPaidAt())) // 최신순 정렬
         .map(this::toDtoWithNames)
         .collect(Collectors.toList());
+  }
+
+  @Override
+  @Transactional(readOnly = true)
+  public PaymentResponseDto getPaymentDetail(Long customerId, Long paymentId) {
+    Payment payment = paymentRepository.findById(paymentId)
+        .orElseThrow(() -> new CustomException(PaymentErrorCode.PAYMENT_NOT_FOUND));
+
+    paymentValidator.validatePaymentOwnership(payment, customerId);
+
+    return toDtoWithNames(payment);
   }
 
   private PaymentResponseDto toDtoWithNames(Payment payment) {

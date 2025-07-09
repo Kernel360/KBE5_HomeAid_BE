@@ -11,7 +11,7 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface PaymentRepository extends JpaRepository<Payment, Long> {
 
-  List<Payment> findAllByReservation_ManagerIdAndPaidAtBetween(Long managerId, LocalDateTime start, LocalDateTime end);
+  //List<Payment> findAllByReservation_ManagerIdAndPaidAtBetween(Long managerId, LocalDateTime start, LocalDateTime end);
   boolean existsByReservationId(Long reservationId); // 중복 결제 방지
 
   @Query("SELECT p FROM Payment p WHERE p.reservation.customerId = :customerId")
@@ -33,10 +33,14 @@ public interface PaymentRepository extends JpaRepository<Payment, Long> {
 
   // 결제 수단별 (이건 월별 통계만 해당되므로 유지)
   @Query("SELECT " +
-      "COALESCE(SUM(CASE WHEN p.paymentMethod = com.homeaid.payment.domain.PaymentMethod.CARD THEN p.amount ELSE 0 END), 0), " +
-      "COALESCE(SUM(CASE WHEN p.paymentMethod = com.homeaid.payment.domain.PaymentMethod.TRANSFER THEN p.amount ELSE 0 END), 0), " +
-      "COALESCE(SUM(CASE WHEN p.paymentMethod = com.homeaid.payment.domain.PaymentMethod.CASH THEN p.amount ELSE 0 END), 0) " +
+      "COALESCE(SUM(CASE WHEN p.paymentMethod = com.homeaid.payment.domain.enumerate.PaymentMethod.CARD THEN p.amount ELSE 0 END), 0), " +
+      "COALESCE(SUM(CASE WHEN p.paymentMethod = com.homeaid.payment.domain.enumerate.PaymentMethod.TRANSFER THEN p.amount ELSE 0 END), 0), " +
+      "COALESCE(SUM(CASE WHEN p.paymentMethod = com.homeaid.payment.domain.enumerate.PaymentMethod.CASH THEN p.amount ELSE 0 END), 0) " +
       "FROM Payment p " +
-      "WHERE YEAR(p.paidAt) = :year AND MONTH(p.paidAt) = :month AND p.status = com.homeaid.payment.domain.PaymentStatus.PAID")
+      "WHERE YEAR(p.paidAt) = :year AND MONTH(p.paidAt) = :month AND p.status = com.homeaid.payment.domain.enumerate.PaymentStatus.PAID")
   Object findPaymentMethodSums(@Param("year") int year, @Param("month") int month);
+
+  List<Payment> findAllByReservation_ManagerIdAndPaidAtBetween(Long managerId, LocalDateTime start, LocalDateTime end);
+
+
 }

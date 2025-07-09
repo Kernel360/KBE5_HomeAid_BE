@@ -147,6 +147,7 @@ public class AdminSettlementController {
   })
   public ResponseEntity<CommonApiResponse<SettlementWithManagerResponseDto>> getSettlementWithManager(
       @PathVariable Long settlementId) {
+
     SettlementWithManagerResponseDto dto = adminSettlementService.getSettlementWithManager(settlementId);
     return ResponseEntity.ok(CommonApiResponse.success(dto));
   }

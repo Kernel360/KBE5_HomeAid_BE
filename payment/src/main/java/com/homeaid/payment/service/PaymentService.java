@@ -10,6 +10,7 @@ public interface PaymentService {
   PaymentResponseDto pay(PaymentRequestDto dto);
   PaymentResponseDto customerCancelPayment(Long customerId, Long paymentId);
   List<PaymentResponseDto> getAllPayments(Long customerId);
+  PaymentResponseDto getPaymentDetail(Long customerId, Long paymentId);
 
   ReservationPaymentDetailResponseDto getReservationPaymentDetail(Long customerId, Long paymentId);
 

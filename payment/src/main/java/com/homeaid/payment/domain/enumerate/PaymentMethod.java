@@ -1,4 +1,4 @@
-package com.homeaid.payment.domain;
+package com.homeaid.payment.domain.enumerate;
 
 import lombok.Getter;
 
