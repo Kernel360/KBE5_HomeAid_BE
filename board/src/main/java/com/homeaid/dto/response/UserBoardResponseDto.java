@@ -3,7 +3,7 @@ package com.homeaid.dto.response;
 
 import com.homeaid.domain.BoardReply;
 import com.homeaid.domain.UserBoard;
-import com.homeaid.worklog.domain.enumerate.UserRole;
+import com.homeaid.domain.enumerate.UserRole;
 import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;

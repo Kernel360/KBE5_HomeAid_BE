@@ -4,7 +4,7 @@ import com.homeaid.domain.Manager;
 import com.homeaid.matching.controller.enumerate.MatchingStatus;
 import com.homeaid.reservation.domain.Reservation;
 import com.homeaid.worklog.domain.WorkLog;
-import com.homeaid.worklog.domain.enumerate.WorkType;
+import com.homeaid.domain.enumerate.WorkType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;

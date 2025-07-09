@@ -1,7 +1,7 @@
 package com.homeaid.auth.dto.request;
 
 import com.homeaid.domain.Manager;
-import com.homeaid.worklog.domain.enumerate.GenderType;
+import com.homeaid.domain.enumerate.GenderType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
