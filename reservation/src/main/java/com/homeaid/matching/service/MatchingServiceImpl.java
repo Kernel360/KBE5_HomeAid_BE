@@ -107,6 +107,7 @@ public class MatchingServiceImpl implements MatchingService {
           throw new CustomException(MatchingErrorCode.UNAUTHORIZED_MATCHING_ACCESS);
         }
         matching.confirmByCustomer();
+        matching.finalizeMatching();
         reservation.confirmMatching();
       }
 

@@ -3,6 +3,8 @@ package com.homeaid.matching.domain;
 import com.homeaid.domain.Manager;
 import com.homeaid.matching.controller.enumerate.MatchingStatus;
 import com.homeaid.reservation.domain.Reservation;
+import com.homeaid.worklog.domain.WorkLog;
+import com.homeaid.worklog.domain.enumerate.WorkType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -60,6 +62,8 @@ public class Matching {
   @Column(columnDefinition = "TEXT")
   private String customerMemo;
 
+  @OneToOne(mappedBy = "matching", cascade = CascadeType.ALL, orphanRemoval = true)
+  private WorkLog workLog;
 
   @CreatedDate
   @Column(updatable = false)
@@ -103,7 +107,6 @@ public class Matching {
     this.customerStatus = MatchingStatus.CONFIRMED;
     this.status = MatchingStatus.CONFIRMED;
     this.matchedAt = LocalDateTime.now();
-    this.reservation.setFinalMatching(this);
   }
 
   public void rejectByCustomer(String memo) {
@@ -111,6 +114,15 @@ public class Matching {
     this.status = MatchingStatus.REJECTED;
     this.customerMemo = memo;
     this.reservation.setFinalMatching(null);
+  }
+
+  public void finalizeMatching() {
+    this.reservation.setFinalMatching(this);
+    this.createWorkLog();
+  }
+
+  public void createWorkLog() {
+    this.workLog = WorkLog.createWorkLog(WorkType.CHECKIN, this);
   }
 
   public boolean isCompleted() {
