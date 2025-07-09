@@ -34,4 +34,7 @@ public interface AdminStatisticsService {
   // Redis → DB fallback 통계 조회
   AdminStatisticsDto getStatisticsOrLoad(int year, Integer month, Integer day);
 
+  // 통계 생성 및 Redis + DB 저장 (스케줄러 등에서 사용)
+  void generateAndStoreStatistics(int year, Integer month, Integer day);
+
 }

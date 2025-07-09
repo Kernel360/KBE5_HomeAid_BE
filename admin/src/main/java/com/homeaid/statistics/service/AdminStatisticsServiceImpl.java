@@ -1,5 +1,7 @@
 package com.homeaid.statistics.service;
 
+import static com.homeaid.statistics.config.StatisticsConstants.STATISTICS_CACHE_TTL;
+
 import com.homeaid.exception.CustomException;
 import com.homeaid.payment.repository.PaymentRepository;
 import com.homeaid.repository.MatchingRepository;
@@ -7,6 +9,7 @@ import com.homeaid.repository.ReservationRepository;
 import com.homeaid.repository.ReviewRepository;
 import com.homeaid.repository.UserRepository;
 import com.homeaid.settlement.repository.SettlementRepository;
+import com.homeaid.statistics.config.StatisticsConstants;
 import com.homeaid.statistics.domain.StatisticsEntity;
 import com.homeaid.statistics.dto.AdminStatisticsDto;
 import com.homeaid.statistics.dto.ManagerRatingStatsDto;
@@ -16,18 +19,20 @@ import com.homeaid.statistics.dto.ReservationStatsDto;
 import com.homeaid.statistics.dto.SettlementStatsDto;
 import com.homeaid.statistics.dto.UserStatsDto;
 import com.homeaid.statistics.exception.StatisticsErrorCode;
+import com.homeaid.statistics.provider.UserStatisticsProvider;
 import com.homeaid.statistics.repository.StatisticsRepository;
 import com.homeaid.util.RedisKeyFactory;
 import com.homeaid.util.RedisUtil;
-import java.time.Duration;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AdminStatisticsServiceImpl implements AdminStatisticsService {
 
-  private final UserRepository userRepository;
+  private final UserStatisticsProvider userStatisticsProvider;
   private final PaymentRepository paymentRepository;
   private final ReservationRepository reservationRepository;
   private final SettlementRepository settlementRepository;
@@ -39,14 +44,7 @@ public class AdminStatisticsServiceImpl implements AdminStatisticsService {
 
   @Override
   public UserStatsDto getUserStats(int year, Integer month, Integer day) {
-    return UserStatsDto.builder()
-        .year(year)
-        .month(month)
-        .day(day)
-        .signupCount(userRepository.countSignUps(year, month, day))
-        .totalUsers(userRepository.count())
-        .withdrawCount(userRepository.countWithdrawn(year, month, day))
-        .build();
+    return userStatisticsProvider.generate(year, month, day);
   }
 
   @Override
@@ -160,7 +158,7 @@ public class AdminStatisticsServiceImpl implements AdminStatisticsService {
    */
   public void saveStatisticsToRedisAndDb(AdminStatisticsDto dto) {
     String key = RedisKeyFactory.buildAdminStatisticsKey(dto.getYear(), dto.getMonth(), dto.getDay());
-    redisUtil.save(key, dto, Duration.ofDays(30));
+    redisUtil.save(key, dto, STATISTICS_CACHE_TTL); // Redis TTL은 상수로 관리하여 유지보수 용이하게 설정
 
     StatisticsEntity entity = StatisticsEntity.fromDto(dto);
     statisticsRepository.save(entity);
@@ -169,20 +167,46 @@ public class AdminStatisticsServiceImpl implements AdminStatisticsService {
   /**
    * Redis 조회 후 없으면 DB fallback (Controller에서 활용)
    */
+  @Override
   public AdminStatisticsDto getStatisticsOrLoad(int year, Integer month, Integer day) {
     String key = RedisKeyFactory.buildAdminStatisticsKey(year, month, day);
 
     // 1. Redis 우선 조회
     Object cached = redisUtil.getObject(key);
     if (cached instanceof AdminStatisticsDto cachedDto) {
+      log.info("[캐시 HIT] Redis에서 통계 데이터 조회 - key: {}", key);
       return cachedDto;
     }
 
-    // 2. Redis에 없다면 DB에서 조회
+    if (cached != null) {
+      log.warn("[캐시 MISS] Redis 값은 존재하지만 AdminStatisticsDto 타입이 아님 - key: {}", key);
+    } else {
+      log.warn("[캐시 MISS] Redis에 해당 통계 데이터 없음 - key: {}", key);
+    }
+
+    // 2. DB fallback
     return statisticsRepository.findByYearAndMonthAndDay(year, month, day)
-        .map(StatisticsEntity::toDto) // 내부에서 직렬화 예외 → CustomException 처리됨
-        .orElseThrow(() -> new CustomException(StatisticsErrorCode.STATISTICS_NOT_FOUND));
-  } // 추천: 추가 모니터링을 위한 메트릭 연동 (선택사항)
+        .map(entity -> {
+          try {
+            AdminStatisticsDto dto = entity.toDto();
+            log.info("[DB Fallback] DB에서 통계 데이터를 조회하여 복원함 - key: {}", key);
+
+            // ✅ Redis 재캐싱 (TTL: 30일)
+            redisUtil.save(key, dto, StatisticsConstants.STATISTICS_CACHE_TTL);
+
+            return dto;
+
+          } catch (Exception e) {
+            log.error("[DB Fallback 실패] 통계 JSON 역직렬화 실패 - key: {}", key, e);
+            throw new CustomException(StatisticsErrorCode.STATISTICS_DESERIALIZATION_FAILED);
+          }
+        })
+        .orElseThrow(() -> {
+          log.error("[DB Fallback 실패] DB에 해당 날짜 통계 데이터 없음 - key: {}", key);
+          return new CustomException(StatisticsErrorCode.STATISTICS_NOT_FOUND);
+        });
+  }
+
 
   /**
    * 스케줄러나 초기화 시에 호출: 통계 생성 → 저장

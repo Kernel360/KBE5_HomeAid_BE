@@ -1,11 +1,9 @@
 package com.homeaid.statistics.scheduler;
 
-import com.homeaid.statistics.dto.MatchingStatsDto;
-import com.homeaid.statistics.dto.PaymentStatsDto;
-import com.homeaid.statistics.dto.ReservationStatsDto;
-import com.homeaid.statistics.dto.SettlementStatsDto;
-import com.homeaid.statistics.dto.UserStatsDto;
+import static com.homeaid.statistics.config.StatisticsConstants.STATISTICS_LOCK_TTL;
+
 import com.homeaid.statistics.service.AdminStatisticsService;
+import com.homeaid.util.RedisUtil;
 import java.time.LocalDate;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,47 +15,40 @@ import org.springframework.stereotype.Service;
 @Service
 public class AdminStatisticsScheduler {
 
-  private final AdminStatisticsService adminStatisticsService;
+  private static final String LOCK_PREFIX = "lock:statistics:";
 
-  @Scheduled(cron = "0 0 3 * * *") // 매일 새벽 3시 실행
+  private final AdminStatisticsService adminStatisticsService;
+  private final RedisUtil redisUtil;
+
+  @Scheduled(cron = "0 0 3 * * *") // 매일 새벽 3시
   public void runScheduledStatistics() {
-    LocalDate today = LocalDate.now();
-    int year = today.getYear();
-    int month = today.getMonthValue();
-    int day = today.getDayOfMonth();
+
+    // 전날 기준으로 통계 생성 - 7월 9일 새벽 3시에 실행된 스케줄러는 7월 8일 통계를 계산해야 함
+    LocalDate targetDate = LocalDate.now().minusDays(1);
+    int year = targetDate.getYear();
+    int month = targetDate.getMonthValue();
+    int day = targetDate.getDayOfMonth();
+
+    String lockKey = LOCK_PREFIX + year + ":" + month + ":" + day;
+
+    // Redis 기반 분산 락 TTL (통계 중복 실행 방지용) → 상수화로 재사용성 확보
+    boolean acquired = redisUtil.setIfAbsent(lockKey, "LOCKED", STATISTICS_LOCK_TTL);
+
+    if (!acquired) {
+      log.warn("[스케줄러] 이미 {}년 {}월 {}일 통계 작업이 실행 중입니다. 중복 실행 방지로 스킵합니다.", year, month, day);
+      return;
+    }
 
     log.info("[스케줄러] {}년 {}월 {}일 통계 계산 시작", year, month, day);
 
     try {
-      log.info("→ 회원 통계 계산");
-      UserStatsDto userStats = adminStatisticsService.getUserStats(year, month, day);
-      log.info("회원 통계: {}", userStats);
-
-      log.info("→ 결제 통계 계산");
-      PaymentStatsDto paymentStats = adminStatisticsService.getPaymentStats(year, month, null); // 월간 통계
-      log.info("결제 통계(월간): {}", paymentStats);
-
-      log.info("→ 일별 결제 통계 계산");
-      PaymentStatsDto dailyPaymentStats = adminStatisticsService.getPaymentStats(year, month, day); // 일별 통계
-      log.info("결제 통계(일간): {}", dailyPaymentStats);
-
-      log.info("→ 예약 통계 계산");
-      ReservationStatsDto reservationStats = adminStatisticsService.getReservationStats(year, month, day);
-      log.info("예약 통계: {}", reservationStats);
-
-      log.info("→ 매칭 통계 계산");
-      MatchingStatsDto matchingStats = adminStatisticsService.getMatchingStats(year, month, day);
-      log.info("매칭 통계: {}", matchingStats);
-
-      log.info("→ 정산 통계 계산");
-      SettlementStatsDto settlementStats = adminStatisticsService.getSettlementStats(year, month, day);
-      log.info("정산 통계: {}", settlementStats);
+      // 통계 생성 및 저장
+      adminStatisticsService.generateAndStoreStatistics(year, month, day);
+      log.info("[스케줄러] {}년 {}월 {}일 통계 계산 완료", year, month, day);
 
     } catch (Exception e) {
-      log.error("스케줄링 통계 처리 중 오류 발생: {}", e.getMessage(), e);
+      log.error("[스케줄러] 통계 생성 중 예외 발생: {}", e.getMessage(), e);
     }
-
-    log.info("[스케줄러] {}년 {}월 {}일 통계 계산 완료", year, month, day);
   }
 
 }

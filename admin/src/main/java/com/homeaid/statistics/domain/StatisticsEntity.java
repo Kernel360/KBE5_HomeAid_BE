@@ -7,6 +7,7 @@ import com.homeaid.statistics.dto.AdminStatisticsDto;
 import com.homeaid.statistics.exception.StatisticsErrorCode;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EntityListeners;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -19,6 +20,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @Entity
 @Table(name = "admin_statistics")
@@ -26,6 +29,7 @@ import org.springframework.data.annotation.CreatedDate;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
+@EntityListeners(AuditingEntityListener.class)
 public class StatisticsEntity {
 
   @Id
@@ -40,8 +44,12 @@ public class StatisticsEntity {
   private String jsonData; // AdminStatisticsDto 전체를 JSON 문자열로 저장
 
   @CreatedDate
-  @Column(updatable = false)
+  @Column(updatable = false, nullable = false)
   private LocalDateTime createdAt;
+
+  @LastModifiedDate
+  @Column(name = "updated_at", nullable = false)
+  private LocalDateTime updatedAt; // 마지막 갱신 시점 자동 기록
 
   public static StatisticsEntity fromDto(AdminStatisticsDto dto) {
     try {

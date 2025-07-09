@@ -1,5 +1,7 @@
 package com.homeaid.statistics.controller;
 
+import static com.homeaid.statistics.config.StatisticsConstants.STATISTICS_CACHE_TTL;
+
 import com.homeaid.common.response.CommonApiResponse;
 import com.homeaid.exception.CustomException;
 import com.homeaid.statistics.dto.AdminStatisticsDto;
@@ -14,7 +16,7 @@ import com.homeaid.statistics.service.AdminStatisticsService;
 import com.homeaid.util.RedisKeyFactory;
 import com.homeaid.util.RedisUtil;
 import io.swagger.v3.oas.annotations.Operation;
-import java.time.Duration;
+import java.time.LocalDate;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -119,21 +121,29 @@ public class AdminStatisticsController {
       @RequestParam(required = false) Integer month,
       @RequestParam(required = false) Integer day) {
 
+    // 기본 파라미터 유효성 검증 추가
+    if (year < 2000 || year > LocalDate.now().getYear()) {
+      throw new CustomException(StatisticsErrorCode.INVALID_YEAR);
+    }
+
+    if (month != null && (month < 1 || month > 12)) {
+      throw new CustomException(StatisticsErrorCode.INVALID_MONTH);
+    }
+
+    if (day != null && (day < 1 || day > 31)) { // 간단히 31까지로 제한
+      throw new CustomException(StatisticsErrorCode.INVALID_DAY);
+    }
+
     String key = RedisKeyFactory.buildAdminStatisticsKey(year, month, day);
     AdminStatisticsDto dto = (AdminStatisticsDto) redisUtil.getObject(key);
 
     if (dto == null) {
-      // Redis 미존재 시 DB fallback + Redis 재저장
       dto = adminStatisticsService.getStatisticsOrLoad(year, month, day);
-      redisUtil.save(key, dto, Duration.ofDays(30));
-    }
-
-    // 최종 null 체크
-    if (dto == null) {
-      throw new CustomException(StatisticsErrorCode.STATISTICS_NOT_FOUND);
+      redisUtil.save(key, dto, STATISTICS_CACHE_TTL);
     }
 
     return ResponseEntity.ok(CommonApiResponse.success(dto));
   }
+
 
 }
