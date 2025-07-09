@@ -10,12 +10,14 @@ import com.homeaid.dto.RequestAlert;
 import com.homeaid.exception.CustomException;
 import com.homeaid.matching.exception.MatchingErrorCode;
 import com.homeaid.reservation.exception.ReservationErrorCode;
-import com.homeaid.util.GeoUtils;
 import com.homeaid.matching.repository.MatchingRepository;
 import com.homeaid.reservation.repository.ReservationRepository;
 import com.homeaid.worklog.exception.WorkLogErrorCode;
 import com.homeaid.worklog.repository.WorkLogRepository;
+import com.homeaid.worklog.util.GeoUtils;
+import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -23,30 +25,38 @@ import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 @Service
+@Slf4j
 public class WorkLogServiceImpl implements WorkLogService {
 
   private final WorkLogRepository workLogRepository;
-  private final ReservationRepository reservationRepository;
-  private final static int CHECK_RANGE_DISTANCE_METER = 1000; //500미터
+
+  private final static int CHECK_RANGE_DISTANCE_METER = 1000;
+
   private final MatchingRepository matchingRepository;
+
   private final NotificationPublisher notificationPublisher;
 
   @Transactional
   @Override
-  public WorkLog createWorkLog(Long userId, Long reservationId, Double latitude, Double longitude) {
-    //요청 한 예약건이 존재하는 예약건인지 검증
+  public WorkLog updateWorkLogForCheckIn(Long userId, Long matchingId, Double latitude,
+      Double longitude) {
 
-    Matching matching = matchingRepository.findById(reservationId).orElseThrow(() -> new CustomException(MatchingErrorCode.MATCHING_NOT_FOUND));
-    //존재한 예약건에 대해 요청한 매니저 아이디가 체크인을 한적이있는지 검증
-    if (workLogRepository.existsWorkLogByManagerIdAndReservationId(userId, reservationId)) {
+    Matching matching = matchingRepository.findById(matchingId)
+        .orElseThrow(() -> new CustomException(MatchingErrorCode.MATCHING_NOT_FOUND));
+
+    WorkLog workLog = matching.getWorkLog();
+
+    if (workLog.getCheckInTime() == null) {
       throw new CustomException(WorkLogErrorCode.ALREADY_COMPLETED_CHECKIN);
     }
 
-    if (!isValidDistance(reservationId, latitude, longitude)) {
+    if (!isValidDistance(matching.getReservation(), latitude, longitude)) {
       throw new CustomException(WorkLogErrorCode.OUT_OF_WORK_RANGE);
     }
-    WorkLog workLog = WorkLog.builder().workType(WorkType.CHECKIN).managerId(userId)
-        .reservation(reservation).build();
+
+    LocalDateTime checkInTime = workLog.updateCheckIn();
+
+    log.info("[WorkLog] 매니저 ID: {}, 매칭 ID: {}, 체크인 시간: {}", userId, matchingId, checkInTime);
 
     RequestAlert createdAlert = RequestAlert.createAlert(AlertType.WORK_CHECKIN,
             reservation.getCustomerId(),
@@ -87,13 +97,10 @@ public class WorkLogServiceImpl implements WorkLogService {
   }
 
   /**
-   * @param reservationId 예약 위치 조회할 id
+   * @param reservation 예약 위치 조회할 id
    * @return 예약 위치와 체크인 위치의 차이가 CHECK_RANGE_DISTANCE_METER 범위 안에 있으면 true
    */
-  private boolean isValidDistance(Long reservationId, Double latitude, Double longitude) {
-    System.out.println(latitude + "+TTHhH+H+h+===" + longitude);
-    Reservation reservation = reservationRepository.findById(reservationId)
-        .orElseThrow(() -> new CustomException(ReservationErrorCode.RESERVATION_NOT_FOUND));
+  private boolean isValidDistance(Reservation reservation, Double latitude, Double longitude) {
     double calculatedDistance = GeoUtils.calculateDistanceInMeters(reservation.getLatitude(),
         reservation.getLongitude(), latitude, longitude);
 
@@ -101,7 +108,8 @@ public class WorkLogServiceImpl implements WorkLogService {
   }
 
   public WorkLog isValidManager(Long reservationId, Long requestManagerId) {
-    WorkLog workLog = workLogRepository.findByReservationId(reservationId).orElseThrow(() -> new CustomException(ReservationErrorCode.RESERVATION_NOT_FOUND));
+    WorkLog workLog = workLogRepository.findByReservationId(reservationId)
+        .orElseThrow(() -> new CustomException(ReservationErrorCode.RESERVATION_NOT_FOUND));
 
     if (!workLog.getManagerId().equals(requestManagerId)) {
       throw new CustomException(WorkLogErrorCode.CHECKOUT_MANAGER_MISMATCH);

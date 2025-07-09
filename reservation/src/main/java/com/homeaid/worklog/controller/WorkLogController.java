@@ -9,6 +9,7 @@ import com.homeaid.worklog.dto.response.CheckInResponseDto;
 import com.homeaid.auth.user.CustomUserDetails;
 import com.homeaid.worklog.service.WorkLogService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
@@ -29,25 +30,27 @@ public class WorkLogController {
 
   private final WorkLogService workLogService;
 
-  @PostMapping
+  @PostMapping("/matchings/{matchingId}/check-in")
   @Operation(summary = "체크인 요청", description = "매니저의 예약건에 대한 체크인 요청")
   @ApiResponses({
       @ApiResponse(responseCode = "200", description = "체크인 성공"),
       @ApiResponse(responseCode = "400", description = "이미 체크인 한 예약건"),
       @ApiResponse(responseCode = "403", description = "예약 위치 범위 밖의 잘못된 요청")
   })
-  public ResponseEntity<CommonApiResponse<CheckInResponseDto>> createCheckIn(
+  public ResponseEntity<CommonApiResponse<CheckInResponseDto>> updateWorkLogForCheckIn(
       @AuthenticationPrincipal CustomUserDetails user,
+      @Parameter(description = "매칭 ID", required = true)
+      @PathVariable(name = "matchingId") Long matchingId,
       @RequestBody @Valid CheckInRequestDto checkInRequestDto) {
 
-    WorkLog workLog = workLogService.createWorkLog(user.getUserId(), checkInRequestDto.getReservationId(), checkInRequestDto.getLat(),
+    WorkLog workLog = workLogService.updateWorkLogForCheckIn(user.getUserId(), matchingId, checkInRequestDto.getLat(),
         checkInRequestDto.getLng());
 
     return ResponseEntity.status(HttpStatus.CREATED)
         .body(CommonApiResponse.success(CheckInResponseDto.toDto(workLog)));
   }
 
-  @PatchMapping("/{reservationId}")
+  @PatchMapping("matchings/{matchingId}")
   @Operation(summary = "체크아웃 요청", description = "매니저의 예약건에 대한 체크아웃 요청")
   @ApiResponses({
       @ApiResponse(responseCode = "200", description = "체크아웃 성공"),
@@ -57,10 +60,10 @@ public class WorkLogController {
   })
   public ResponseEntity<CommonApiResponse<Void>> updateWorkLogForCheckOut(
       @AuthenticationPrincipal CustomUserDetails user,
-      @PathVariable(name = "reservationId") Long reservationId,
+      @PathVariable(name = "matchingId") Long matchingId,
       @RequestBody @Valid CheckOutRequestDto checkOutRequestDto) {
 
-    workLogService.updateWorkLogForCheckOut(user.getUserId(), reservationId, checkOutRequestDto.getLat(),
+    workLogService.updateWorkLogForCheckOut(user.getUserId(), matchingId, checkOutRequestDto.getLat(),
         checkOutRequestDto.getLng());
 
     return ResponseEntity.ok(CommonApiResponse.success());

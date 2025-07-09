@@ -56,6 +56,11 @@ public class WorkLog {
         return WorkLog.builder().checkInTime(null).checkOutTime(null).workType(workType).matching(matching).build();
     }
 
+    public LocalDateTime updateCheckIn() {
+        this.checkInTime = LocalDateTime.now();
+        return this.checkInTime;
+    }
+
     public void updateCheckOut() {
         this.checkOutTime = LocalDateTime.now();
         this.workType = WorkType.CHECKOUT;

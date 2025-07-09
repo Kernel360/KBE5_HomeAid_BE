@@ -16,7 +16,4 @@ public class CheckInRequestDto {
     @Schema(description = "위도 값", example = "37.4946490234479")
     private Double lng;
 
-    @NotNull
-    private Long reservationId;
-
 }
