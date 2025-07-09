@@ -150,4 +150,17 @@ public class SseNotificationService {
             throw e;
         }
     }
+
+    @Scheduled(fixedRate = 30000) //30초마다 핑
+    public void sendHeartbeat() {
+        connections.forEach((userId, emitter) -> {
+            try {
+                emitter.send(SseEmitter.event()
+                        .name("ping")
+                        .data(System.currentTimeMillis()));
+            } catch (IOException ignored) {
+                emitter.complete();
+            }
+        });
+    }
 }
