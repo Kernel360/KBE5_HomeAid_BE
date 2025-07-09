@@ -23,13 +23,37 @@ public interface PaymentRepository extends JpaRepository<Payment, Long> {
   @Query("SELECT COALESCE(SUM(p.amount), 0) FROM Payment p WHERE p.status = 'PAID'")
   long sumAllPaymentAmounts();
 
-  // 총 결제 금액 (연간/월간)
-  @Query("SELECT COALESCE(SUM(p.amount), 0) FROM Payment p WHERE YEAR(p.paidAt) = :year AND (:month IS NULL OR MONTH(p.paidAt) = :month) AND p.status = 'PAID'")
-  long sumPayments(@Param("year") int year, @Param("month") Integer month);
+  // 총 결제 금액 (연간/월간/일간)
+  @Query("SELECT COALESCE(SUM(p.amount), 0) FROM Payment p " +
+      "WHERE YEAR(p.paidAt) = :year " +
+      "AND (:month IS NULL OR MONTH(p.paidAt) = :month) " +
+      "AND (:day IS NULL OR DAY(p.paidAt) = :day) " +
+      "AND p.status = 'PAID'")
+  long sumPayments(@Param("year") int year, @Param("month") Integer month, @Param("day") Integer day);
 
-  // 취소 금액 (연간/월간)
-  @Query("SELECT COALESCE(SUM(p.amount), 0) FROM Payment p WHERE YEAR(p.paidAt) = :year AND (:month IS NULL OR MONTH(p.paidAt) = :month) AND p.status IN ('CANCELED', 'REFUNDED', 'PARTIAL_REFUNDED')")
-  long sumCanceledPayments(@Param("year") int year, @Param("month") Integer month);
+  // 취소 금액 (연간/월간/일간)
+  @Query("SELECT COALESCE(SUM(p.amount), 0) FROM Payment p " +
+      "WHERE YEAR(p.paidAt) = :year " +
+      "AND (:month IS NULL OR MONTH(p.paidAt) = :month) " +
+      "AND (:day IS NULL OR DAY(p.paidAt) = :day) " +
+      "AND p.status IN ('CANCELED', 'REFUNDED', 'PARTIAL_REFUNDED')")
+  long sumCanceledPayments(@Param("year") int year, @Param("month") Integer month, @Param("day") Integer day);
+
+  // 결제 건수 (연간/월간/일간)
+  @Query("SELECT COUNT(p) FROM Payment p " +
+      "WHERE YEAR(p.paidAt) = :year " +
+      "AND (:month IS NULL OR MONTH(p.paidAt) = :month) " +
+      "AND (:day IS NULL OR DAY(p.paidAt) = :day) " +
+      "AND p.status = 'PAID'")
+  long countPayments(@Param("year") int year, @Param("month") Integer month, @Param("day") Integer day);
+
+  // 취소 건수 (연간/월간/일간)
+  @Query("SELECT COUNT(p) FROM Payment p " +
+      "WHERE YEAR(p.paidAt) = :year " +
+      "AND (:month IS NULL OR MONTH(p.paidAt) = :month) " +
+      "AND (:day IS NULL OR DAY(p.paidAt) = :day) " +
+      "AND p.status IN ('CANCELED', 'REFUNDED', 'PARTIAL_REFUNDED')")
+  long countCanceledPayments(@Param("year") int year, @Param("month") Integer month, @Param("day") Integer day);
 
   // 결제 수단별 (이건 월별 통계만 해당되므로 유지)
   @Query("SELECT " +
@@ -41,6 +65,5 @@ public interface PaymentRepository extends JpaRepository<Payment, Long> {
   Object findPaymentMethodSums(@Param("year") int year, @Param("month") int month);
 
   List<Payment> findAllByReservation_ManagerIdAndPaidAtBetween(Long managerId, LocalDateTime start, LocalDateTime end);
-
 
 }

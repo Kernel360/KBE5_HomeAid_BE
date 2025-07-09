@@ -21,13 +21,26 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
   @Query("SELECT COUNT(r) FROM Reservation r WHERE DATE(r.createdDate) = CURRENT_DATE")
   long countTodayReservations();
 
-  // 연도 또는 연도 + 월 기준 예약 수 조회
+  // 전체 예약 수 (연/월/일)
   @Query("""
     SELECT COUNT(r) FROM Reservation r
     WHERE YEAR(r.createdDate) = :year
       AND (:month IS NULL OR MONTH(r.createdDate) = :month)
-    """)
-  long countReservationsByYearAndOptionalMonth(@Param("year") int year, @Param("month") Integer month);
+      AND (:day IS NULL OR DAY(r.createdDate) = :day)
+  """)
+  long countReservations(@Param("year") int year, @Param("month") Integer month, @Param("day") Integer day
+  );
+
+  // 취소된 예약 수 (연/월/일)
+  @Query("""
+    SELECT COUNT(r) FROM Reservation r
+    WHERE r.status = 'CANCELLED'
+      AND YEAR(r.createdDate) = :year
+      AND (:month IS NULL OR MONTH(r.createdDate) = :month)
+      AND (:day IS NULL OR DAY(r.createdDate) = :day)
+  """)
+  long countCancelledReservations(@Param("year") int year, @Param("month") Integer month, @Param("day") Integer day
+  );
 
   // 연도 또는 연도 + 월 기준 평균 처리 시간 (일)
   @Query(value = """
@@ -39,7 +52,27 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
   """, nativeQuery = true)
   Double getAverageProcessingDays(@Param("year") int year, @Param("month") Integer month);
 
-//  @Query("SELECT AVG(TIMESTAMPDIFF(MINUTE, r.createdAt, r.completedAt)) " +
-//      "FROM Reservation r WHERE YEAR(r.createdAt) = :year AND r.completedAt IS NOT NULL")
-//  Double getAverageProcessingTime(@Param("year") int year);
+  // 완료된 예약 수 (성공률 계산용)
+  @Query("""
+    SELECT COUNT(r) FROM Reservation r
+    WHERE r.status = 'COMPLETED'
+      AND YEAR(r.createdDate) = :year
+      AND (:month IS NULL OR MONTH(r.createdDate) = :month)
+      AND (:day IS NULL OR DAY(r.createdDate) = :day)
+  """)
+  long countCompletedReservations(@Param("year") int year, @Param("month") Integer month, @Param("day") Integer day
+  );
+
+  // 평균 처리 시간 (분) - Native SQL
+  @Query(value = """
+    SELECT AVG(TIMESTAMPDIFF(MINUTE, r.requested_date, r.modified_date))
+    FROM reservation r
+    WHERE YEAR(r.requested_date) = :year
+      AND (:month IS NULL OR MONTH(r.requested_date) = :month)
+      AND (:day IS NULL OR DAY(r.requested_date) = :day)
+      AND r.status = 'COMPLETED'
+  """, nativeQuery = true)
+  Double getAverageProcessingMinutes(@Param("year") int year, @Param("month") Integer month, @Param("day") Integer day
+  );
+
 }
