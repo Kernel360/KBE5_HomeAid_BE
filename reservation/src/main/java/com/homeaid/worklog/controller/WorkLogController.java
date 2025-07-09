@@ -30,27 +30,27 @@ public class WorkLogController {
 
   private final WorkLogService workLogService;
 
-  @PostMapping("/matchings/{matchingId}/check-in")
+  @PatchMapping("/matchings/{matchingId}/check-in")
   @Operation(summary = "체크인 요청", description = "매니저의 예약건에 대한 체크인 요청")
   @ApiResponses({
       @ApiResponse(responseCode = "200", description = "체크인 성공"),
       @ApiResponse(responseCode = "400", description = "이미 체크인 한 예약건"),
       @ApiResponse(responseCode = "403", description = "예약 위치 범위 밖의 잘못된 요청")
   })
-  public ResponseEntity<CommonApiResponse<CheckInResponseDto>> updateWorkLogForCheckIn(
+  public ResponseEntity<CommonApiResponse<Void>> updateWorkLogForCheckIn(
       @AuthenticationPrincipal CustomUserDetails user,
       @Parameter(description = "매칭 ID", required = true)
       @PathVariable(name = "matchingId") Long matchingId,
       @RequestBody @Valid CheckInRequestDto checkInRequestDto) {
 
-    WorkLog workLog = workLogService.updateWorkLogForCheckIn(user.getUserId(), matchingId, checkInRequestDto.getLat(),
+    workLogService.updateWorkLogForCheckIn(user.getUserId(), matchingId, checkInRequestDto.getLat(),
         checkInRequestDto.getLng());
 
     return ResponseEntity.status(HttpStatus.CREATED)
-        .body(CommonApiResponse.success(CheckInResponseDto.toDto(workLog)));
+        .body(CommonApiResponse.success());
   }
 
-  @PatchMapping("matchings/{matchingId}")
+  @PatchMapping("/matchings/{matchingId}/check-out")
   @Operation(summary = "체크아웃 요청", description = "매니저의 예약건에 대한 체크아웃 요청")
   @ApiResponses({
       @ApiResponse(responseCode = "200", description = "체크아웃 성공"),
@@ -68,6 +68,8 @@ public class WorkLogController {
 
     return ResponseEntity.ok(CommonApiResponse.success());
   }
+
+
 
   @GetMapping
   @Operation(summary = "매니저 근무 기록 전체 조회", description = "매니저의 체크인/체크아웃 기록을 페이지네이션으로 조회합니다.")

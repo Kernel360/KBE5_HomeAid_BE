@@ -123,10 +123,7 @@ public class Matching {
   }
 
   public void createWorkLog() {
-    this.workLog = WorkLog.createWorkLog(WorkType.CHECKIN, this);
+    this.workLog = WorkLog.createWorkLog(this);
   }
 
-  public boolean isCompleted() {
-    return this.status == MatchingStatus.CONFIRMED;
-  }
 }

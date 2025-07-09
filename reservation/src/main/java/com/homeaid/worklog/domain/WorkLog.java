@@ -52,18 +52,20 @@ public class WorkLog {
         this.matching = matching;
     }
 
-    public static WorkLog createWorkLog(WorkType workType, Matching matching) {
-        return WorkLog.builder().checkInTime(null).checkOutTime(null).workType(workType).matching(matching).build();
+    public static WorkLog createWorkLog(Matching matching) {
+        return WorkLog.builder().checkInTime(null).checkOutTime(null).workType(null).matching(matching).build();
     }
 
     public LocalDateTime updateCheckIn() {
         this.checkInTime = LocalDateTime.now();
+        this.workType = WorkType.CHECKIN;
         return this.checkInTime;
     }
 
-    public void updateCheckOut() {
+    public LocalDateTime updateCheckOut() {
         this.checkOutTime = LocalDateTime.now();
         this.workType = WorkType.CHECKOUT;
+        return this.checkOutTime;
     }
 
 }

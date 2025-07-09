@@ -7,9 +7,9 @@ import org.springframework.data.domain.Pageable;
 
 public interface WorkLogService {
 
-  WorkLog updateWorkLogForCheckIn(Long userId, Long matchingId, Double longitude, Double latitude);
+  void updateWorkLogForCheckIn(Long userId, Long matchingId, Double longitude, Double latitude);
 
-  void updateWorkLogForCheckOut(Long userId, Long reservationId,
+  void updateWorkLogForCheckOut(Long userId, Long matchingId,
       Double longitude, Double latitude);
 
   Page<WorkLog> getAllWorkLogsByManager(Long userId, Pageable pageable);

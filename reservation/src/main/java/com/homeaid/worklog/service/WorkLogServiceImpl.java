@@ -9,7 +9,6 @@ import com.homeaid.worklog.domain.enumerate.WorkType;
 import com.homeaid.dto.RequestAlert;
 import com.homeaid.exception.CustomException;
 import com.homeaid.matching.exception.MatchingErrorCode;
-import com.homeaid.reservation.exception.ReservationErrorCode;
 import com.homeaid.matching.repository.MatchingRepository;
 import com.homeaid.reservation.repository.ReservationRepository;
 import com.homeaid.worklog.exception.WorkLogErrorCode;
@@ -38,15 +37,14 @@ public class WorkLogServiceImpl implements WorkLogService {
 
   @Transactional
   @Override
-  public WorkLog updateWorkLogForCheckIn(Long userId, Long matchingId, Double latitude,
+  public void updateWorkLogForCheckIn(Long userId, Long matchingId, Double latitude,
       Double longitude) {
 
-    Matching matching = matchingRepository.findById(matchingId)
-        .orElseThrow(() -> new CustomException(MatchingErrorCode.MATCHING_NOT_FOUND));
+    Matching matching = getAuthorizedWorkLog(matchingId, userId);
 
     WorkLog workLog = matching.getWorkLog();
 
-    if (workLog.getCheckInTime() == null) {
+    if (workLog.getCheckInTime() != null) {
       throw new CustomException(WorkLogErrorCode.ALREADY_COMPLETED_CHECKIN);
     }
 
@@ -63,30 +61,37 @@ public class WorkLogServiceImpl implements WorkLogService {
             UserRole.CUSTOMER,
             reservationId, null);
     notificationPublisher.publishNotification(createdAlert);
-
-    return workLogRepository.save(workLog);
   }
 
   @Transactional
   @Override
-  public void updateWorkLogForCheckOut(Long userId, Long reservationId,
+  public void updateWorkLogForCheckOut(Long userId, Long matchingId,
       Double latitude, Double longitude) {
 
-    WorkLog workLog = isValidManager(reservationId, userId);
+    Matching matching = getAuthorizedWorkLog(matchingId, userId);
 
-    if (!isValidDistance(workLog.getReservation().getId(), latitude, longitude)) {
+    WorkLog workLog = matching.getWorkLog();
+
+    if (workLog.getCheckInTime() != null) {
+      throw new CustomException(WorkLogErrorCode.ALREADY_COMPLETED_CHECKIN);
+    }
+
+    if (!isValidDistance(matching.getReservation(), latitude, longitude)) {
       throw new CustomException(WorkLogErrorCode.OUT_OF_WORK_RANGE);
     }
 
-    workLog.updateCheckOut();
+    LocalDateTime checkOutTime = workLog.updateCheckOut();
 
-    updateReservationStatusCompleted(workLog.getReservation());
+    log.info("[WorkLog] 매니저 ID: {}, 매칭 ID: {}, 체크아웃 시간: {}", userId, matchingId, checkOutTime);
+
+    matching.getReservation().updateStatusCompleted();
 
     RequestAlert createdAlert = RequestAlert.createAlert(AlertType.WORK_CHECKOUT,
-            workLog.getReservation().getCustomerId(),
-            UserRole.CUSTOMER,
-            reservationId,
-            null);
+        workLog.getReservation().getCustomerId(),
+        UserRole.CUSTOMER,
+        reservationId,
+        null);
+
     notificationPublisher.publishNotification(createdAlert);
   }
 
@@ -107,19 +112,21 @@ public class WorkLogServiceImpl implements WorkLogService {
     return calculatedDistance < CHECK_RANGE_DISTANCE_METER;
   }
 
-  public WorkLog isValidManager(Long reservationId, Long requestManagerId) {
-    WorkLog workLog = workLogRepository.findByReservationId(reservationId)
-        .orElseThrow(() -> new CustomException(ReservationErrorCode.RESERVATION_NOT_FOUND));
-
-    if (!workLog.getManagerId().equals(requestManagerId)) {
+  public void isValidManager(Long managerId, Long requestManagerId) {
+    if (!managerId.equals(requestManagerId)) {
       throw new CustomException(WorkLogErrorCode.CHECKOUT_MANAGER_MISMATCH);
     }
-
-    return workLog;
   }
 
-  public void updateReservationStatusCompleted(Reservation reservation) {
-    reservation.updateStatusCompleted();
+  private Matching findMatchingById(Long matchingId) {
+    return matchingRepository.findById(matchingId)
+        .orElseThrow(() -> new CustomException(MatchingErrorCode.MATCHING_NOT_FOUND));
+  }
+
+  private Matching getAuthorizedWorkLog(Long matchingId, Long userId) {
+    Matching matching = findMatchingById(matchingId);
+    isValidManager(matching.getManager().getId(), userId);
+    return matching;
   }
 
 
