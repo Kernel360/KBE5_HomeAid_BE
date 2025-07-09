@@ -1,6 +1,6 @@
 package com.homeaid.domain;
 
-import com.homeaid.domain.enumerate.*;
+import com.homeaid.worklog.domain.enumerate.*;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;

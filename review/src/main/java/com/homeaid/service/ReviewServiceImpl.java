@@ -1,14 +1,14 @@
 package com.homeaid.service;
 
-import com.homeaid.domain.Reservation;
+import com.homeaid.reservation.domain.Reservation;
 import com.homeaid.domain.Review;
-import com.homeaid.domain.enumerate.ReservationStatus;
+import com.homeaid.reservation.domain.enumerate.ReservationStatus;
 import com.homeaid.exception.CustomException;
-import com.homeaid.exception.MatchingErrorCode;
-import com.homeaid.exception.ReservationErrorCode;
+import com.homeaid.matching.exception.MatchingErrorCode;
+import com.homeaid.reservation.exception.ReservationErrorCode;
 import com.homeaid.exception.ReviewErrorCode;
-import com.homeaid.repository.MatchingRepository;
-import com.homeaid.repository.ReservationRepository;
+import com.homeaid.matching.repository.MatchingRepository;
+import com.homeaid.reservation.repository.ReservationRepository;
 import com.homeaid.repository.ReviewRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;

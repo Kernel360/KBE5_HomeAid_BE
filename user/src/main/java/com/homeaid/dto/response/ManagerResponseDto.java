@@ -1,7 +1,7 @@
 package com.homeaid.dto.response;
 
 import com.homeaid.domain.Manager;
-import com.homeaid.domain.enumerate.ManagerStatus;
+import com.homeaid.worklog.domain.enumerate.ManagerStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

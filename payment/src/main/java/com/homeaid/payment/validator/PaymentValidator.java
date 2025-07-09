@@ -1,6 +1,6 @@
 package com.homeaid.payment.validator;
 
-import com.homeaid.domain.enumerate.ReservationStatus;
+import com.homeaid.reservation.domain.enumerate.ReservationStatus;
 import com.homeaid.exception.CustomException;
 import com.homeaid.payment.domain.Payment;
 import com.homeaid.payment.exception.PaymentErrorCode;

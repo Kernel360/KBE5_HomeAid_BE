@@ -37,6 +37,7 @@ public class AdminStatisticsServiceImpl implements AdminStatisticsService {
     return userStatisticsProvider.generate(year, month, day);
   }
 
+  // 정산 통계
   @Override
   public PaymentStatsDto getPaymentStats(int year, Integer month, Integer day) {
     return paymentStatisticsProvider.generate(year, month, day);

@@ -6,7 +6,7 @@ import com.homeaid.dashboard.dto.DailyRevenueRefundDto;
 import com.homeaid.payment.repository.PaymentRepository;
 import com.homeaid.payment.repository.RefundRepository;
 import com.homeaid.repository.ManagerRepository;
-import com.homeaid.repository.ReservationRepository;
+import com.homeaid.reservation.repository.ReservationRepository;
 import com.homeaid.repository.UserRepository;
 import com.homeaid.settlement.repository.SettlementRepository;
 import java.time.DayOfWeek;

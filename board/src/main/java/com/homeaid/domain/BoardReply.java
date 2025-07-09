@@ -1,6 +1,6 @@
 package com.homeaid.domain;
 
-import com.homeaid.domain.enumerate.UserRole;
+import com.homeaid.worklog.domain.enumerate.UserRole;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EntityListeners;

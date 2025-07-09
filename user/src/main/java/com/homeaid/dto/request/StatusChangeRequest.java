@@ -1,10 +1,9 @@
 package com.homeaid.dto.request;
 
-import com.homeaid.domain.enumerate.ManagerStatus;
+import com.homeaid.worklog.domain.enumerate.ManagerStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 
 @Getter

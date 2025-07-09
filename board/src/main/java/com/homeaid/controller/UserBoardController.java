@@ -2,7 +2,7 @@ package com.homeaid.controller;
 
 import com.homeaid.common.response.CommonApiResponse;
 import com.homeaid.domain.UserBoard;
-import com.homeaid.domain.enumerate.UserRole;
+import com.homeaid.worklog.domain.enumerate.UserRole;
 import com.homeaid.dto.request.CreateBoardRequestDto;
 import com.homeaid.dto.request.UpdateBoardRequestDto;
 import com.homeaid.common.response.PagedResponseDto;

@@ -1,7 +1,7 @@
 package com.homeaid.repository;
 
 import com.homeaid.domain.UserWithdrawalRequest;
-import com.homeaid.domain.enumerate.RequestStatus;
+import com.homeaid.worklog.domain.enumerate.RequestStatus;
 import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

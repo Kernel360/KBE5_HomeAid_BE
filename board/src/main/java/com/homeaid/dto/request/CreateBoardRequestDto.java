@@ -2,7 +2,7 @@ package com.homeaid.dto.request;
 
 
 import com.homeaid.domain.UserBoard;
-import com.homeaid.domain.enumerate.UserRole;
+import com.homeaid.worklog.domain.enumerate.UserRole;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;

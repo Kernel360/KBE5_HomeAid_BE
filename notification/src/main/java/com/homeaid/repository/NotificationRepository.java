@@ -1,8 +1,8 @@
 package com.homeaid.repository;
 
 import com.homeaid.domain.Notification;
-import com.homeaid.domain.enumerate.NotificationStatus;
-import com.homeaid.domain.enumerate.UserRole;
+import com.homeaid.worklog.domain.enumerate.NotificationStatus;
+import com.homeaid.worklog.domain.enumerate.UserRole;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;

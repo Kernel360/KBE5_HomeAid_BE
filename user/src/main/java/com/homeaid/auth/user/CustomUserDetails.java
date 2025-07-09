@@ -1,6 +1,7 @@
 package com.homeaid.auth.user;
 
 import com.homeaid.domain.User;
+
 import com.homeaid.domain.enumerate.UserRole;
 import java.util.Collection;
 import java.util.Collections;
