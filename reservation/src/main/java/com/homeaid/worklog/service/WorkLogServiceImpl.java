@@ -29,8 +29,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 public class WorkLogServiceImpl implements WorkLogService {
 
-  private final WorkLogRepository workLogRepository;
-
   private final static int CHECK_RANGE_DISTANCE_METER = 1000;
 
   private final MatchingRepository matchingRepository;

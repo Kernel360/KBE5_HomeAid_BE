@@ -156,7 +156,7 @@ public class Reservation {
   }
 
   public Matching createMatching(Manager manager) {
-    Matching newMatching = Matching.create(manager, matchingList.size());
+    Matching newMatching = Matching.create(manager, matchingList.size()+1);
     newMatching.setReservation(this);
     updateStatusMatching();
     setManagerId(manager.getId());

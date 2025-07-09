@@ -64,6 +64,9 @@ public class ReservationResponseDto {
   @Schema(description = "고객 메모", example = "집에 개가 있어요.")
   private String customerMemo;
 
+  @Schema(description = "매칭 ID", example = "99")
+  private Long matchingId;
+
   public static ReservationResponseDto toDto(Reservation reservation, String customerName, String managerName) {
     return ReservationResponseDto.builder()
         .reservationId(reservation.getId())
@@ -80,7 +83,7 @@ public class ReservationResponseDto {
         .build();
   }
 
-  public static ReservationResponseDto toDto(Reservation reservation, MatchingStatus matchingStatus, String managerName) {
+  public static ReservationResponseDto toDto(Reservation reservation, MatchingStatus matchingStatus, String managerName, Long matchingId) {
     return ReservationResponseDto.builder()
         .reservationId(reservation.getId())
         .status(reservation.getStatus())
@@ -96,6 +99,7 @@ public class ReservationResponseDto {
         .address(reservation.getAddress())
         .addressDetail(reservation.getAddressDetail())
         .matchingStatus(matchingStatus)
+        .matchingId(matchingId)
         .build();
   }
 

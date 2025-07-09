@@ -79,13 +79,15 @@ public class ReservationServiceImpl implements ReservationService {
     Matching latestMatching = getLatestMatching(reservation).orElse(null);
 
     String managerName = null;
+    MatchingStatus status = null;
+    Long matchingId = null;
     if (latestMatching != null) {
       managerName = latestMatching.getManager().getName();
+      status = latestMatching.getStatus();
+      matchingId = latestMatching.getId();
     }
 
-    MatchingStatus status = (latestMatching != null) ? latestMatching.getStatus() : null;
-
-    return ReservationResponseDto.toDto(reservation, status, managerName);
+    return ReservationResponseDto.toDto(reservation, status, managerName, matchingId);
   }
 
   @Override

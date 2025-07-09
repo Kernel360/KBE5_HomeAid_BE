@@ -2,7 +2,6 @@ package com.homeaid.matching.repository;
 
 import com.homeaid.matching.controller.enumerate.MatchingStatus;
 import com.homeaid.matching.domain.Matching;
-import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
