@@ -1,5 +1,6 @@
 package com.homeaid.matching.repository;
 
+import com.homeaid.matching.controller.enumerate.MatchingStatus;
 import com.homeaid.matching.domain.Matching;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
@@ -11,9 +12,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface MatchingRepository extends JpaRepository<Matching, Long> {
-
-  @Query("SELECT COUNT(m) FROM Matching m WHERE m.reservation.id = :reservationId")
-  int countByReservationId(@Param("reservationId") Long reservationId);
 
   Page<Matching> findAllByManagerId(Long managerId, Pageable pageable);
 
@@ -49,5 +47,6 @@ public interface MatchingRepository extends JpaRepository<Matching, Long> {
   long countTotalMatchings(@Param("year") int year, @Param("month") Integer month, @Param("day") Integer day
   );
 
-  Optional<Matching> findTopByReservationIdOrderByModifiedDateDesc(Long reservationId);
+  @Query("SELECT m FROM Matching m JOIN FETCH m.workLog WHERE m.manager.id = :managerId AND m.status = :status ORDER BY m.workLog.createdDate DESC")
+  Page<Matching> findAllWithWorkLogByManager_IdAndStatus(@Param("managerId") Long managerId, @Param("status") MatchingStatus status, Pageable pageable);
 }

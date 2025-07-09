@@ -12,6 +12,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -93,7 +94,8 @@ public class WorkLogController {
       @RequestParam(value = "page", defaultValue = "0") int page,
       @RequestParam(value = "size", defaultValue = "10") int size
   ) {
-    Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "checkInTime"));
+    Pageable pageable = PageRequest.of(page, size);
+
     Page<WorkLog> workLogs = workLogService.getAllWorkLogsByManager(user.getUserId(), pageable);
 
     PagedResponseDto<WorkLogResponseDto> response = PagedResponseDto.fromPage(workLogs,

@@ -1,5 +1,6 @@
 package com.homeaid.worklog.service;
 
+import com.homeaid.matching.controller.enumerate.MatchingStatus;
 import com.homeaid.matching.domain.Matching;
 import com.homeaid.reservation.domain.Reservation;
 import com.homeaid.worklog.domain.WorkLog;
@@ -10,15 +11,15 @@ import com.homeaid.dto.RequestAlert;
 import com.homeaid.exception.CustomException;
 import com.homeaid.matching.exception.MatchingErrorCode;
 import com.homeaid.matching.repository.MatchingRepository;
-import com.homeaid.reservation.repository.ReservationRepository;
-import com.homeaid.worklog.dto.response.WorkLogResponseDto;
 import com.homeaid.worklog.exception.WorkLogErrorCode;
 import com.homeaid.worklog.repository.WorkLogRepository;
 import com.homeaid.worklog.util.GeoUtils;
 import java.time.LocalDateTime;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -73,7 +74,7 @@ public class WorkLogServiceImpl implements WorkLogService {
 
     WorkLog workLog = matching.getWorkLog();
 
-    if (workLog.getCheckInTime() != null) {
+    if (workLog.getCheckOutTime() != null) {
       throw new CustomException(WorkLogErrorCode.ALREADY_COMPLETED_CHECKIN);
     }
 
@@ -99,7 +100,14 @@ public class WorkLogServiceImpl implements WorkLogService {
   @Override
   @Transactional(readOnly = true)
   public Page<WorkLog> getAllWorkLogsByManager(Long userId, Pageable pageable) {
-    return workLogRepository.findAllByManagerId(userId, pageable);
+    Page<Matching> matchingPage =
+        matchingRepository.findAllWithWorkLogByManager_IdAndStatus(userId, MatchingStatus.CONFIRMED, pageable);
+
+    List<WorkLog> workLogList = matchingPage.stream()
+        .map(Matching::getWorkLog)
+        .toList();
+
+    return new PageImpl<>(workLogList, pageable, matchingPage.getTotalElements());
   }
 
   @Override
