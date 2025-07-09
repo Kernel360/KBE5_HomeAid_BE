@@ -11,6 +11,7 @@ import com.homeaid.exception.CustomException;
 import com.homeaid.matching.exception.MatchingErrorCode;
 import com.homeaid.matching.repository.MatchingRepository;
 import com.homeaid.reservation.repository.ReservationRepository;
+import com.homeaid.worklog.dto.response.WorkLogResponseDto;
 import com.homeaid.worklog.exception.WorkLogErrorCode;
 import com.homeaid.worklog.repository.WorkLogRepository;
 import com.homeaid.worklog.util.GeoUtils;
@@ -99,6 +100,15 @@ public class WorkLogServiceImpl implements WorkLogService {
   @Transactional(readOnly = true)
   public Page<WorkLog> getAllWorkLogsByManager(Long userId, Pageable pageable) {
     return workLogRepository.findAllByManagerId(userId, pageable);
+  }
+
+  @Override
+  @Transactional(readOnly = true)
+  public WorkLog getWorkLog(Long userId, Long matchingId) {
+
+    Matching matching = getAuthorizedWorkLog(matchingId, userId);
+
+    return matching.getWorkLog();
   }
 
   /**

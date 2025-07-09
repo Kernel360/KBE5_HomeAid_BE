@@ -11,10 +11,7 @@ import java.time.LocalDateTime;
 @Getter
 @Builder
 @Schema(description = "매니저 근무 기록 DTO")
-public class CheckInResponseDto {
-
-    @Schema(description = "근무 기록 ID", example = "1234")
-    private Long workLogId;
+public class WorkLogResponseDto {
 
     @Schema(description = "체크인 시간", example = "2025-06-06T09:00:00")
     private LocalDateTime checkInTime;
@@ -25,9 +22,8 @@ public class CheckInResponseDto {
     @Schema(description = "근무 상태", example = "COMPLETED")
     private WorkType status;
 
-    public static CheckInResponseDto toDto(WorkLog workLog) {
-        return CheckInResponseDto.builder()
-            .workLogId(workLog.getId())
+    public static WorkLogResponseDto toDto(WorkLog workLog) {
+        return WorkLogResponseDto.builder()
             .checkInTime(workLog.getCheckInTime())
             .checkOutTime(workLog.getCheckOutTime())
             .status(workLog.getWorkType())

@@ -3,9 +3,8 @@ package com.homeaid.worklog.controller;
 import com.homeaid.common.response.CommonApiResponse;
 import com.homeaid.common.response.PagedResponseDto;
 import com.homeaid.worklog.domain.WorkLog;
-import com.homeaid.worklog.dto.request.CheckInRequestDto;
-import com.homeaid.worklog.dto.request.CheckOutRequestDto;
-import com.homeaid.worklog.dto.response.CheckInResponseDto;
+import com.homeaid.worklog.dto.request.WorkLogRequestDto;
+import com.homeaid.worklog.dto.response.WorkLogResponseDto;
 import com.homeaid.auth.user.CustomUserDetails;
 import com.homeaid.worklog.service.WorkLogService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -31,49 +30,65 @@ public class WorkLogController {
   private final WorkLogService workLogService;
 
   @PatchMapping("/matchings/{matchingId}/check-in")
-  @Operation(summary = "체크인 요청", description = "매니저의 예약건에 대한 체크인 요청")
+  @Operation(summary = "체크인 요청", description = "매니저의 매칭건에 대한 체크인 요청")
   @ApiResponses({
       @ApiResponse(responseCode = "200", description = "체크인 성공"),
-      @ApiResponse(responseCode = "400", description = "이미 체크인 한 예약건"),
+      @ApiResponse(responseCode = "400", description = "이미 체크인 한 매칭건"),
       @ApiResponse(responseCode = "403", description = "예약 위치 범위 밖의 잘못된 요청")
   })
   public ResponseEntity<CommonApiResponse<Void>> updateWorkLogForCheckIn(
       @AuthenticationPrincipal CustomUserDetails user,
       @Parameter(description = "매칭 ID", required = true)
       @PathVariable(name = "matchingId") Long matchingId,
-      @RequestBody @Valid CheckInRequestDto checkInRequestDto) {
+      @RequestBody @Valid WorkLogRequestDto workLogRequestDto) {
 
-    workLogService.updateWorkLogForCheckIn(user.getUserId(), matchingId, checkInRequestDto.getLat(),
-        checkInRequestDto.getLng());
+    workLogService.updateWorkLogForCheckIn(user.getUserId(), matchingId, workLogRequestDto.getLat(),
+        workLogRequestDto.getLng());
 
     return ResponseEntity.status(HttpStatus.CREATED)
         .body(CommonApiResponse.success());
   }
 
   @PatchMapping("/matchings/{matchingId}/check-out")
-  @Operation(summary = "체크아웃 요청", description = "매니저의 예약건에 대한 체크아웃 요청")
+  @Operation(summary = "체크아웃 요청", description = "매니저의 매칭건에 대한 체크아웃 요청")
   @ApiResponses({
       @ApiResponse(responseCode = "200", description = "체크아웃 성공"),
-      @ApiResponse(responseCode = "404", description = "존재하지 않는 예약 건"),
+      @ApiResponse(responseCode = "404", description = "존재하지 않는 매칭 건"),
       @ApiResponse(responseCode = "403", description = "체크인의 매니저와 체크아웃 매니저가 다를 때"),
       @ApiResponse(responseCode = "403", description = "예약 위치 범위 밖의 잘못된 요청")
   })
   public ResponseEntity<CommonApiResponse<Void>> updateWorkLogForCheckOut(
       @AuthenticationPrincipal CustomUserDetails user,
       @PathVariable(name = "matchingId") Long matchingId,
-      @RequestBody @Valid CheckOutRequestDto checkOutRequestDto) {
+      @RequestBody @Valid WorkLogRequestDto workLogRequestDto) {
 
-    workLogService.updateWorkLogForCheckOut(user.getUserId(), matchingId, checkOutRequestDto.getLat(),
-        checkOutRequestDto.getLng());
+    workLogService.updateWorkLogForCheckOut(user.getUserId(), matchingId,
+        workLogRequestDto.getLat(),
+        workLogRequestDto.getLng());
 
     return ResponseEntity.ok(CommonApiResponse.success());
   }
 
+  @GetMapping("/matchings/{matchingId}")
+  @Operation(summary = "작업기록 조회", description = "매니저의 매칭건에 대한 작업기록 조회")
+  @ApiResponses({
+      @ApiResponse(responseCode = "200", description = "조회 성공"),
+      @ApiResponse(responseCode = "404", description = "존재하지 않는 매칭 건"),
+      @ApiResponse(responseCode = "403", description = "체크인의 매니저와 체크아웃 매니저가 다를 때")
+  })
+  public ResponseEntity<CommonApiResponse<WorkLogResponseDto>> getWorkLog(
+      @AuthenticationPrincipal CustomUserDetails user,
+      @PathVariable(name = "matchingId") Long matchingId
+  ) {
+
+    return ResponseEntity.ok(CommonApiResponse.success(
+        WorkLogResponseDto.toDto(workLogService.getWorkLog(user.getUserId(), matchingId))));
+  }
 
 
   @GetMapping
   @Operation(summary = "매니저 근무 기록 전체 조회", description = "매니저의 체크인/체크아웃 기록을 페이지네이션으로 조회합니다.")
-  public ResponseEntity<CommonApiResponse<PagedResponseDto<CheckInResponseDto>>> getAllWorkLogsByManager(
+  public ResponseEntity<CommonApiResponse<PagedResponseDto<WorkLogResponseDto>>> getAllWorkLogsByManager(
       @AuthenticationPrincipal CustomUserDetails user,
       @RequestParam(value = "page", defaultValue = "0") int page,
       @RequestParam(value = "size", defaultValue = "10") int size
@@ -81,7 +96,8 @@ public class WorkLogController {
     Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "checkInTime"));
     Page<WorkLog> workLogs = workLogService.getAllWorkLogsByManager(user.getUserId(), pageable);
 
-    PagedResponseDto<CheckInResponseDto> response = PagedResponseDto.fromPage(workLogs, CheckInResponseDto::toDto);
+    PagedResponseDto<WorkLogResponseDto> response = PagedResponseDto.fromPage(workLogs,
+        WorkLogResponseDto::toDto);
 
     return ResponseEntity.ok(CommonApiResponse.success(response));
   }

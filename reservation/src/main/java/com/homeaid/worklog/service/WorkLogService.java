@@ -13,4 +13,6 @@ public interface WorkLogService {
       Double longitude, Double latitude);
 
   Page<WorkLog> getAllWorkLogsByManager(Long userId, Pageable pageable);
+
+  WorkLog getWorkLog(Long userId, Long matchingId);
 }
