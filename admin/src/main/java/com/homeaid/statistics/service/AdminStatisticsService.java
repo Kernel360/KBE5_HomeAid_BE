@@ -1,5 +1,6 @@
 package com.homeaid.statistics.service;
 
+import com.homeaid.statistics.dto.AdminStatisticsDto;
 import com.homeaid.statistics.dto.ManagerRatingStatsDto;
 import com.homeaid.statistics.dto.MatchingStatsDto;
 import com.homeaid.statistics.dto.PaymentStatsDto;
@@ -26,4 +27,11 @@ public interface AdminStatisticsService {
 
   // 서비스 품질 통계
   ManagerRatingStatsDto getManagerRatingStats(int year, Integer month, Integer day);
+
+  // Redis 및 DB에 저장
+  void saveStatisticsToRedisAndDb(AdminStatisticsDto dto);
+
+  // Redis → DB fallback 통계 조회
+  AdminStatisticsDto getStatisticsOrLoad(int year, Integer month, Integer day);
+
 }

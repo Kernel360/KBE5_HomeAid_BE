@@ -16,4 +16,5 @@ public class AdminStatisticsDto {
   private MatchingStatsDto matchingStats;
   private SettlementStatsDto settlementStats;
   private ManagerRatingStatsDto managerRatingStats;
+
 }
