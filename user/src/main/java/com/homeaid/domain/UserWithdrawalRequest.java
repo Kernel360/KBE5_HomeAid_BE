@@ -1,6 +1,7 @@
 package com.homeaid.domain;
 
-import com.homeaid.worklog.domain.enumerate.RequestStatus;
+
+import com.homeaid.domain.enumerate.RequestStatus;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
