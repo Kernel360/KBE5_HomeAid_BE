@@ -53,7 +53,7 @@ public class WorkLog {
     }
 
     public static WorkLog createWorkLog(Matching matching) {
-        return WorkLog.builder().checkInTime(null).checkOutTime(null).workType(null).matching(matching).build();
+        return WorkLog.builder().checkInTime(null).checkOutTime(null).workType(WorkType.NOT_STARTED).matching(matching).build();
     }
 
     public LocalDateTime updateCheckIn() {

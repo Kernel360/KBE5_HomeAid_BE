@@ -1,5 +1,5 @@
 package com.homeaid.worklog.domain.enumerate;
 
 public enum WorkType {
-    CHECKIN, CHECKOUT
+    NOT_STARTED, CHECKIN, CHECKOUT
 }
