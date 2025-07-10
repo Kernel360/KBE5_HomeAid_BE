@@ -9,10 +9,11 @@ import com.homeaid.repository.NotificationRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Set;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 
 @Service
 @Slf4j
@@ -31,28 +32,19 @@ public class NotificationService {
 
     //연결시 사용자의 읽지 않은 알림들
     @Transactional(readOnly = true)
-    public List<Notification> getUnReadAlerts(Long userId) {
-        return notificationRepository.findByTargetIdAndStatus(userId, NotificationStatus.UNREAD);
-    }
+    public List<Notification> getUnReadAlerts(Long userId, UserRole userRole) {
+        List<Notification> notifications = null;
+        if (UserRole.ADMIN.equals(userRole)) {
+            notifications = notificationRepository.findByTargetRoleAndStatusOrderByCreatedAtDesc(userRole, NotificationStatus.UNREAD);
+        }
+        notifications = notificationRepository.findByTargetIdAndStatusOrderByCreatedAtDesc(userId, NotificationStatus.UNREAD);
 
-    //연결시 관리자의 읽지 않은 알림들
-    public List<Notification> getUnReadAdminAlerts(UserRole userType) {
-        return notificationRepository.findByTargetRoleAndStatus(userType, NotificationStatus.UNREAD);
-    }
-
-    public List<Notification> getUnReadAlerts(Set<Long> connectionIds, LocalDateTime recentCutoff, LocalDateTime sendCutoff) {
-        return notificationRepository.findUnSentAlerts(connectionIds, recentCutoff, sendCutoff);
+        return Optional.ofNullable(notifications).orElse(Collections.emptyList());
     }
 
     @Transactional
     public void updateMarkSentAt(List<Notification> notifications) {
         notifications.forEach(Notification::markAsSent);
-        log.info("✅ {} 개의 알림이 lastSentAt 업데이트됨", notifications.size());
-    }
-
-    public List<Notification> getUnreadAdminAlerts(LocalDateTime recentCutoff, LocalDateTime sendCutoff) {
-        log.info("관리자 안읽은 알림");
-        return notificationRepository.findUnsetAdminAlerts(recentCutoff, sendCutoff);
     }
 
     @Transactional

@@ -6,7 +6,7 @@ import com.homeaid.domain.Manager;
 import com.homeaid.domain.Matching;
 import com.homeaid.domain.Reservation;
 import com.homeaid.domain.ReservationItem;
-import com.homeaid.domain.enumerate.NotificationEventType;
+import com.homeaid.domain.enumerate.AlertType;
 import com.homeaid.domain.enumerate.ReservationStatus;
 import com.homeaid.domain.enumerate.UserRole;
 import com.homeaid.dto.RequestAlert;
@@ -45,7 +45,8 @@ public class ReservationServiceImpl implements ReservationService {
   private final MatchingRepository matchingRepository;
 
   private final ServiceOptionRepository serviceOptionRepository;
-  private final SseNotificationService sseNotificationService;
+
+  private final NotificationPublisher notificationPublisher;
 
   @Override
   @Transactional
@@ -57,12 +58,10 @@ public class ReservationServiceImpl implements ReservationService {
 
     Reservation savedReservation = reservationRepository.save(reservation);
 
-    RequestAlert requestAlert = RequestAlert.builder()
-            .notificationEventType(NotificationEventType.RESERVATION_CREATED)
-            .targetRole(UserRole.ADMIN)
-            .relatedEntityId(savedReservation.getId())
-            .build();
-    sseNotificationService.createAdminAlertByRequestAlert(requestAlert);
+    RequestAlert createdAdminAlert = RequestAlert.createAlert(AlertType.RESERVATION_CREATED, null,
+            UserRole.ADMIN,
+            savedReservation.getId(), null);
+    notificationPublisher.publishAdminNotification(createdAdminAlert);
 
     return savedReservation;
   }

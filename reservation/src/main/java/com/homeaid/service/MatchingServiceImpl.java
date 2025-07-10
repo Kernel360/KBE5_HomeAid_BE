@@ -4,7 +4,7 @@ package com.homeaid.service;
 import com.homeaid.domain.Manager;
 import com.homeaid.domain.Matching;
 import com.homeaid.domain.Reservation;
-import com.homeaid.domain.enumerate.NotificationEventType;
+import com.homeaid.domain.enumerate.AlertType;
 import com.homeaid.domain.enumerate.UserRole;
 import com.homeaid.domain.enumerate.Weekday;
 import com.homeaid.dto.RequestAlert;
@@ -34,7 +34,7 @@ public class MatchingServiceImpl implements MatchingService {
   private final ReservationRepository reservationRepository;
   private final MatchingRepository matchingRepository;
   private final RegionValidator regionValidator;
-  private final SseNotificationService sseNotificationService;
+  private final NotificationPublisher notificationPublisher;
 
   @Override
   @Transactional
@@ -58,13 +58,8 @@ public class MatchingServiceImpl implements MatchingService {
     
     Long matchingId = matchingRepository.save(matching).getId();
 
-    RequestAlert requestAlert = RequestAlert.builder()
-            .notificationEventType(NotificationEventType.MATCHING_CREATED)
-            .targetId(managerId)
-            .targetRole(UserRole.MANAGER)
-            .relatedEntityId(matchingId)
-            .build();
-    sseNotificationService.createAlertByRequestAlert(requestAlert);
+    RequestAlert createdAlert = RequestAlert.createAlert(AlertType.JOB_OFFER, managerId, UserRole.MANAGER, matchingId, null);
+    notificationPublisher.publishNotification(createdAlert);
 
     return matchingId;
   }
@@ -90,19 +85,20 @@ public class MatchingServiceImpl implements MatchingService {
         matching.getReservation().failedMatching();
       }
     }
-    NotificationEventType notificationEventType = memo == null ?
-            NotificationEventType.MATCHING_ACCEPTED_BY_MANAGER
-            : NotificationEventType.MATCHING_REJECTED_BY_MANAGER;
+    AlertType alertType = memo == null ?
+            AlertType.MANAGER_MATCHING_ACCEPTED
+            : AlertType.MANAGER_MATCHING_REJECTED;
 
-    RequestAlert requestAdminAlert = RequestAlert.builder()
-            .notificationEventType(notificationEventType)
-            .targetRole(UserRole.ADMIN)
-            .relatedEntityId(matching.getReservation().getId())
-            .content(memo)
-            .build();
+    if (alertType.equals(AlertType.MANAGER_MATCHING_ACCEPTED)) {
+      RequestAlert createdAlert = RequestAlert.createAlert(AlertType.SUGGEST_MATCHING_TO_CUSTOMER,
+              matching.getReservation().getCustomerId(),
+              UserRole.CUSTOMER,
+              matching.getReservation().getId(), null);
+      notificationPublisher.publishNotification(createdAlert);
+    }
 
-    sseNotificationService.createAdminAlertByRequestAlert(requestAdminAlert); //관리자 알람용
-
+    RequestAlert createdAdminAlert = RequestAlert.createAlert(alertType,null, UserRole.ADMIN, matching.getReservation().getId(), memo);
+    notificationPublisher.publishAdminNotification(createdAdminAlert);
   }
 
   @Override
@@ -130,25 +126,21 @@ public class MatchingServiceImpl implements MatchingService {
         matching.getReservation().failedMatching();
       }
     }
-    NotificationEventType notificationEventType = memo == null || memo.isBlank() ?
-            NotificationEventType.MATCHING_ACCEPTED_BY_CUSTOMER : NotificationEventType.MATCHING_REJECTED_BY_CUSTOMER;
+    AlertType alertType = memo == null || memo.isBlank() ?
+            AlertType.CUSTOMER_MATCHING_ACCEPTED : AlertType.CUSTOMER_MATCHING_REJECTED;
 
-    RequestAlert requestAlert = RequestAlert.builder()
-            .notificationEventType(notificationEventType)
-            .targetId(matching.getManager().getId())
-            .targetRole(UserRole.MANAGER)
-            .relatedEntityId(matching.getReservation().getId())
-            .content(memo)
-            .build();
-    sseNotificationService.createAlertByRequestAlert(requestAlert);//고객 알람용
+    RequestAlert createdAlert = RequestAlert.createAlert(alertType,
+            matching.getManager().getId(),
+            UserRole.MANAGER,
+            matching.getReservation().getId(), memo);
 
-    RequestAlert requestAdminAlert = RequestAlert.builder()
-            .notificationEventType(notificationEventType)
-            .targetRole(UserRole.ADMIN)
-            .relatedEntityId(matching.getReservation().getId())
-            .content(memo)
-            .build();
-    sseNotificationService.createAdminAlertByRequestAlert(requestAdminAlert);//관리자 알람용
+    notificationPublisher.publishNotification(createdAlert);
+
+    RequestAlert createdAdminAlert = RequestAlert.createAlert(alertType, null,
+            UserRole.ADMIN,
+            matching.getReservation().getId(), memo);
+
+    notificationPublisher.publishAdminNotification(createdAdminAlert);
 
   }
 
