@@ -26,7 +26,14 @@ public class AdminStatisticsStorageServiceImpl implements AdminStatisticsStorage
     redisUtil.save(key, dto, StatisticsConstants.STATISTICS_CACHE_TTL);
 
     StatisticsEntity entity = StatisticsEntity.fromDto(dto);
-    statisticsRepository.save(entity);
+
+    try {
+      StatisticsEntity saved = statisticsRepository.save(entity);
+      log.info("[통계 저장] DB 저장 완료 - ID: {}, 날짜: {}-{}-{}", saved.getId(), saved.getYear(), saved.getMonth(), saved.getDay());
+    } catch (Exception e) {
+      log.error("[통계 저장 실패] 예외 발생", e);
+      throw e;
+    }
   }
 
   @Override
@@ -47,7 +54,7 @@ public class AdminStatisticsStorageServiceImpl implements AdminStatisticsStorage
     }
 
     // 2. DB fallback
-    return statisticsRepository.findByYearAndMonthAndDay(year, month, day)
+    return statisticsRepository.findByDate(year, month, day)
         .map(entity -> {
           try {
             AdminStatisticsDto dto = entity.toDto();
