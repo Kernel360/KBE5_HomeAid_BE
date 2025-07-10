@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
@@ -17,6 +18,9 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccessHandler {
+
+  @Value("${FRONTEND_REDIRECT_URI}")
+  private String frontendRedirectUri;
 
   private final OAuthCodeService oauthCodeService;
 
@@ -36,7 +40,7 @@ public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccess
       oauthCodeService.store(oauthCode, user.getId());
 
       // 리다이렉트 URL 구성 - 임시 토큰 직접 전달
-      String redirectUrl = "http://localhost:3000/auth/oauth/callback"
+      String redirectUrl = frontendRedirectUri
           + "?oauthCode=" + oauthCode
           + "&email=" + user.getEmail()
           + "&profileComplete=" + user.isProfileComplete();

@@ -36,6 +36,7 @@ public class AuthServiceImpl implements AuthService {
 
   // 매니저 회원가입
   @Override
+  @Transactional
   public Manager signUpManager(@Valid Manager manager) {
 
     if (userRepository.existsByPhone(manager.getPhone())) {
@@ -50,6 +51,7 @@ public class AuthServiceImpl implements AuthService {
 
   // 고객 회원가입
   @Override
+  @Transactional
   public Customer signUpCustomer(Customer customer) {
 
     if (userRepository.existsByPhone(customer.getPhone())) {
@@ -63,6 +65,7 @@ public class AuthServiceImpl implements AuthService {
   }
 
   // OAuth 사용자 추가 정보 저장
+  @Transactional
   public void additionalOAuthInfo(AdditionalUserInfoDto dto) {
 
     log.info("사용자 추가 정보 입력 요청: {}", dto.getEmail());
