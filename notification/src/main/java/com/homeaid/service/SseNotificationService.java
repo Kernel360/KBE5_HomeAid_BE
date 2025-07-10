@@ -40,7 +40,8 @@ public class SseNotificationService {
             }
         }
 
-        SseEmitter emitter = new SseEmitter(SSE_TIMEOUT); // 2분 타임아웃
+        SseEmitter emitter = new SseEmitter(SSE_TIMEOUT);
+        connections.put(userId, emitter);
 
         if (userRole == UserRole.ADMIN) {
             adminIds.add(userId);
@@ -55,7 +56,6 @@ public class SseNotificationService {
         emitter.onError(e -> {
             removeConnection(userId);
         });
-        connections.put(userId, emitter);
 
         try {
             emitter.send(SseEmitter.event()
@@ -140,6 +140,7 @@ public class SseNotificationService {
 
     private void removeConnection(Long userId) {
         connections.remove(userId);
+        adminIds.remove(userId);
     }
 
     public void updateSentAlerts(List<Notification> notifications) {

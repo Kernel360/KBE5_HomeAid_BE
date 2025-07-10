@@ -1,8 +1,6 @@
 package com.homeaid.controller;
 
 import com.homeaid.common.response.CommonApiResponse;
-import com.homeaid.domain.Notification;
-import com.homeaid.domain.enumerate.UserRole;
 import com.homeaid.dto.ResponseAlert;
 import com.homeaid.security.user.CustomUserDetails;
 import com.homeaid.service.NotificationService;
@@ -43,20 +41,13 @@ public class NotificationController {
     }
 
     @GetMapping
-    public ResponseEntity<CommonApiResponse<List<ResponseAlert>>> getAllAlerts(
+    public ResponseEntity<CommonApiResponse<List<ResponseAlert>>> getUnReadAlerts(
             @AuthenticationPrincipal CustomUserDetails user) {
-        List<Notification> notifications = null;
-
-        if (UserRole.ADMIN.equals(user.getUserRole())) {
-            notifications = notificationService.getUnReadAdminAlerts(UserRole.ADMIN); // 고정값 전달
-        } else {
-            notifications = notificationService.getUnReadAlerts(user.getUserId());
-        }
-
-        List<ResponseAlert> responseAlerts = null;
-        if (notifications != null) {
-            responseAlerts = notifications.stream().map(ResponseAlert::toDto).toList();
-        }
+        List<ResponseAlert> responseAlerts = notificationService
+                .getUnReadAlerts(user.getUserId(), user.getUserRole())
+                .stream()
+                .map(ResponseAlert::toDto)
+                .toList();
 
         return ResponseEntity.ok(CommonApiResponse.success(responseAlerts));
     }

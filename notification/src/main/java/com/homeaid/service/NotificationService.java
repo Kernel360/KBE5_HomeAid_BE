@@ -11,10 +11,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
-import java.util.Set;
-import org.springframework.transaction.annotation.Transactional;
+import java.util.Optional;
 
 @Service
 @Slf4j
@@ -33,29 +32,19 @@ public class NotificationService {
 
     //연결시 사용자의 읽지 않은 알림들
     @Transactional(readOnly = true)
-    public List<Notification> getUnReadAlerts(Long userId) {
-        return notificationRepository.findByTargetIdAndStatusOrderByCreatedAtDesc(userId, NotificationStatus.UNREAD);
-    }
+    public List<Notification> getUnReadAlerts(Long userId, UserRole userRole) {
+        List<Notification> notifications = null;
+        if (UserRole.ADMIN.equals(userRole)) {
+            notifications = notificationRepository.findByTargetRoleAndStatusOrderByCreatedAtDesc(userRole, NotificationStatus.UNREAD);
+        }
+        notifications = notificationRepository.findByTargetIdAndStatusOrderByCreatedAtDesc(userId, NotificationStatus.UNREAD);
 
-    //연결시 관리자의 읽지 않은 알림들
-    @Transactional(readOnly = true)
-    public List<Notification> getUnReadAdminAlerts(UserRole userType) {
-        return notificationRepository.findByTargetRoleAndStatusOrderByCreatedAtDesc(userType, NotificationStatus.UNREAD);
-    }
-
-    @Transactional(readOnly = true)
-    public List<Notification> getUnReadAlerts(Set<Long> connectionIds, LocalDateTime recentCutoff, LocalDateTime sendCutoff) {
-        return notificationRepository.findUnSentAlerts(connectionIds, recentCutoff, sendCutoff);
+        return Optional.ofNullable(notifications).orElse(Collections.emptyList());
     }
 
     @Transactional
     public void updateMarkSentAt(List<Notification> notifications) {
         notifications.forEach(Notification::markAsSent);
-    }
-
-    @Transactional(readOnly = true)
-    public List<Notification> getUnreadAdminAlerts(LocalDateTime recentCutoff, LocalDateTime sendCutoff) {
-        return notificationRepository.findUnsetAdminAlerts(recentCutoff, sendCutoff);
     }
 
     @Transactional
