@@ -20,7 +20,7 @@ public class AdminStatisticsScheduler {
   private final AdminStatisticsService adminStatisticsService;
   private final RedisUtil redisUtil;
 
-  @Scheduled(cron = "0 0 3 * * *") // 매일 새벽 3시
+  @Scheduled(cron = "0 0 1 * * *") // 매일 새벽 1시
   public void runScheduledStatistics() {
 
     // 전날 기준으로 통계 생성 - 7월 9일 새벽 3시에 실행된 스케줄러는 7월 8일 통계를 계산해야 함
