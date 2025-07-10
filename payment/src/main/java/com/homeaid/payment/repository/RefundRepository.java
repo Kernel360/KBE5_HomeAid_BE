@@ -24,4 +24,7 @@ public interface RefundRepository extends JpaRepository<Refund, Long> {
 
   // 관리자가 환불을 시도할 때 중복 환불 여부 체크
   boolean existsByPayment_IdAndStatusIn(Long paymentId, List<RefundStatus> statuses);
+
+  List<Refund> findAllByPaymentId(Long paymentId);
+
 }

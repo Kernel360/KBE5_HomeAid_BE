@@ -4,7 +4,11 @@ import com.homeaid.domain.Manager;
 import com.homeaid.domain.enumerate.ManagerStatus;
 import com.homeaid.domain.enumerate.ReservationStatus;
 import com.homeaid.payment.domain.Payment;
+import com.homeaid.payment.domain.Refund;
 import com.homeaid.payment.domain.enumerate.PaymentStatus;
+import com.homeaid.payment.domain.enumerate.RefundStatus;
+import com.homeaid.payment.dto.response.PaymentResponseDto;
+import com.homeaid.payment.repository.RefundRepository;
 import com.homeaid.repository.ManagerRepository;
 import com.homeaid.payment.repository.PaymentRepository;
 import com.homeaid.settlement.domain.Settlement;
@@ -31,6 +35,7 @@ public class AdminSettlementServiceImpl implements AdminSettlementService {
   private final PaymentRepository paymentRepository;
   private final SettlementValidator settlementValidator;
   private final ManagerRepository managerRepository;
+  private final RefundRepository refundRepository;
 
   // 관리자가 수동으로 매니저 정산 생성
   @Override
@@ -86,7 +91,7 @@ public class AdminSettlementServiceImpl implements AdminSettlementService {
   // Settlement 저장 로직
   private Settlement saveSettlement(List<Payment> validPayments, LocalDate weekStart, LocalDate weekEnd) {
     int totalPaid = validPayments.stream()
-        .mapToInt(Payment::getAmount)
+        .mapToInt(Payment::getNetAmount)
         .sum();
 
     int managerAmount = (int) Math.round(totalPaid * 0.8);
@@ -168,17 +173,18 @@ public class AdminSettlementServiceImpl implements AdminSettlementService {
   // 관리자용 상세 조회
   @Override
   public SettlementWithManagerResponseDto getSettlementWithManager(Long settlementId) {
-    // Settlement 조회
     Settlement settlement = findById(settlementId);
-
-    // Manager 조회
     Manager manager = managerRepository.findById(settlement.getManagerId())
         .orElseThrow(() -> new CustomException(SettlementErrorCode.MANAGER_NOT_FOUND));
 
-    // Settlement 기간 기준으로 결제내역 조회
     List<Payment> payments = getPaymentsForSettlement(settlement);
 
-    return SettlementWithManagerResponseDto.from(settlement, manager, payments);
+    // 변경된 부분: DB에 저장된 netAmount, refundedAmount 직접 사용
+    List<PaymentResponseDto> paymentDtos = payments.stream()
+        .map(PaymentResponseDto::toDto)
+        .toList();
+
+    return SettlementWithManagerResponseDto.from(settlement, manager, paymentDtos);
   }
 
   private List<Payment> getPaymentsForSettlement(Settlement settlement) {
@@ -193,5 +199,12 @@ public class AdminSettlementServiceImpl implements AdminSettlementService {
     }
 
     return payments;
+  }
+
+  private int getRefundedAmountForPayment(Long paymentId) {
+    return refundRepository.findAllByPaymentId(paymentId).stream()
+        .filter(refund -> refund.getStatus() == RefundStatus.APPROVED)
+        .mapToInt(Refund::getRefundAmount)
+        .sum();
   }
 }

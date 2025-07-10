@@ -18,6 +18,8 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
 import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
@@ -59,6 +61,21 @@ public class Payment {
   @Builder.Default
   @Column(nullable = false)
   private Integer refundedAmount = 0;  // 부분환불 누적 금액
+
+  @Column(nullable = false)
+  private Integer netAmount; // 초기값은 amount - refundedAmount
+
+  @PrePersist
+  @PreUpdate
+  private void updateNetAmount() {
+    if (amount != null && refundedAmount != null) {
+      this.netAmount = amount - refundedAmount;
+    }
+  }
+
+  public int getNetAmount() {
+    return this.amount - this.refundedAmount;
+  }
 
   // 결제에 대해 전체 환불 처리
   public void markRefunded() {
