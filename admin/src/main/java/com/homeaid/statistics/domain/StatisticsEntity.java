@@ -1,6 +1,7 @@
 package com.homeaid.statistics.domain;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.homeaid.exception.CustomException;
 import com.homeaid.statistics.dto.AdminStatisticsDto;
@@ -67,8 +68,9 @@ public class StatisticsEntity {
 
   public AdminStatisticsDto toDto() {
     try {
-      ObjectMapper mapper = new ObjectMapper();
-      return mapper.readValue(this.jsonData, AdminStatisticsDto.class); // JSON 문자열 → DTO
+      ObjectMapper mapper = new ObjectMapper()
+          .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+      return mapper.readValue(this.jsonData, AdminStatisticsDto.class);
     } catch (JsonProcessingException e) {
       throw new CustomException(StatisticsErrorCode.STATISTICS_DESERIALIZATION_FAILED);
     }
