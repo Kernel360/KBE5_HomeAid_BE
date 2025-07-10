@@ -2,13 +2,13 @@ package com.homeaid.service;
 
 import com.homeaid.domain.Reservation;
 import com.homeaid.domain.WorkLog;
-import com.homeaid.domain.enumerate.NotificationEventType;
+import com.homeaid.domain.enumerate.AlertType;
+import com.homeaid.domain.enumerate.UserRole;
 import com.homeaid.domain.enumerate.WorkType;
 import com.homeaid.dto.RequestAlert;
 import com.homeaid.exception.CustomException;
 import com.homeaid.exception.ReservationErrorCode;
 import com.homeaid.exception.WorkLogErrorCode;
-import com.homeaid.repository.MatchingRepository;
 import com.homeaid.repository.ReservationRepository;
 import com.homeaid.repository.WorkLogRepository;
 import com.homeaid.util.GeoUtils;
@@ -26,7 +26,6 @@ public class WorkLogServiceImpl implements WorkLogService {
   private final WorkLogRepository workLogRepository;
   private final ReservationRepository reservationRepository;
   private final static int CHECK_RANGE_DISTANCE_METER = 1000; //500미터
-  private final MatchingRepository matchingRepository;
   private final NotificationPublisher notificationPublisher;
 
   @Transactional
@@ -46,12 +45,11 @@ public class WorkLogServiceImpl implements WorkLogService {
     WorkLog workLog = WorkLog.builder().workType(WorkType.CHECKIN).managerId(userId)
         .reservation(reservation).build();
 
-    RequestAlert requestAlert = RequestAlert.builder()
-            .targetId(reservation.getCustomerId())
-            .notificationEventType(NotificationEventType.WORK_CHECKIN)
-            .relatedEntityId(reservationId)
-            .build();
-    notificationPublisher.publishNotification(requestAlert);
+    RequestAlert createdAlert = RequestAlert.createAlert(AlertType.WORK_CHECKIN,
+            reservation.getCustomerId(),
+            UserRole.CUSTOMER,
+            reservationId, null);
+    notificationPublisher.publishNotification(createdAlert);
 
     return workLogRepository.save(workLog);
   }
@@ -71,12 +69,12 @@ public class WorkLogServiceImpl implements WorkLogService {
 
     updateReservationStatusCompleted(workLog.getReservation());
 
-    RequestAlert requestAlert = RequestAlert.builder()
-            .targetId(workLog.getReservation().getCustomerId())
-            .notificationEventType(NotificationEventType.WORK_CHECKOUT)
-            .relatedEntityId(reservationId)
-            .build();
-    notificationPublisher.publishNotification(requestAlert);
+    RequestAlert createdAlert = RequestAlert.createAlert(AlertType.WORK_CHECKOUT,
+            workLog.getReservation().getCustomerId(),
+            UserRole.CUSTOMER,
+            reservationId,
+            null);
+    notificationPublisher.publishNotification(createdAlert);
   }
 
   @Override
