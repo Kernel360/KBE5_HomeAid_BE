@@ -2,22 +2,20 @@ package com.homeaid.auth.controller;
 
 import com.homeaid.auth.dto.TokenResponse;
 import com.homeaid.auth.dto.request.AdditionalUserInfoDto;
+import com.homeaid.auth.dto.request.CustomerSignUpRequestDto;
+import com.homeaid.auth.dto.request.ManagerSignUpRequestDto;
+import com.homeaid.auth.dto.response.OauthResponseDto;
+import com.homeaid.auth.dto.response.SignUpResponseDto;
+import com.homeaid.auth.service.AuthService;
+import com.homeaid.auth.util.CookieUtil;
 import com.homeaid.common.response.CommonApiResponse;
 import com.homeaid.domain.Customer;
 import com.homeaid.domain.Manager;
-import com.homeaid.auth.dto.request.CustomerSignUpRequestDto;
-import com.homeaid.auth.dto.request.ManagerSignUpRequestDto;
-import com.homeaid.auth.dto.response.SignUpResponseDto;
-import com.homeaid.auth.service.AuthService;
-import com.homeaid.auth.service.AuthServiceImpl;
-import com.homeaid.auth.util.CookieUtil;
-import com.homeaid.domain.User;
-import com.homeaid.exception.CustomException;
-import com.homeaid.exception.UserErrorCode;
-import com.homeaid.repository.UserRepository;
+import com.homeaid.service.UserService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -36,13 +34,12 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthController {
 
   private final AuthService authService;
-  private final UserRepository userRepository;
   private final BCryptPasswordEncoder passwordEncoder;
-  private final AuthServiceImpl authServiceImpl;
   private final CookieUtil cookieUtil;
 
   private static final String TOKEN_HEADER = "Authorization";
   private static final String TOKEN_PREFIX = "Bearer ";
+  private final UserService userService;
 
   @PostMapping("/signup/managers")
   public ResponseEntity<CommonApiResponse<SignUpResponseDto>> signUpManager(
@@ -71,20 +68,20 @@ public class AuthController {
         .body(CommonApiResponse.success(SignUpResponseDto.toCustomerDto(customer)));
   }
 
-  @PatchMapping("/oauth/additional-profile")
-  public ResponseEntity<Void> updateAdditionalUserInfo(@RequestBody AdditionalUserInfoDto dto) {
-    User user = userRepository.findByEmail(dto.getEmail())
-        .orElseThrow(() -> new CustomException(UserErrorCode.USER_NOT_FOUND));
-
-    user.AdditionalOAuthInfo(dto.getPhone(), dto.getBirth(), dto.getGender(), dto.getUserRole());
-    userRepository.save(user);
-    return ResponseEntity.ok().build();
+  @PatchMapping("/oauth-additional-profile")
+  public ResponseEntity<CommonApiResponse<Void>> updateAdditionalUserInfo(
+      @Valid @RequestBody AdditionalUserInfoDto dto,
+      HttpServletResponse response
+  ) {
+    authService.additionalOAuthInfo(dto);
+    return ResponseEntity.ok(CommonApiResponse.success(null));
   }
 
   @PostMapping("/logout")
-  public ResponseEntity<Void> logout(@RequestHeader("Authorization") String accessToken) {
-    authServiceImpl.logout(stripBearer(accessToken));
-    return ResponseEntity.ok().build();
+  public ResponseEntity<CommonApiResponse<Void>> logout(
+      @RequestHeader("Authorization") String accessToken) {
+    authService.logout(stripBearer(accessToken));
+    return ResponseEntity.ok(CommonApiResponse.success(null));
   }
 
   @PostMapping("/refresh/reissue")
@@ -92,7 +89,7 @@ public class AuthController {
       @CookieValue("refresh_token") String refreshToken,
       HttpServletResponse response) {
 
-    TokenResponse newTokens = authServiceImpl.reissueToken(refreshToken);
+    TokenResponse newTokens = authService.reissueToken(refreshToken);
 
     // 새로 발급한 AT 헤더에 담기
     response.addHeader(TOKEN_HEADER, TOKEN_PREFIX + newTokens.accessToken());
@@ -102,6 +99,25 @@ public class AuthController {
     response.addCookie(refreshCookie);
 
     return ResponseEntity.ok().build();
+  }
+
+  // oauth 토큰 발급
+  @PostMapping("/oauth/token")
+  public ResponseEntity<OauthResponseDto> issueTokenFromOAuthCode(
+      @RequestBody Map<String, String> request,
+      HttpServletResponse response
+  ) {
+    String oauthCode = request.get("oauthCode");
+    OauthResponseDto oauthResponse = authService.issueTokenFromOAuthCode(oauthCode);
+
+    // RT 쿠키 저장
+    Cookie refreshCookie = cookieUtil.buildRefreshCookie(oauthResponse.getRefreshToken());
+    response.addCookie(refreshCookie);
+
+    // AT 헤더 저장
+    response.addHeader(TOKEN_HEADER, TOKEN_PREFIX + oauthResponse.getAccessToken());
+
+    return ResponseEntity.ok(oauthResponse);
   }
 
   private String stripBearer(String tokenHeader) {

@@ -1,5 +1,6 @@
 package com.homeaid.auth.security.config;
 
+import com.homeaid.auth.security.filter.OAuth2AuthenticationSuccessHandler;
 import com.homeaid.auth.service.RefreshTokenService;
 import com.homeaid.auth.service.TokenBlacklistService;
 import com.homeaid.auth.security.filter.AccessTokenFilter;
@@ -36,6 +37,7 @@ public class SecurityConfig {
   private final TokenBlacklistService tokenBlacklistService;
   private final CookieUtil cookieUtil;
   private final CustomOAuth2UserService customOAuth2UserService;
+  private final OAuth2AuthenticationSuccessHandler oAuth2SuccessHandler;
 
   // TODO 권한별 requestMatchers uri 정리 필요
   private final String[] allowUrls = {
@@ -43,11 +45,12 @@ public class SecurityConfig {
       "/api/v1/auth/signup/**",
       "/api/v1/swagger/auth/**",
       "/api/v1/auth/**",
-      "/oauth2/**",
+      "api/v1/oauth2/**",
       "/api/v1/users/my/**",
-      "/api/v1/reservations/**",
-      "/api/v1/managers/**",
-      "/api/v1/reviews/**"
+      "api/v1/reservations/**",
+      "api/v1/managers/**",
+      "api/v1/reviews/**",
+      "api/v1/**"
   };
 
   private final String[] swaggerUrls = {
@@ -85,8 +88,7 @@ public class SecurityConfig {
         .oauth2Login(oauth2 -> oauth2
             .userInfoEndpoint(userInfo -> userInfo
                 .userService(customOAuth2UserService))
-//            .successHandler(oAuth2SuccessHandler)
-//            .failureHandler(failureHandler)
+            .successHandler(oAuth2SuccessHandler)
         );
 
     http

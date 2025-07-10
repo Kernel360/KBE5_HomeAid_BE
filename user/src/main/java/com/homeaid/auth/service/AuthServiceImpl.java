@@ -1,15 +1,18 @@
 package com.homeaid.auth.service;
 
 import com.homeaid.auth.dto.TokenResponse;
+import com.homeaid.auth.dto.request.AdditionalUserInfoDto;
+import com.homeaid.auth.dto.response.OauthResponseDto;
 import com.homeaid.auth.exception.TokenErrorCode;
+import com.homeaid.auth.security.jwt.JwtTokenProvider;
+import com.homeaid.auth.user.CustomUserDetails;
 import com.homeaid.domain.Customer;
 import com.homeaid.domain.Manager;
+import com.homeaid.domain.User;
 import com.homeaid.dto.request.SignInRequestDto;
 import com.homeaid.exception.CustomException;
 import com.homeaid.exception.UserErrorCode;
 import com.homeaid.repository.UserRepository;
-import com.homeaid.auth.security.jwt.JwtTokenProvider;
-import com.homeaid.auth.user.CustomUserDetails;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +32,7 @@ public class AuthServiceImpl implements AuthService {
   private final CustomUserDetailsService customUserDetailsService;
   private final BCryptPasswordEncoder passwordEncoder;
   private final UserRepository userRepository;
+  private final OAuthCodeService oauthCodeService;
 
   // 매니저 회원가입
   @Override
@@ -56,6 +60,19 @@ public class AuthServiceImpl implements AuthService {
     userRepository.save(customer);
     log.info("[고객 회원가입 완료] id={}, phone={}", customer.getId(), customer.getPhone());
     return customer;
+  }
+
+  // OAuth 사용자 추가 정보 저장
+  public void additionalOAuthInfo(AdditionalUserInfoDto dto) {
+
+    log.info("사용자 추가 정보 입력 요청: {}", dto.getEmail());
+    // 유저 조회
+    User user = userRepository.findByEmail(dto.getEmail())
+        .orElseThrow(() -> new CustomException(UserErrorCode.USER_NOT_FOUND));
+
+    // 추가 정보 저장
+    user.additionalOAuthInfo(dto.getRole(), dto.getPhone(), dto.getBirth(), dto.getGender());
+    userRepository.save(user);
   }
 
   @Override
@@ -123,4 +140,25 @@ public class AuthServiceImpl implements AuthService {
     return jwtTokenProvider.createAccessToken(user.get().getId(), user.get().getRole().name());
   }
 
+  @Override
+  public OauthResponseDto issueTokenFromOAuthCode(String oauthCode) {
+    log.debug("임시토큰 -> jwt 토큰 발급 요청 - code={}", oauthCode);
+    User user = oauthCodeService.resolve(oauthCode)
+        .orElseThrow(() -> new CustomException(UserErrorCode.USER_NOT_FOUND));
+
+    String accessToken = jwtTokenProvider.createAccessToken(user.getId(), user.getRole().name());
+    String refreshToken = jwtTokenProvider.createRefreshToken(user.getId());
+    refreshTokenService.saveRefreshToken(user.getId(), refreshToken);
+
+    log.debug("[AuthService] 토큰 생성 완료 - userId={}, accessToken={}, refreshToken={}", user.getId(), accessToken, refreshToken);
+
+    return new OauthResponseDto(
+        accessToken,
+        refreshToken,
+        user.getId(),
+        user.getName(),
+        "ROLE_" + user.getRole().name()
+    );
+  }
 }
+
