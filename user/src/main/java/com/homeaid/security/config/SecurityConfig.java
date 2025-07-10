@@ -76,6 +76,7 @@ public class SecurityConfig {
 //        .requestMatchers("/api/v1/customer/**").hasRole("CUSTOMER")
             .requestMatchers("/api/v1/manager/**").hasRole("MANAGER")
             .requestMatchers("/api/v1/reservations/*/issues").hasAnyRole("MANAGER", "CUSTOMER")
+            .requestMatchers("api/v1/alerts/connection").hasAnyRole("CUSTOMER", "MANAGER", "ADMIN")
 //        .requestMatchers("/api/v1/**").hasAnyRole("ADMIN", "USER", "MANAGER")
             .anyRequest().authenticated()
     );

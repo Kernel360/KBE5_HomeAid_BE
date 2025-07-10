@@ -4,11 +4,9 @@ import com.homeaid.common.response.CommonApiResponse;
 import com.homeaid.domain.Notification;
 import com.homeaid.domain.enumerate.UserRole;
 import com.homeaid.dto.ResponseAlert;
-import com.homeaid.security.jwt.JwtTokenProvider;
 import com.homeaid.security.user.CustomUserDetails;
 import com.homeaid.service.NotificationService;
 import com.homeaid.service.SseNotificationService;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -25,18 +23,10 @@ import java.util.List;
 public class NotificationController {
     private final SseNotificationService sseNotificationService;
     private final NotificationService notificationService;
-    private final JwtTokenProvider jwtTokenProvider;
 
     @GetMapping(value = "/connection", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public SseEmitter subscribe(HttpServletRequest request) {
-
-        String token = jwtTokenProvider.resolveToken(request);
-        jwtTokenProvider.validateToken(token);
-        Long userId = jwtTokenProvider.getUserIdFromToken(token);
-        UserRole userRole = UserRole.valueOf(
-                jwtTokenProvider.getRoleFromToken(token).replace("ROLE_", ""));
-
-        return sseNotificationService.createConnection(userId, userRole);
+    public SseEmitter subscribe(@AuthenticationPrincipal CustomUserDetails user) {
+        return sseNotificationService.createConnection(user.getUserId(), user.getUserRole());
     }
 
     @PatchMapping("/{alertId}")
