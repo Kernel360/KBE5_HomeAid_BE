@@ -55,7 +55,7 @@ spring:
 env:
   secure-cookie: false
 sse:
-  timeout: ${SSE_TIMEOUT:120000}
+  timeout: ${SSE_TIMEOUT:600000}
 
 
 springdoc:

@@ -8,6 +8,7 @@ import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 import org.springframework.data.redis.repository.configuration.EnableRedisRepositories;
 import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
@@ -50,6 +51,14 @@ public class RedisConfig {
     redisTemplate.setHashValueSerializer(new GenericJackson2JsonRedisSerializer());
 
     return redisTemplate;
+  }
+
+  // Pub/Sub을 위한 메세지 리스너 컨테이너 추가
+  @Bean
+  public RedisMessageListenerContainer redisMessageListener() {
+    RedisMessageListenerContainer container = new RedisMessageListenerContainer();
+    container.setConnectionFactory(redisConnectionFactory());
+    return container;
   }
 
 }

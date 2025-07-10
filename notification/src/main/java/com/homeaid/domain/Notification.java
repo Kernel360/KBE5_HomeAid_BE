@@ -23,8 +23,8 @@ public class Notification {
     private Long id;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private NotificationEventType eventType;
+    @Column(name = "event_type", columnDefinition = "VARCHAR(50)")
+    private AlertType eventType;
 
     @Column(columnDefinition = "TEXT")
     private String content;
@@ -50,7 +50,7 @@ public class Notification {
     private LocalDateTime lastSentAt;
 
     @Builder
-    public Notification(NotificationEventType eventType,
+    public Notification(AlertType eventType,
                         Long targetId,
                         UserRole targetRole,
                         Long relatedEntityId,
