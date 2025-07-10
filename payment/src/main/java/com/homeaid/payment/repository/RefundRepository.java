@@ -8,6 +8,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 public interface RefundRepository extends JpaRepository<Refund, Long> {
 
@@ -31,4 +32,11 @@ public interface RefundRepository extends JpaRepository<Refund, Long> {
   // 관리자 대시보드
   @Query("SELECT COALESCE(SUM(r.refundAmount), 0) FROM Refund r WHERE r.status = 'COMPLETED'")
   long sumAllRefundAmounts();
+
+  // 관리자 대시보드 그래프
+  @Query("SELECT COALESCE(SUM(r.refundAmount), 0) FROM Refund r " +
+      "WHERE YEAR(r.processedAt) = :year AND MONTH(r.processedAt) = :month AND DAY(r.processedAt) = :day " +
+      "AND r.status = 'COMPLETED'")
+  long sumRefundsByDate(@Param("year") int year, @Param("month") int month, @Param("day") int day);
+
 }
