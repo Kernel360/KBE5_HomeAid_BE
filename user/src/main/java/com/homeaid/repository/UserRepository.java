@@ -1,7 +1,6 @@
 package com.homeaid.repository;
 
 import com.homeaid.domain.User;
-import java.time.LocalDateTime;
 import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -39,4 +38,5 @@ public interface UserRepository extends JpaRepository<User, Long> {
   long countWithdrawn(@Param("year") int year, @Param("month") Integer month, @Param("day") Integer day
   );
 
+  Optional<User> findByEmail(String email);
 }

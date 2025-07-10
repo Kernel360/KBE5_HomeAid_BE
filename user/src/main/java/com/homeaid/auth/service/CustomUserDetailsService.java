@@ -1,5 +1,6 @@
-package com.homeaid.security.user;
+package com.homeaid.auth.service;
 
+import com.homeaid.auth.user.CustomUserDetails;
 import com.homeaid.domain.User;
 import com.homeaid.repository.UserRepository;
 import lombok.RequiredArgsConstructor;

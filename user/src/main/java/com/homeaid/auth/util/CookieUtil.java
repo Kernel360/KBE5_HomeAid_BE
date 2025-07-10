@@ -1,4 +1,4 @@
-package com.homeaid.security.util;
+package com.homeaid.auth.util;
 
 import jakarta.servlet.http.Cookie;
 import org.springframework.beans.factory.annotation.Value;

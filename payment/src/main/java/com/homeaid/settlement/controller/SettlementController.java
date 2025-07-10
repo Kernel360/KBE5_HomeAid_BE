@@ -1,7 +1,7 @@
 package com.homeaid.settlement.controller;
 
 import com.homeaid.common.response.CommonApiResponse;
-import com.homeaid.security.user.CustomUserDetails;
+import com.homeaid.auth.user.CustomUserDetails;
 import com.homeaid.settlement.dto.response.SettlementPaymentDetailResponseDto;
 import com.homeaid.settlement.service.SettlementService;
 import com.homeaid.settlement.domain.Settlement;

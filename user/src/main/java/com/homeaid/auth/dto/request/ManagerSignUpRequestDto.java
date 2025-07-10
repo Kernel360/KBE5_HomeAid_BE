@@ -1,4 +1,4 @@
-package com.homeaid.dto.request;
+package com.homeaid.auth.dto.request;
 
 import com.homeaid.domain.Manager;
 import com.homeaid.domain.enumerate.GenderType;

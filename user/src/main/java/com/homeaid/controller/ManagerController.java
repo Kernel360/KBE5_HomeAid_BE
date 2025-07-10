@@ -6,7 +6,7 @@ import com.homeaid.dto.request.ManagerDetailInfoRequestDto;
 import com.homeaid.dto.response.ManagerDocumentListResponseDto;
 import com.homeaid.exception.CustomException;
 import com.homeaid.exception.ErrorCode;
-import com.homeaid.security.user.CustomUserDetails;
+import com.homeaid.auth.user.CustomUserDetails;
 import com.homeaid.service.ManagerService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;

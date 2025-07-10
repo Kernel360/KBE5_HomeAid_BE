@@ -1,11 +1,13 @@
-package com.homeaid.security.config;
+package com.homeaid.auth.security.config;
 
+import com.homeaid.auth.security.filter.OAuth2AuthenticationSuccessHandler;
 import com.homeaid.auth.service.RefreshTokenService;
 import com.homeaid.auth.service.TokenBlacklistService;
-import com.homeaid.security.filter.AccessTokenFilter;
-import com.homeaid.security.filter.JwtAuthenticationFilter;
-import com.homeaid.security.jwt.JwtTokenProvider;
-import com.homeaid.security.util.CookieUtil;
+import com.homeaid.auth.security.filter.AccessTokenFilter;
+import com.homeaid.auth.security.filter.JwtAuthenticationFilter;
+import com.homeaid.auth.security.jwt.JwtTokenProvider;
+import com.homeaid.auth.service.CustomOAuth2UserService;
+import com.homeaid.auth.util.CookieUtil;
 import java.util.Arrays;
 import java.util.Collections;
 import lombok.RequiredArgsConstructor;
@@ -34,17 +36,21 @@ public class SecurityConfig {
   private final RefreshTokenService refreshTokenService;
   private final TokenBlacklistService tokenBlacklistService;
   private final CookieUtil cookieUtil;
+  private final CustomOAuth2UserService customOAuth2UserService;
+  private final OAuth2AuthenticationSuccessHandler oAuth2SuccessHandler;
 
+  // TODO 권한별 requestMatchers uri 정리 필요
   private final String[] allowUrls = {
       "/", "/actuator/health",
-      "/api/v1/users/signup/**",
-      "/api/v1/swagger/users/**",
+      "/api/v1/auth/signup/**",
+      "/api/v1/swagger/auth/**",
       "/api/v1/auth/**",
-      "/api/v1/users/**",
+      "api/v1/oauth2/**",
       "/api/v1/users/my/**",
-      "/api/v1/reservations/**",
-      "/api/v1/managers/**",
-      "/api/v1/reviews/**"
+      "api/v1/reservations/**",
+      "api/v1/managers/**",
+      "api/v1/reviews/**",
+      "api/v1/**"
   };
 
   private final String[] swaggerUrls = {
@@ -68,17 +74,22 @@ public class SecurityConfig {
             session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
     http.authorizeHttpRequests(auth -> auth
-            .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-            .requestMatchers(allowUrls).permitAll()
-            .requestMatchers(swaggerUrls).permitAll()
+                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                .requestMatchers(allowUrls).permitAll()
+                .requestMatchers(swaggerUrls).permitAll()
 //        .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
 //        .requestMatchers("/api/v1/customer/**").hasRole("CUSTOMER")
             .requestMatchers("/api/v1/manager/**").hasRole("MANAGER")
             .requestMatchers("/api/v1/reservations/*/issues").hasAnyRole("MANAGER", "CUSTOMER")
             .requestMatchers("/api/v1/alerts/connection").hasAnyRole("CUSTOMER", "MANAGER", "ADMIN")
 //        .requestMatchers("/api/v1/**").hasAnyRole("ADMIN", "USER", "MANAGER")
-            .anyRequest().authenticated()
-    );
+                .anyRequest().authenticated()
+        )
+        .oauth2Login(oauth2 -> oauth2
+            .userInfoEndpoint(userInfo -> userInfo
+                .userService(customOAuth2UserService))
+            .successHandler(oAuth2SuccessHandler)
+        );
 
     http
         .addFilterAt(signinFilter, UsernamePasswordAuthenticationFilter.class)

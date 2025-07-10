@@ -1,4 +1,4 @@
-package com.homeaid.security.jwt;
+package com.homeaid.auth.security.jwt;
 
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
