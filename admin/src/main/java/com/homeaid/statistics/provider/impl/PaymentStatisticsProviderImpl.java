@@ -19,15 +19,14 @@ public class PaymentStatisticsProviderImpl implements PaymentStatisticsProvider 
     long paymentCount = paymentRepository.countPayments(year, month, day);
     long cancelCount = paymentRepository.countCanceledPayments(year, month, day);
 
-    PaymentStatsDto.PaymentStatsDtoBuilder builder = PaymentStatsDto.builder()
+    var builder = PaymentStatsDto.builder()
         .year(year).month(month).day(day)
         .totalAmount(total)
         .cancelAmount(canceled)
         .paymentCount(paymentCount)
         .cancelCount(cancelCount);
 
-    // 결제 수단별 통계는 "월 통계"일 때만 포함
-    if (month != null && day == null) {
+    if (shouldIncludePaymentMethodStats(month, day)) {
       Object result = paymentRepository.findPaymentMethodSums(year, month);
       if (result instanceof Object[] values && values.length == 3) {
         builder.card(((Number) values[0]).longValue());
@@ -40,4 +39,9 @@ public class PaymentStatisticsProviderImpl implements PaymentStatisticsProvider 
 
     return builder.build();
   }
+
+  private boolean shouldIncludePaymentMethodStats(Integer month, Integer day) {
+    return month != null && day == null;
+  }
+
 }

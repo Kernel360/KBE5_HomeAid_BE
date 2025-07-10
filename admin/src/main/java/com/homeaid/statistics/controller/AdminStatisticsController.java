@@ -1,7 +1,5 @@
 package com.homeaid.statistics.controller;
 
-import static com.homeaid.statistics.config.StatisticsConstants.STATISTICS_CACHE_TTL;
-
 import com.homeaid.common.response.CommonApiResponse;
 import com.homeaid.exception.CustomException;
 import com.homeaid.statistics.dto.AdminStatisticsDto;
@@ -13,8 +11,6 @@ import com.homeaid.statistics.dto.SettlementStatsDto;
 import com.homeaid.statistics.dto.UserStatsDto;
 import com.homeaid.statistics.exception.StatisticsErrorCode;
 import com.homeaid.statistics.service.AdminStatisticsService;
-import com.homeaid.util.RedisKeyFactory;
-import com.homeaid.util.RedisUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import java.time.LocalDate;
 import lombok.RequiredArgsConstructor;
@@ -31,7 +27,6 @@ import org.springframework.web.bind.annotation.RestController;
 @PreAuthorize("hasRole('ADMIN')")
 public class AdminStatisticsController {
 
-  private final RedisUtil redisUtil;
   private final AdminStatisticsService adminStatisticsService;
 
   // TODO : 데이터가 Null 일 경우에 대한 방어로직 추가
@@ -121,7 +116,7 @@ public class AdminStatisticsController {
       @RequestParam(required = false) Integer month,
       @RequestParam(required = false) Integer day) {
 
-    // 기본 파라미터 유효성 검증 추가
+    // 파라미터 유효성 체크
     if (year < 2000 || year > LocalDate.now().getYear()) {
       throw new CustomException(StatisticsErrorCode.INVALID_YEAR);
     }
@@ -130,20 +125,12 @@ public class AdminStatisticsController {
       throw new CustomException(StatisticsErrorCode.INVALID_MONTH);
     }
 
-    if (day != null && (day < 1 || day > 31)) { // 간단히 31까지로 제한
+    if (day != null && (day < 1 || day > 31)) {
       throw new CustomException(StatisticsErrorCode.INVALID_DAY);
     }
 
-    String key = RedisKeyFactory.buildAdminStatisticsKey(year, month, day);
-    AdminStatisticsDto dto = (AdminStatisticsDto) redisUtil.getObject(key);
-
-    if (dto == null) {
-      dto = adminStatisticsService.getStatisticsOrLoad(year, month, day);
-      redisUtil.save(key, dto, STATISTICS_CACHE_TTL);
-    }
-
+    AdminStatisticsDto dto = adminStatisticsService.getStatisticsOrLoad(year, month, day);
     return ResponseEntity.ok(CommonApiResponse.success(dto));
   }
-
 
 }
