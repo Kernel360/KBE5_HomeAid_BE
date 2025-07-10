@@ -2,7 +2,6 @@ package com.homeaid.settlement.dto;
 
 import com.homeaid.domain.Manager;
 import com.homeaid.domain.enumerate.ManagerStatus;
-import com.homeaid.payment.domain.Payment;
 import com.homeaid.payment.dto.response.PaymentResponseDto;
 import com.homeaid.settlement.domain.Settlement;
 import com.homeaid.settlement.domain.enumerate.SettlementStatus;
