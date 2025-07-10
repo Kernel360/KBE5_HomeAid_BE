@@ -27,12 +27,25 @@ public interface SettlementRepository extends JpaRepository<Settlement, Long> {
   @Query("SELECT COALESCE(SUM(s.managerSettlementPrice), 0) FROM Settlement s")
   long sumAllSettlementAmounts();
 
-  // 정산 신청 수 (연간 또는 월간)
-  @Query("SELECT COUNT(s) FROM Settlement s WHERE YEAR(s.settledAt) = :year AND (:month IS NULL OR MONTH(s.settledAt) = :month)")
-  long countRequested(@Param("year") int year, @Param("month") Integer month);
+  // 정산 신청 수 (연/월/일)
+  @Query("""
+    SELECT COUNT(s) FROM Settlement s
+    WHERE YEAR(s.settledAt) = :year
+      AND (:month IS NULL OR MONTH(s.settledAt) = :month)
+      AND (:day IS NULL OR DAY(s.settledAt) = :day)
+  """)
+  long countRequested(@Param("year") int year, @Param("month") Integer month, @Param("day") Integer day
+  );
 
-  // 정산 지급 완료 수 (연간 또는 월간)
-  @Query("SELECT COUNT(s) FROM Settlement s WHERE s.paidAt IS NOT NULL AND YEAR(s.paidAt) = :year AND (:month IS NULL OR MONTH(s.paidAt) = :month)")
-  long countPaid(@Param("year") int year, @Param("month") Integer month);
+  // 정산 지급 완료 수 (연/월/일)
+  @Query("""
+    SELECT COUNT(s) FROM Settlement s
+    WHERE s.paidAt IS NOT NULL
+      AND YEAR(s.paidAt) = :year
+      AND (:month IS NULL OR MONTH(s.paidAt) = :month)
+      AND (:day IS NULL OR DAY(s.paidAt) = :day)
+  """)
+  long countPaid(@Param("year") int year, @Param("month") Integer month, @Param("day") Integer day
+  );
 
 }

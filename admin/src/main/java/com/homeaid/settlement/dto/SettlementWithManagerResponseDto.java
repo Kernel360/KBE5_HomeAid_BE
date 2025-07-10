@@ -2,7 +2,6 @@ package com.homeaid.settlement.dto;
 
 import com.homeaid.domain.Manager;
 import com.homeaid.domain.enumerate.ManagerStatus;
-import com.homeaid.payment.domain.Payment;
 import com.homeaid.payment.dto.response.PaymentResponseDto;
 import com.homeaid.settlement.domain.Settlement;
 import com.homeaid.settlement.domain.enumerate.SettlementStatus;
@@ -69,31 +68,32 @@ public class SettlementWithManagerResponseDto {
   @Schema(description = "정산에 포함된 결제 목록")
   private List<PaymentResponseDto> payments;
 
+  public static SettlementWithManagerResponseDto from(Settlement settlement, Manager manager, List<PaymentResponseDto> payments) {
+    int actualAmount = payments.stream()
+        .mapToInt(p -> p.getNetAmount() != null ? p.getNetAmount() : 0)
+        .sum();
 
-  public static SettlementWithManagerResponseDto from(Settlement settlement, Manager manager, List<Payment> paymentList) {
-    Integer managerAmount = (int) Math.round(settlement.getTotalAmount() * 0.8);
-    Integer adminAmount = settlement.getTotalAmount() - managerAmount;
+    int managerAmount = (int) Math.round(actualAmount * 0.8);
+    int adminAmount = actualAmount - managerAmount;
 
     return SettlementWithManagerResponseDto.builder()
         .id(settlement.getId())
         .from(settlement.getSettlementWeekStart())
         .to(settlement.getSettlementWeekEnd())
-        .totalAmount(settlement.getTotalAmount())
+        .totalAmount(actualAmount)
         .managerAmount(managerAmount)
         .adminAmount(adminAmount)
         .settledAt(settlement.getSettledAt())
         .confirmedAt(settlement.getConfirmedAt())
         .paidAt(settlement.getPaidAt())
         .status(settlement.getStatus())
-
         .managerId(manager.getId())
         .managerName(manager.getName())
         .managerPhone(manager.getPhone())
         .managerEmail(manager.getEmail())
         .managerStatus(manager.getStatus())
-
-        .totalPayments(paymentList.size())
-        .payments(paymentList.stream().map(PaymentResponseDto::toDto).toList())
+        .totalPayments(payments.size())
+        .payments(payments)
         .build();
   }
 

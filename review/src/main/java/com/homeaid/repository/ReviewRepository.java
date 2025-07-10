@@ -33,4 +33,28 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
   """)
   Page<Review> findByWriterRoleCondition(@Param("writerRole") UserRole writerRole, Pageable pageable);
 
+  // 매니저 전체 평균 평점
+  @Query("""
+      SELECT COALESCE(AVG(r.rating), 0)
+      FROM Review r
+      WHERE r.writerRole = 'CUSTOMER'
+        AND YEAR(r.createdAt) = :year
+        AND (:month IS NULL OR MONTH(r.createdAt) = :month)
+        AND (:day IS NULL OR DAY(r.createdAt) = :day)
+  """)
+  Double findAvgRatingForManagers(@Param("year") int year, @Param("month") Integer month, @Param("day") Integer day
+  );
+
+  // 매니저 대상 총 리뷰 수
+  @Query("""
+      SELECT COUNT(r)
+      FROM Review r
+      WHERE r.writerRole = 'CUSTOMER'
+        AND YEAR(r.createdAt) = :year
+        AND (:month IS NULL OR MONTH(r.createdAt) = :month)
+        AND (:day IS NULL OR DAY(r.createdAt) = :day)
+  """)
+  Long countReviewsForManagers(@Param("year") int year, @Param("month") Integer month, @Param("day") Integer day
+  );
+
 }

@@ -15,7 +15,7 @@ public class WeeklySettlementScheduler {
 
   private final AdminSettlementService adminSettlementService;
 
-  @Scheduled(cron = "0 0 2 * * THU") //
+  @Scheduled(cron = "0 0 1 * * Mon") //
   //@Scheduled(cron = "0 50 18 * * *")  // 매일 18:40 (오후 6시 40분) 테스트
   public void createWeeklySettlements() {
     log.info("[정산 스케줄러] 주간 정산 생성 시작");

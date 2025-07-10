@@ -37,17 +37,11 @@ public class PaymentResponseDto {
   @Schema(description = "고객 이름", example = "박호일")
   private String customerName;
 
-  public static PaymentResponseDto toDto(Payment payment, String customerName) {
-    return PaymentResponseDto.builder()
-        .id(payment.getId())
-        .reservationId(payment.getReservation().getId())
-        .amount(payment.getAmount())
-        .paymentMethod(payment.getPaymentMethod())
-        .status(payment.getStatus())
-        .paidAt(payment.getPaidAt())
-        .customerName(customerName)
-        .build();
-  }
+  @Schema(description = "환불 금액", example = "10000")
+  private Integer refundedAmount;
+
+  @Schema(description = "실 결제 금액", example = "40000")
+  private Integer netAmount;
 
   public static PaymentResponseDto toDto(Payment payment) {
     return PaymentResponseDto.builder()
@@ -57,6 +51,22 @@ public class PaymentResponseDto {
         .paymentMethod(payment.getPaymentMethod())
         .status(payment.getStatus())
         .paidAt(payment.getPaidAt())
+        .refundedAmount(payment.getRefundedAmount())
+        .netAmount(payment.getNetAmount())
+        .build();
+  }
+
+  public static PaymentResponseDto toDto(Payment payment, String customerName) {
+    return PaymentResponseDto.builder()
+        .id(payment.getId())
+        .reservationId(payment.getReservation().getId())
+        .amount(payment.getAmount())
+        .paymentMethod(payment.getPaymentMethod())
+        .status(payment.getStatus())
+        .paidAt(payment.getPaidAt())
+        .customerName(customerName)
+        .refundedAmount(payment.getRefundedAmount())
+        .netAmount(payment.getNetAmount())
         .build();
   }
 }

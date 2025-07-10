@@ -73,4 +73,15 @@ public class RedisUtil {
       return false;
     }
   }
+
+  // 스케줄러 중복 실행 방지를 위한 분산 락
+  public boolean setIfAbsent(String key, String value, Duration timeout) {
+    try {
+      Boolean result = redisTemplate.opsForValue().setIfAbsent(key, value, timeout);
+      return Boolean.TRUE.equals(result);
+    } catch (Exception e) {
+      log.error("Redis Lock 설정 실패 - Key: {}", key, e);
+      return false;
+    }
+  }
 }
