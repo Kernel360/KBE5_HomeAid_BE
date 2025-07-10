@@ -1,6 +1,6 @@
 package com.homeaid.payment.dto.request;
 
-import com.homeaid.payment.domain.PaymentMethod;
+import com.homeaid.payment.domain.enumerate.PaymentMethod;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

@@ -7,6 +7,7 @@ import com.homeaid.domain.ServiceIssueImage;
 import com.homeaid.exception.CustomException;
 import com.homeaid.exception.ErrorCode;
 import com.homeaid.util.S3Service;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -59,14 +60,20 @@ public class ServiceIssueFileServiceImpl implements ServiceIssueFileService {
 
     log.debug("삭제 대상 이미지 ID들: {}", toRemove.stream().map(ServiceIssueImage::getId).toList());
 
-    toRemove.forEach(img -> s3Service.deleteFile(img.getS3Key()));
+    toRemove.forEach(img -> {
+      try {
+        s3Service.deleteFile(img.getS3Key());
+      } catch (FileNotFoundException e) {
+        throw new CustomException(ErrorCode.FILE_DELETE_ERROR);
+      }
+    });
     serviceIssue.getImages().removeAll(toRemove);
 
     uploadFiles(serviceIssue, files);
   }
 
   @Override
-  public void deleteFiles(ServiceIssue serviceIssue) {
+  public void deleteFiles(ServiceIssue serviceIssue) throws FileNotFoundException {
     List<ServiceIssueImage> images = serviceIssue.getImages();
     if (images == null || images.isEmpty()) {
       return;

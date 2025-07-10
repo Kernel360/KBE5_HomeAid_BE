@@ -37,29 +37,6 @@ public class AdminPaymentServiceImpl implements AdminPaymentService {
   }
 
   @Override
-  @Transactional
-  public PaymentResponseDto refundPayment(Long paymentId) { // 전체 환불
-    Payment payment = paymentRepository.findById(paymentId)
-        .orElseThrow(() -> new CustomException(PaymentErrorCode.PAYMENT_NOT_FOUND));
-
-    payment.refund(payment.getReservation().getStatus());
-
-    return toDtoWithUserNames(payment); // 응답 DTO 변환
-  }
-
-  // TODO : 결제 도메인에 refundedAmount 추가했지만 아직 DB에 반영안됨. 추후 수정예정
-  @Override
-  @Transactional
-  public PaymentResponseDto partialRefund(Long paymentId, int refundAmount) {
-    Payment payment = paymentRepository.findById(paymentId)
-        .orElseThrow(() -> new CustomException(PaymentErrorCode.PAYMENT_NOT_FOUND));
-
-    payment.partialRefund(payment.getReservation().getStatus(), refundAmount);
-
-    return toDtoWithUserNames(payment);
-  }
-
-  @Override
   @Transactional(readOnly = true)
   public List<PaymentResponseDto> getAllPayments() {
     return paymentRepository.findAll().stream()

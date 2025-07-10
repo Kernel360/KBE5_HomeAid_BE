@@ -8,6 +8,7 @@ import com.homeaid.exception.CustomException;
 import com.homeaid.exception.ErrorCode;
 import com.homeaid.repository.ManagerDocumentRepository;
 import com.homeaid.util.S3Service;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -54,7 +55,11 @@ public class ManagerDocumentServiceImpl implements ManagerDocumentService {
           managerDocumentRepository.findByManagerIdAndDocumentType(manager.getId(),
                   param.documentType())
               .ifPresent(existing -> {
-                s3Service.deleteFile(existing.getS3Key());
+                try {
+                  s3Service.deleteFile(existing.getS3Key());
+                } catch (FileNotFoundException e) {
+                  throw new CustomException(ErrorCode.FILE_DELETE_ERROR);
+                }
                 managerDocumentRepository.delete(existing);
               });
 
