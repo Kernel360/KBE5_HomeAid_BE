@@ -7,6 +7,7 @@ import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
 public interface RefundRepository extends JpaRepository<Refund, Long> {
 
@@ -27,4 +28,7 @@ public interface RefundRepository extends JpaRepository<Refund, Long> {
 
   List<Refund> findAllByPaymentId(Long paymentId);
 
+  // 관리자 대시보드
+  @Query("SELECT COALESCE(SUM(r.refundAmount), 0) FROM Refund r WHERE r.status = 'COMPLETED'")
+  long sumAllRefundAmounts();
 }
