@@ -2,7 +2,7 @@ package com.homeaid.controller;
 
 import com.homeaid.common.response.CommonApiResponse;
 import com.homeaid.dto.ResponseAlert;
-import com.homeaid.security.user.CustomUserDetails;
+import com.homeaid.auth.user.CustomUserDetails;
 import com.homeaid.service.NotificationService;
 import com.homeaid.service.SseNotificationService;
 import lombok.RequiredArgsConstructor;
@@ -14,6 +14,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 import java.util.List;
+
 @RestController
 @RequestMapping("/api/v1/alerts")
 @RequiredArgsConstructor

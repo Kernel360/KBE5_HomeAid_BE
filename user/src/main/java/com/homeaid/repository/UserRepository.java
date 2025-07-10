@@ -38,4 +38,5 @@ public interface UserRepository extends JpaRepository<User, Long> {
   long countWithdrawn(@Param("year") int year, @Param("month") Integer month, @Param("day") Integer day
   );
 
+  Optional<User> findByEmail(String email);
 }
