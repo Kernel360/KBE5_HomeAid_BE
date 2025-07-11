@@ -1,6 +1,7 @@
 package com.homeaid.domain;
 
 
+
 import com.homeaid.domain.enumerate.GenderType;
 import com.homeaid.domain.enumerate.ManagerStatus;
 import com.homeaid.domain.enumerate.UserRole;

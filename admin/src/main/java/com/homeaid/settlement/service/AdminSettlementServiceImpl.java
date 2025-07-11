@@ -2,7 +2,7 @@ package com.homeaid.settlement.service;
 
 import com.homeaid.domain.Manager;
 import com.homeaid.domain.enumerate.ManagerStatus;
-import com.homeaid.domain.enumerate.ReservationStatus;
+import com.homeaid.reservation.domain.enumerate.ReservationStatus;
 import com.homeaid.payment.domain.Payment;
 import com.homeaid.payment.domain.Refund;
 import com.homeaid.payment.domain.enumerate.PaymentStatus;
@@ -82,6 +82,7 @@ public class AdminSettlementServiceImpl implements AdminSettlementService {
 
     List<Payment> payments = paymentRepository.findAllByReservation_ManagerIdAndPaidAtBetween(managerId, start, end);
 
+    // TODO : 정산 가능한 결제만 필터링 (결제완료 + 서비스완료) 수정 필요
     return payments.stream()
         .filter(payment -> payment.getStatus() == PaymentStatus.PAID &&
             payment.getReservation().getStatus() == ReservationStatus.COMPLETED)

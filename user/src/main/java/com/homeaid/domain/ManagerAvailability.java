@@ -1,5 +1,6 @@
 package com.homeaid.domain;
 
+
 import com.homeaid.domain.enumerate.Weekday;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;

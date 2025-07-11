@@ -1,6 +1,6 @@
 package com.homeaid.payment.service;
 
-import com.homeaid.domain.enumerate.ReservationStatus;
+
 import com.homeaid.exception.CustomException;
 import com.homeaid.payment.domain.Payment;
 import com.homeaid.payment.domain.Refund;
@@ -13,6 +13,7 @@ import com.homeaid.payment.exception.PaymentErrorCode;
 import com.homeaid.payment.repository.PaymentRepository;
 import com.homeaid.payment.repository.RefundRepository;
 import com.homeaid.payment.validator.RefundValidator;
+import com.homeaid.reservation.domain.enumerate.ReservationStatus;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

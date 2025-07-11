@@ -1,10 +1,11 @@
 package com.homeaid.payment.policy;
 
-import com.homeaid.domain.Reservation;
+
 import com.homeaid.exception.CustomException;
 import com.homeaid.payment.domain.Payment;
 import com.homeaid.payment.dto.request.RefundRequestDto;
 import com.homeaid.payment.exception.RefundErrorCode;
+import com.homeaid.reservation.domain.Reservation;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;

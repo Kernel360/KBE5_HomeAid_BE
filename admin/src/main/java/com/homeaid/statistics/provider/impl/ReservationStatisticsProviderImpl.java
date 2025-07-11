@@ -1,6 +1,7 @@
 package com.homeaid.statistics.provider.impl;
 
-import com.homeaid.repository.ReservationRepository;
+
+import com.homeaid.reservation.repository.ReservationRepository;
 import com.homeaid.statistics.dto.ReservationStatsDto;
 import com.homeaid.statistics.provider.ReservationStatisticsProvider;
 import lombok.RequiredArgsConstructor;

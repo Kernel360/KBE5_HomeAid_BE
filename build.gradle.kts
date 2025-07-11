@@ -32,7 +32,6 @@ dependencies {
 	implementation(project(":payment"))
 	implementation(project(":reservation"))
 	implementation(project(":board"))
-	implementation(project(":worklog"))
 	implementation(project(":global"))
 	implementation(project(":admin"))
 	implementation(project(":review"))

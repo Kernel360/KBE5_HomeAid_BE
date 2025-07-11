@@ -45,12 +45,12 @@ public class SecurityConfig {
       "/api/v1/auth/signup/**",
       "/api/v1/swagger/auth/**",
       "/api/v1/auth/**",
-      "api/v1/oauth2/**",
+      "/api/v1/oauth2/**",
       "/api/v1/users/my/**",
-      "api/v1/reservations/**",
-      "api/v1/managers/**",
-      "api/v1/reviews/**",
-      "api/v1/**"
+      "/api/v1/reservations/**",
+      "/api/v1/managers/**",
+      "/api/v1/reviews/**",
+      "/api/v1/**"
   };
 
   private final String[] swaggerUrls = {
