@@ -41,7 +41,6 @@ public class ReservationServiceImpl implements ReservationService {
 
   private final CustomerRepository customerRepository;
 
-
   private final ServiceOptionRepository serviceOptionRepository;
 
   private final NotificationPublisher notificationPublisher;
@@ -79,6 +78,7 @@ public class ReservationServiceImpl implements ReservationService {
     String managerName = null;
     MatchingStatus status = null;
     Long matchingId = null;
+
     if (latestMatching != null) {
       managerName = latestMatching.getManager().getName();
       status = latestMatching.getStatus();

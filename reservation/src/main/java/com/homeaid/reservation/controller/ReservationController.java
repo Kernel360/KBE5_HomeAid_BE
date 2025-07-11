@@ -51,10 +51,10 @@ public class ReservationController {
       content = @Content(schema = @Schema(implementation = ReservationResponseDto.class)))
   @ApiResponse(responseCode = "400", description = "유효하지 않은 요청",
       content = @Content(schema = @Schema(implementation = CommonApiResponse.class)))
-  public ResponseEntity<CommonApiResponse<ReservationResponseDto>> createReservation(
+  public ResponseEntity<CommonApiResponse<ReservationResponseDto>> createReservation (
       @AuthenticationPrincipal CustomUserDetails user,
-      @RequestBody @Valid ReservationRequestDto reservationRequestDto) {
-
+      @RequestBody @Valid ReservationRequestDto reservationRequestDto
+  ) {
     Reservation reservation = reservationService.createReservation(
         ReservationRequestDto.toEntity(reservationRequestDto), user.getUserId(),
         reservationRequestDto.getOptionId());
@@ -71,9 +71,9 @@ public class ReservationController {
       @ApiResponse(responseCode = "404", description = "해당 예약이 존재하지 않음",
           content = @Content(schema = @Schema(implementation = CommonApiResponse.class))),
   })
-  public ResponseEntity<CommonApiResponse<ReservationResponseDto>> getReservation(
+  public ResponseEntity<CommonApiResponse<ReservationResponseDto>> getReservation (
       @Parameter(description = "조회할 예약 ID", example = "1")
-      @PathVariable(name = "reservationId") Long reservationId
+      @PathVariable(name = "reservationId") final Long reservationId
   ) {
 
     return ResponseEntity.ok(
@@ -88,10 +88,10 @@ public class ReservationController {
       @ApiResponse(responseCode = "400", description = "유효하지 않은 요청 또는 수정 불가 상태",
           content = @Content(schema = @Schema(implementation = CommonApiResponse.class))),
   })
-  public ResponseEntity<CommonApiResponse<ReservationResponseDto>> updateReservation(
+  public ResponseEntity<CommonApiResponse<ReservationResponseDto>> updateReservation (
       @AuthenticationPrincipal CustomUserDetails user,
       @Parameter(description = "수정할 예약 ID", example = "1")
-      @PathVariable(name = "reservationId") Long reservationId,
+      @PathVariable(name = "reservationId") final Long reservationId,
       @RequestBody @Valid ReservationRequestDto reservationRequestDto) {
 
     Reservation updated = reservationService.updateReservation(
@@ -114,7 +114,7 @@ public class ReservationController {
   public ResponseEntity<CommonApiResponse<Void>> deleteReservation(
       @AuthenticationPrincipal CustomUserDetails user,
       @Parameter(description = "삭제할 예약 ID", example = "1")
-      @PathVariable(name = "reservationId") Long reservationId
+      @PathVariable(name = "reservationId") final Long reservationId
   ) {
     reservationService.deleteReservation(reservationId, user.getUserId());
     return ResponseEntity.ok(CommonApiResponse.success(null));
@@ -125,7 +125,7 @@ public class ReservationController {
    */
   @GetMapping
   @Operation(summary = "예약 전체 조회", description = "페이지네이션 기반으로 예약 목록을 조회합니다.")
-  public ResponseEntity<CommonApiResponse<PagedResponseDto<ReservationResponseDto>>> getReservationsList(
+  public ResponseEntity<CommonApiResponse<PagedResponseDto<ReservationResponseDto>>> getReservationsList (
       @RequestParam(value = "page", defaultValue = "0") int page,
       @RequestParam(value = "size", defaultValue = "10") int size,
       @RequestParam(value = "status", required = false) ReservationStatus status
@@ -144,17 +144,20 @@ public class ReservationController {
    */
   @GetMapping("/customer")
   @Operation(summary = "특정 유저의 예약 전체 조회", description = "고객의 모든 예약을 페이지네이션으로 조회합니다.")
-  public ResponseEntity<CommonApiResponse<PagedResponseDto<ReservationResponseDto>>> getReservationsByCustomer(
+  public ResponseEntity<CommonApiResponse<PagedResponseDto<ReservationResponseDto>>> getReservationsByCustomer (
       @AuthenticationPrincipal CustomUserDetails user,
       @RequestParam(value = "page", defaultValue = "0") int page,
       @RequestParam(value = "size", defaultValue = "10") int size
   ) {
+
     Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdDate"));
+
     Page<Reservation> reservations = reservationService.getReservationsByCustomer(user.getUserId(),
         pageable);
 
     PagedResponseDto<ReservationResponseDto> response =
         PagedResponseDto.fromPage(reservations, ReservationResponseDto::toDto);
+
     return ResponseEntity.ok(CommonApiResponse.success(response));
   }
 
@@ -163,17 +166,19 @@ public class ReservationController {
    */
   @GetMapping("/manager")
   @Operation(summary = "매니저 담당 예약 전체 조회", description = "매니저가 담당 중인 예약을 페이지네이션으로 조회합니다.")
-  public ResponseEntity<CommonApiResponse<PagedResponseDto<ManagerReservationResponseDto>>> getReservationsByManager(
+  public ResponseEntity<CommonApiResponse<PagedResponseDto<ManagerReservationResponseDto>>> getReservationsByManager (
       @AuthenticationPrincipal CustomUserDetails userDetails,
       @RequestParam(value = "page", defaultValue = "0") int page,
       @RequestParam(value = "size", defaultValue = "10") int size
   ) {
 
     Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdDate"));
+
     Page<ManagerReservationResponseDto> reservations = reservationService.getReservationsByManager(
         userDetails.getUserId(), pageable);
 
-    PagedResponseDto<ManagerReservationResponseDto> response = PagedResponseDto.fromPage(reservations);
+    PagedResponseDto<ManagerReservationResponseDto> response = PagedResponseDto.fromPage(
+        reservations);
 
     return ResponseEntity.ok(CommonApiResponse.success(response));
   }
