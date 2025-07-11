@@ -5,7 +5,6 @@ import com.homeaid.auth.user.CustomUserDetails;
 import com.homeaid.issue.domain.ServiceIssue;
 import com.homeaid.issue.dto.request.ServiceIssueRequestDto;
 import com.homeaid.issue.dto.response.ServiceIssueResponseDto;
-import com.homeaid.security.user.CustomUserDetails;
 import com.homeaid.issue.service.ServiceIssueService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;

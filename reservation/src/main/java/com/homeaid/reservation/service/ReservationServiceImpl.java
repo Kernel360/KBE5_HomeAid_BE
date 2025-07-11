@@ -3,7 +3,6 @@ package com.homeaid.reservation.service;
 
 import com.homeaid.domain.Customer;
 import com.homeaid.matching.domain.Matching;
-import com.homeaid.matching.repository.MatchingRepository;
 import com.homeaid.reservation.domain.Reservation;
 import com.homeaid.reservation.domain.ReservationItem;
 import com.homeaid.matching.controller.enumerate.MatchingStatus;
@@ -18,7 +17,7 @@ import com.homeaid.reservation.exception.ReservationErrorCode;
 import com.homeaid.exception.UserErrorCode;
 import com.homeaid.repository.*;
 import com.homeaid.reservation.repository.ReservationRepository;
-import com.homeaid.service.SseNotificationService;
+import com.homeaid.service.NotificationPublisher;
 import com.homeaid.serviceoption.domain.ServiceOption;
 import com.homeaid.serviceoption.repository.ServiceOptionRepository;
 import java.util.List;
@@ -42,7 +41,6 @@ public class ReservationServiceImpl implements ReservationService {
 
   private final CustomerRepository customerRepository;
 
-  private final MatchingRepository matchingRepository;
 
   private final ServiceOptionRepository serviceOptionRepository;
 

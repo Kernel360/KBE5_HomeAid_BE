@@ -51,7 +51,7 @@ public class SettlementServiceImpl implements SettlementService {
     }
 
     List<PaymentResponseDto> paymentDtos = payments.stream()
-        .map(p -> PaymentResponseDto.toDto(p, getCustomerName(p.getReservation().getCustomerId())))
+        .map(p -> PaymentResponseDto.toDto(p, getCustomerName(p.getReservation().getCustomer().getId())))
         .toList();
 
     log.info("[정산] managerId={} settlementId={} 결제내역 {}건 반환", managerId, settlementId, paymentDtos.size());

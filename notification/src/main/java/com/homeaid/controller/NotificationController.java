@@ -1,9 +1,6 @@
 package com.homeaid.controller;
 
 import com.homeaid.common.response.CommonApiResponse;
-import com.homeaid.domain.Notification;
-import com.homeaid.domain.enumerate.UserRole;
-import com.homeaid.security.user.CustomUserDetails;
 import com.homeaid.dto.ResponseAlert;
 import com.homeaid.auth.user.CustomUserDetails;
 import com.homeaid.service.NotificationService;

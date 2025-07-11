@@ -1,6 +1,7 @@
 package com.homeaid.statistics.provider.impl;
 
-import com.homeaid.repository.MatchingRepository;
+
+import com.homeaid.matching.repository.MatchingRepository;
 import com.homeaid.statistics.dto.MatchingStatsDto;
 import com.homeaid.statistics.provider.MatchingStatisticsProvider;
 import lombok.RequiredArgsConstructor;

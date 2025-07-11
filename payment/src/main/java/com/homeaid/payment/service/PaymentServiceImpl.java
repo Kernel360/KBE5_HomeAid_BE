@@ -1,7 +1,7 @@
 package com.homeaid.payment.service;
 
 import com.homeaid.domain.User;
-import com.homeaid.dto.response.ReservationResponseDto;
+
 import com.homeaid.payment.domain.Payment;
 import com.homeaid.payment.domain.enumerate.PaymentStatus;
 import com.homeaid.reservation.domain.Reservation;
@@ -12,6 +12,7 @@ import com.homeaid.payment.dto.response.ReservationPaymentDetailResponseDto;
 import com.homeaid.payment.exception.PaymentErrorCode;
 import com.homeaid.payment.repository.PaymentRepository;
 import com.homeaid.payment.validator.PaymentValidator;
+import com.homeaid.reservation.dto.response.ReservationResponseDto;
 import com.homeaid.reservation.repository.ReservationRepository;
 import com.homeaid.repository.UserRepository;
 import org.springframework.transaction.annotation.Transactional;
@@ -77,7 +78,7 @@ public class PaymentServiceImpl implements PaymentService {
 
     Reservation reservation = payment.getReservation();
 
-    String customerName = getCustomerName(reservation.getCustomerId());
+    String customerName = getCustomerName(reservation.getCustomer().getId());
 
     ReservationResponseDto reservationDto = ReservationResponseDto.toDto(reservation);
     PaymentResponseDto paymentDto = PaymentResponseDto.toDto(payment, customerName);
@@ -106,7 +107,7 @@ public class PaymentServiceImpl implements PaymentService {
   }
 
   private PaymentResponseDto toDtoWithNames(Payment payment) {
-    String customerName = getCustomerName(payment.getReservation().getCustomerId());
+    String customerName = getCustomerName(payment.getReservation().getCustomer().getId());
     return PaymentResponseDto.toDto(payment, customerName);
   }
 

@@ -1,6 +1,7 @@
 package com.homeaid.payment.dto.response;
 
-import com.homeaid.dto.response.ReservationResponseDto;
+
+import com.homeaid.reservation.dto.response.ReservationResponseDto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Getter;

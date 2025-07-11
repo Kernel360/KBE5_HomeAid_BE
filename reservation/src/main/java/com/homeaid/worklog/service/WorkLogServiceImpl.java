@@ -3,16 +3,15 @@ package com.homeaid.worklog.service;
 import com.homeaid.matching.controller.enumerate.MatchingStatus;
 import com.homeaid.matching.domain.Matching;
 import com.homeaid.reservation.domain.Reservation;
+import com.homeaid.service.NotificationPublisher;
 import com.homeaid.worklog.domain.WorkLog;
 import com.homeaid.domain.enumerate.AlertType;
 import com.homeaid.domain.enumerate.UserRole;
-import com.homeaid.worklog.domain.enumerate.WorkType;
 import com.homeaid.dto.RequestAlert;
 import com.homeaid.exception.CustomException;
 import com.homeaid.matching.exception.MatchingErrorCode;
 import com.homeaid.matching.repository.MatchingRepository;
 import com.homeaid.worklog.exception.WorkLogErrorCode;
-import com.homeaid.worklog.repository.WorkLogRepository;
 import com.homeaid.worklog.util.GeoUtils;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -42,6 +41,8 @@ public class WorkLogServiceImpl implements WorkLogService {
 
     Matching matching = getAuthorizedWorkLog(matchingId, userId);
 
+    Reservation reservation = matching.getReservation();
+
     WorkLog workLog = matching.getWorkLog();
 
     if (workLog.getCheckInTime() != null) {
@@ -57,9 +58,9 @@ public class WorkLogServiceImpl implements WorkLogService {
     log.info("[WorkLog] 매니저 ID: {}, 매칭 ID: {}, 체크인 시간: {}", userId, matchingId, checkInTime);
 
     RequestAlert createdAlert = RequestAlert.createAlert(AlertType.WORK_CHECKIN,
-            reservation.getCustomerId(),
+            reservation.getCustomer().getId(),
             UserRole.CUSTOMER,
-            reservationId, null);
+            reservation.getId(), null);
     notificationPublisher.publishNotification(createdAlert);
   }
 
@@ -87,9 +88,9 @@ public class WorkLogServiceImpl implements WorkLogService {
     matching.getReservation().updateStatusCompleted();
 
     RequestAlert createdAlert = RequestAlert.createAlert(AlertType.WORK_CHECKOUT,
-        workLog.getReservation().getCustomerId(),
+        matching.getReservation().getCustomer().getId(),
         UserRole.CUSTOMER,
-        reservationId,
+        matching.getReservation().getId(),
         null);
 
     notificationPublisher.publishNotification(createdAlert);

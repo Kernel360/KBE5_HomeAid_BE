@@ -2,9 +2,9 @@ package com.homeaid.matching.service;
 
 
 import com.homeaid.domain.Manager;
+import com.homeaid.domain.enumerate.AlertType;
 import com.homeaid.matching.domain.Matching;
 import com.homeaid.reservation.domain.Reservation;
-import com.homeaid.domain.enumerate.NotificationEventType;
 import com.homeaid.domain.enumerate.UserRole;
 import com.homeaid.domain.enumerate.Weekday;
 import com.homeaid.dto.RequestAlert;
@@ -17,7 +17,7 @@ import com.homeaid.exception.UserErrorCode;
 import com.homeaid.repository.ManagerRepository;
 import com.homeaid.matching.repository.MatchingRepository;
 import com.homeaid.reservation.repository.ReservationRepository;
-import com.homeaid.service.SseNotificationService;
+import com.homeaid.service.NotificationPublisher;
 import com.homeaid.util.RegionValidator;
 import java.time.LocalTime;
 import java.util.List;
@@ -82,7 +82,7 @@ public class MatchingServiceImpl implements MatchingService {
 
     if (alertType.equals(AlertType.MANAGER_MATCHING_ACCEPTED)) {
       RequestAlert createdAlert = RequestAlert.createAlert(AlertType.SUGGEST_MATCHING_TO_CUSTOMER,
-              matching.getReservation().getCustomerId(),
+              matching.getReservation().getCustomer().getId(),
               UserRole.CUSTOMER,
               matching.getReservation().getId(), null);
       notificationPublisher.publishNotification(createdAlert);
