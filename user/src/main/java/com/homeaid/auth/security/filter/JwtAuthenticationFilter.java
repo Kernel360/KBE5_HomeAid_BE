@@ -5,7 +5,7 @@ import com.homeaid.auth.service.RefreshTokenService;
 import com.homeaid.auth.security.jwt.JwtTokenProvider;
 import com.homeaid.auth.user.CustomUserDetails;
 import com.homeaid.auth.util.CookieUtil;
-import com.homeaid.dto.request.SignInRequestDto;
+import com.homeaid.auth.dto.request.SignInRequestDto;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
