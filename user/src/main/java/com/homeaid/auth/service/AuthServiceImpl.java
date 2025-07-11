@@ -2,6 +2,7 @@ package com.homeaid.auth.service;
 
 import com.homeaid.auth.dto.TokenResponse;
 import com.homeaid.auth.dto.request.AdditionalUserInfoDto;
+import com.homeaid.auth.dto.request.SignInRequestDto;
 import com.homeaid.auth.dto.response.OauthResponseDto;
 import com.homeaid.auth.exception.TokenErrorCode;
 import com.homeaid.auth.security.jwt.JwtTokenProvider;
@@ -9,7 +10,6 @@ import com.homeaid.auth.user.CustomUserDetails;
 import com.homeaid.domain.Customer;
 import com.homeaid.domain.Manager;
 import com.homeaid.domain.User;
-import com.homeaid.dto.request.SignInRequestDto;
 import com.homeaid.exception.CustomException;
 import com.homeaid.exception.UserErrorCode;
 import com.homeaid.repository.UserRepository;
