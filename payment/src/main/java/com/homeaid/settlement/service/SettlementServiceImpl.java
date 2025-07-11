@@ -25,8 +25,11 @@ public class SettlementServiceImpl implements SettlementService {
   private final PaymentRepository paymentRepository;
 
   @Override
-  public List<Settlement> getWeeklySettlements(Long managerId, LocalDate startDate) {
-    return settlementRepository.findByManagerIdAndSettlementWeekStart(managerId, startDate);
+  public List<Settlement> getWeeklySettlements(Long managerId, LocalDate targetDate) {
+    return settlementRepository
+        .findByManagerIdAndSettlementWeekStartLessThanEqualAndSettlementWeekEndGreaterThanEqual(
+            managerId, targetDate, targetDate
+        );
   }
 
   @Override
