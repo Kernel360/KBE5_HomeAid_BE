@@ -36,7 +36,7 @@ public class AdminCustomerController {
   private final AdminCustomerService adminCustomerService;
 
   @Operation(
-      summary = "고객 전체 목록 조회",
+      summary = "고객 전체 목록 조회  (검색 포함)",
       description = "관리자가 모든 고객을 페이징하여 조회합니다."
   )
   @ApiResponses({

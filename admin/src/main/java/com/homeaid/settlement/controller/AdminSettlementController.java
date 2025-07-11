@@ -2,9 +2,12 @@ package com.homeaid.settlement.controller;
 
 import com.homeaid.common.response.CommonApiResponse;
 import com.homeaid.settlement.domain.Settlement;
+import com.homeaid.settlement.dto.MonthlySettlementSummaryDto;
 import com.homeaid.settlement.dto.SettlementWithManagerResponseDto;
+import com.homeaid.settlement.dto.WeeklySettlementGroupDto;
 import com.homeaid.settlement.dto.response.SettlementResponseDto;
 import com.homeaid.settlement.service.AdminSettlementService;
+import com.homeaid.settlement.util.WeeklySettlementGrouper;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -14,6 +17,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
@@ -31,6 +35,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class AdminSettlementController {
 
   private final AdminSettlementService adminSettlementService;
+  private final WeeklySettlementGrouper weeklySettlementGrouper;
 
   @PostMapping("/manager")
   @Operation(summary = "[관리자] 매니저 주간 정산 생성")
@@ -150,6 +155,27 @@ public class AdminSettlementController {
 
     SettlementWithManagerResponseDto dto = adminSettlementService.getSettlementWithManager(settlementId);
     return ResponseEntity.ok(CommonApiResponse.success(dto));
+  }
+
+  @GetMapping("/monthly")
+  @Operation(summary = "[관리자] 특정 월의 정산 목록 + 주차별 그룹 응답")
+  public ResponseEntity<CommonApiResponse<MonthlySettlementSummaryDto>> getMonthlySettlementSummary(
+      @RequestParam("year") int year,
+      @RequestParam("month") int month
+  ) {
+    List<Settlement> settlements = adminSettlementService.findByMonth(year, month);
+    List<SettlementResponseDto> dtoList = settlements.stream()
+        .map(SettlementResponseDto::from)
+        .toList();
+
+    Map<String, WeeklySettlementGroupDto> weeklyGrouped = weeklySettlementGrouper.groupByWeek(settlements, year, month);
+
+    MonthlySettlementSummaryDto result = MonthlySettlementSummaryDto.builder()
+        .settlements(dtoList)
+        .weeklyGrouped(weeklyGrouped)
+        .build();
+
+    return ResponseEntity.ok(CommonApiResponse.success(result));
   }
 
 

@@ -15,13 +15,17 @@ import com.homeaid.settlement.domain.Settlement;
 import com.homeaid.exception.CustomException;
 import com.homeaid.settlement.domain.enumerate.SettlementStatus;
 import com.homeaid.settlement.dto.SettlementWithManagerResponseDto;
+import com.homeaid.settlement.dto.WeeklySettlementGroupDto;
 import com.homeaid.settlement.exception.SettlementErrorCode;
 import com.homeaid.settlement.repository.SettlementRepository;
+import com.homeaid.settlement.util.WeeklySettlementGrouper;
 import com.homeaid.settlement.validator.SettlementValidator;
 import jakarta.transaction.Transactional;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.temporal.TemporalAdjusters;
 import java.util.List;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -36,6 +40,7 @@ public class AdminSettlementServiceImpl implements AdminSettlementService {
   private final SettlementValidator settlementValidator;
   private final ManagerRepository managerRepository;
   private final RefundRepository refundRepository;
+  private final WeeklySettlementGrouper weeklySettlementGrouper;
 
   // 관리자가 수동으로 매니저 정산 생성
   @Override
@@ -82,7 +87,6 @@ public class AdminSettlementServiceImpl implements AdminSettlementService {
 
     List<Payment> payments = paymentRepository.findAllByReservation_ManagerIdAndPaidAtBetween(managerId, start, end);
 
-    // TODO : 정산 가능한 결제만 필터링 (결제완료 + 서비스완료) 수정 필요
     return payments.stream()
         .filter(payment -> payment.getStatus() == PaymentStatus.PAID &&
             payment.getReservation().getStatus() == ReservationStatus.COMPLETED)
@@ -208,4 +212,19 @@ public class AdminSettlementServiceImpl implements AdminSettlementService {
         .mapToInt(Refund::getRefundAmount)
         .sum();
   }
+
+  @Override
+  public Map<String, WeeklySettlementGroupDto> getGroupedWeeklySettlementsByMonth(int year,
+      int month) {
+    List<Settlement> settlements = findByMonth(year, month);
+    return weeklySettlementGrouper.groupByWeek(settlements, year, month);
+  }
+
+  @Override
+  public List<Settlement> findByMonth(int year, int month) {
+    LocalDate monthStart = LocalDate.of(year, month, 1);
+    LocalDate monthEnd = monthStart.with(TemporalAdjusters.lastDayOfMonth());
+    return adminSettlementRepository.findBySettlementWeekStartBetween(monthStart, monthEnd);
+  }
+
 }

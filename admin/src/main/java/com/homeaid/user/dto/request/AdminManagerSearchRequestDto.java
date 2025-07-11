@@ -1,6 +1,5 @@
 package com.homeaid.user.dto.request;
 
-import com.homeaid.domain.enumerate.ManagerStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -23,8 +22,5 @@ public class AdminManagerSearchRequestDto {
 
   @Schema(description = "경력 내용 (부분 일치 검색)")
   private String career;
-
-  @Schema(description = "매니저 상태", example = "ACTIVE")
-  private ManagerStatus status;
 
 }
