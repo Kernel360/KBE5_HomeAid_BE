@@ -2,7 +2,7 @@ package com.homeaid.settlement.service;
 
 import com.homeaid.domain.Manager;
 import com.homeaid.domain.enumerate.ManagerStatus;
-import com.homeaid.domain.enumerate.ReservationStatus;
+import com.homeaid.reservation.domain.enumerate.ReservationStatus;
 import com.homeaid.payment.domain.Payment;
 import com.homeaid.payment.domain.Refund;
 import com.homeaid.payment.domain.enumerate.PaymentStatus;

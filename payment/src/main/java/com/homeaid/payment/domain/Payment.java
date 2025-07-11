@@ -1,7 +1,7 @@
 package com.homeaid.payment.domain;
 
-import com.homeaid.domain.Reservation;
-import com.homeaid.domain.enumerate.ReservationStatus;
+import com.homeaid.reservation.domain.Reservation;
+import com.homeaid.reservation.domain.enumerate.ReservationStatus;
 import com.homeaid.exception.CustomException;
 import com.homeaid.payment.domain.enumerate.PaymentMethod;
 import com.homeaid.payment.domain.enumerate.PaymentStatus;

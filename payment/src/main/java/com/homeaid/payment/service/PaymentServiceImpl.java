@@ -1,10 +1,10 @@
 package com.homeaid.payment.service;
 
 import com.homeaid.domain.User;
-import com.homeaid.dto.response.ReservationResponseDto;
+
 import com.homeaid.payment.domain.Payment;
 import com.homeaid.payment.domain.enumerate.PaymentStatus;
-import com.homeaid.domain.Reservation;
+import com.homeaid.reservation.domain.Reservation;
 import com.homeaid.payment.dto.request.PaymentRequestDto;
 import com.homeaid.payment.dto.response.PaymentResponseDto;
 import com.homeaid.exception.CustomException;
@@ -12,7 +12,8 @@ import com.homeaid.payment.dto.response.ReservationPaymentDetailResponseDto;
 import com.homeaid.payment.exception.PaymentErrorCode;
 import com.homeaid.payment.repository.PaymentRepository;
 import com.homeaid.payment.validator.PaymentValidator;
-import com.homeaid.repository.ReservationRepository;
+import com.homeaid.reservation.dto.response.ReservationResponseDto;
+import com.homeaid.reservation.repository.ReservationRepository;
 import com.homeaid.repository.UserRepository;
 import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
@@ -66,6 +67,7 @@ public class PaymentServiceImpl implements PaymentService {
   }
   // 환불 중간에 문제가 발생하면 -> 전체 작업을 롤백해야 함 -> 트랜잭션이 없다면 중간 상태가 DB에 반영될 수 있음 -> 장애 위험 발생
 
+  // 결제 단건 조회
   @Override
   @Transactional(readOnly = true)
   public ReservationPaymentDetailResponseDto getReservationPaymentDetail(Long customerId, Long paymentId) {
@@ -76,7 +78,7 @@ public class PaymentServiceImpl implements PaymentService {
 
     Reservation reservation = payment.getReservation();
 
-    String customerName = getCustomerName(reservation.getCustomerId());
+    String customerName = getCustomerName(reservation.getCustomer().getId());
 
     ReservationResponseDto reservationDto = ReservationResponseDto.toDto(reservation);
     PaymentResponseDto paymentDto = PaymentResponseDto.toDto(payment, customerName);
@@ -105,7 +107,7 @@ public class PaymentServiceImpl implements PaymentService {
   }
 
   private PaymentResponseDto toDtoWithNames(Payment payment) {
-    String customerName = getCustomerName(payment.getReservation().getCustomerId());
+    String customerName = getCustomerName(payment.getReservation().getCustomer().getId());
     return PaymentResponseDto.toDto(payment, customerName);
   }
 

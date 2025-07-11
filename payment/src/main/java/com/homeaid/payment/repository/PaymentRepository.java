@@ -14,7 +14,7 @@ public interface PaymentRepository extends JpaRepository<Payment, Long> {
   //List<Payment> findAllByReservation_ManagerIdAndPaidAtBetween(Long managerId, LocalDateTime start, LocalDateTime end);
   boolean existsByReservationId(Long reservationId); // 중복 결제 방지
 
-  @Query("SELECT p FROM Payment p WHERE p.reservation.customerId = :customerId")
+  @Query("SELECT p FROM Payment p WHERE p.reservation.customer.id = :customerId")
   List<Payment> findByCustomerId(@Param("customerId") Long customerId);
 
   @Query("SELECT COUNT(p) FROM Payment p WHERE p.status = 'PAID'") // 또는 조건 없이 COUNT(p)

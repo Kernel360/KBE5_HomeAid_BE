@@ -21,7 +21,7 @@ public class AdminPaymentServiceImpl implements AdminPaymentService {
   private final UserRepository userRepository;
 
   private PaymentResponseDto toDtoWithUserNames(Payment payment) {
-    String customerName = userRepository.findById(payment.getReservation().getCustomerId())
+    String customerName = userRepository.findById(payment.getReservation().getCustomer().getId())
         .map(User::getName)
         .orElse("알 수 없음");
 

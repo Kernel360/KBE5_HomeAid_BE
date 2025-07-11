@@ -20,7 +20,7 @@ public class RefundValidator {
 
   // 결제 소유자가 맞는지 검증
   public void validateOwnership(Payment payment, Long userId) {
-    if (!payment.getReservation().getCustomerId().equals(userId)) {
+    if (!payment.getReservation().getCustomer().getId().equals(userId)) {
       throw new CustomException(PaymentErrorCode.PAYMENT_ACCESS_DENIED);
     }
   }

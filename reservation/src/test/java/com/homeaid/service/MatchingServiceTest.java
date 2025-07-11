@@ -12,15 +12,15 @@
 //import static org.mockito.Mockito.verify;
 //
 //import com.homeaid.domain.Manager;
-//import com.homeaid.domain.Matching;
-//import com.homeaid.domain.Reservation;
+//import com.homeaid.matching.domain.Matching;
+//import com.homeaid.reservation.domain.Reservation;
 //import com.homeaid.domain.enumerate.GenderType;
 //import com.homeaid.domain.enumerate.Weekday;
-//import com.homeaid.dto.request.MatchingManagerResponseDto.ManagerAction;
+//import com.homeaid.matching.dto.request.MatchingManagerResponseDto.ManagerAction;
 //import com.homeaid.exception.CustomException;
 //import com.homeaid.repository.ManagerRepository;
-//import com.homeaid.repository.MatchingRepository;
-//import com.homeaid.repository.ReservationRepository;
+//import com.homeaid.matching.repository.MatchingRepository;
+//import com.homeaid.reservation.repository.ReservationRepository;
 //import com.homeaid.serviceoption.domain.ServiceOption;
 //import com.homeaid.util.RegionValidator;
 //import java.time.LocalDate;

@@ -1,8 +1,8 @@
 package com.homeaid.payment.policy;
 
-import com.homeaid.domain.Reservation;
 import com.homeaid.payment.domain.Payment;
 import com.homeaid.payment.dto.request.RefundRequestDto;
+import com.homeaid.reservation.domain.Reservation;
 
 public interface RefundAmountPolicy {
 

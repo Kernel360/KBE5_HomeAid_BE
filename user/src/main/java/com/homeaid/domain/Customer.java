@@ -1,10 +1,10 @@
 package com.homeaid.domain;
 
 
+
 import com.homeaid.domain.enumerate.GenderType;
 import com.homeaid.domain.enumerate.UserRole;
 import jakarta.persistence.CascadeType;
-import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;

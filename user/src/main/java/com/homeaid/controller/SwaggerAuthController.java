@@ -3,12 +3,12 @@ package com.homeaid.controller;
 import com.homeaid.common.response.CommonApiResponse;
 import com.homeaid.domain.Customer;
 import com.homeaid.domain.Manager;
-import com.homeaid.dto.request.CustomerSignUpRequestDto;
-import com.homeaid.dto.request.ManagerSignUpRequestDto;
+import com.homeaid.auth.dto.request.CustomerSignUpRequestDto;
+import com.homeaid.auth.dto.request.ManagerSignUpRequestDto;
+import com.homeaid.auth.dto.response.SignUpResponseDto;
+import com.homeaid.auth.dto.response.SignInResponseDto;
+import com.homeaid.auth.service.AuthService;
 import com.homeaid.dto.request.SignInRequestDto;
-import com.homeaid.dto.response.SignUpResponseDto;
-import com.homeaid.dto.response.SignInResponseDto;
-import com.homeaid.service.UserServiceImpl;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -26,13 +26,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/v1/swagger/users")
+@RequestMapping("/api/v1/swagger/auth")
 @RequiredArgsConstructor
 @Tag(name = "로그인/회원가입", description = "사용자 로그인/회원가입 API (매니저/고객)")
 //@Profile("swagger")  // swagger 프로파일에서만 활성화 가능 (선택)
 public class SwaggerAuthController {
 
-  private final UserServiceImpl userServiceImpl;
+  private final AuthService authService;
   private final BCryptPasswordEncoder passwordEncoder;
 
   @PostMapping("/signup/managers")
@@ -50,7 +50,7 @@ public class SwaggerAuthController {
   ) {
 
     String password = passwordEncoder.encode(managerSignUpRequestDto.getPassword());
-    Manager manager = userServiceImpl.signUpManager(
+    Manager manager = authService.signUpManager(
         ManagerSignUpRequestDto.toEntity(managerSignUpRequestDto, password) // 비밀번호 추가 수정 필요
     );
     return ResponseEntity.status(HttpStatus.CREATED)
@@ -73,7 +73,7 @@ public class SwaggerAuthController {
 
     String password = passwordEncoder.encode(customerSignUpRequestDto.getPassword());
 
-    Customer customer = userServiceImpl.signUpCustomer(
+    Customer customer = authService.signUpCustomer(
         CustomerSignUpRequestDto.toEntity(customerSignUpRequestDto, password) // 비밀번호 추가 수정 필요
     );
     return ResponseEntity.status(HttpStatus.CREATED)
@@ -90,7 +90,7 @@ public class SwaggerAuthController {
   @PostMapping("/signin")
   public ResponseEntity<SignInResponseDto> swaggerSignIn(
       @RequestBody SignInRequestDto swaggerRequest) {
-    String token = userServiceImpl.loginAndGetToken(swaggerRequest);
+    String token = authService.loginAndGetToken(swaggerRequest);
     return ResponseEntity.ok(new SignInResponseDto(token));
   }
 

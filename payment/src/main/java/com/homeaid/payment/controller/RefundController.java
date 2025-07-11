@@ -4,7 +4,7 @@ import com.homeaid.common.response.CommonApiResponse;
 import com.homeaid.payment.dto.request.RefundRequestDto;
 import com.homeaid.payment.dto.response.RefundResponseDto;
 import com.homeaid.payment.service.RefundService;
-import com.homeaid.security.user.CustomUserDetails;
+import com.homeaid.auth.user.CustomUserDetails;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;

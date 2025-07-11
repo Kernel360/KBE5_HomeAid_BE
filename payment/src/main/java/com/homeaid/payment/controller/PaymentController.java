@@ -4,7 +4,7 @@ import com.homeaid.common.response.CommonApiResponse;
 import com.homeaid.payment.dto.request.PaymentRequestDto;
 import com.homeaid.payment.dto.response.PaymentResponseDto;
 import com.homeaid.payment.dto.response.ReservationPaymentDetailResponseDto;
-import com.homeaid.security.user.CustomUserDetails;
+import com.homeaid.auth.user.CustomUserDetails;
 import com.homeaid.payment.service.PaymentService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
