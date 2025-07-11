@@ -2,7 +2,6 @@ package com.homeaid.auth.security.config;
 
 import com.homeaid.auth.security.filter.OAuth2AuthenticationSuccessHandler;
 import com.homeaid.auth.service.RefreshTokenService;
-import com.homeaid.auth.service.TokenBlacklistService;
 import com.homeaid.auth.security.filter.AccessTokenFilter;
 import com.homeaid.auth.security.filter.JwtAuthenticationFilter;
 import com.homeaid.auth.security.jwt.JwtTokenProvider;
@@ -34,10 +33,10 @@ public class SecurityConfig {
 
   private final JwtTokenProvider jwtTokenProvider;
   private final RefreshTokenService refreshTokenService;
-  private final TokenBlacklistService tokenBlacklistService;
   private final CookieUtil cookieUtil;
   private final CustomOAuth2UserService customOAuth2UserService;
   private final OAuth2AuthenticationSuccessHandler oAuth2SuccessHandler;
+  private final AccessTokenFilter accessTokenFilter;
 
   // TODO 권한별 requestMatchers uri 정리 필요
   private final String[] allowUrls = {
@@ -93,8 +92,7 @@ public class SecurityConfig {
 
     http
         .addFilterAt(signinFilter, UsernamePasswordAuthenticationFilter.class)
-        .addFilterBefore(new AccessTokenFilter(jwtTokenProvider, tokenBlacklistService),
-            UsernamePasswordAuthenticationFilter.class);
+        .addFilterBefore(accessTokenFilter, UsernamePasswordAuthenticationFilter.class);
 
     return http.build();
   }
