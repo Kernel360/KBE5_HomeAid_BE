@@ -70,7 +70,7 @@ public class AuthController {
   }
 
   // oauth 회원가입
-  @PatchMapping("/signup/oauth/additional-profile")
+  @PostMapping("/signup/oauth/additional-profile")
   public ResponseEntity<CommonApiResponse<Void>> completeOAuthSignup(
       @Valid @RequestBody OAuthSignupRequestDto request
   ) {
@@ -107,7 +107,7 @@ public class AuthController {
     return ResponseEntity.ok(CommonApiResponse.success(null));
   }
 
-  // Refresh 토큰 기반 새 AccessToken 발급
+  // 토큰 만료 시, Refresh 토큰 기반 새 AccessToken 발급
   @PostMapping("/refresh/reissue")
   public ResponseEntity<TokenResponse> reissue(
       @CookieValue("refresh_token") String refreshToken,

@@ -27,7 +27,7 @@ public class Customer extends User {
   @Builder
   public Customer(String email, String password, String name, String phone, LocalDate birth,
       GenderType gender) {
-    super(email, password, name, phone, birth, gender, UserRole.MANAGER);
+    super(email, password, name, phone, birth, gender, UserRole.CUSTOMER);
   }
 
   public void addAddress(CustomerAddress address) {
