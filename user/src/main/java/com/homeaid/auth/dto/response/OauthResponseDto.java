@@ -7,8 +7,6 @@ import lombok.Getter;
 @AllArgsConstructor
 public class OauthResponseDto {
 
-  private String accessToken;
-  private String refreshToken;
   private Long userId;
   private String username;
   private String role;

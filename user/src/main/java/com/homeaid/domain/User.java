@@ -1,7 +1,5 @@
 package com.homeaid.domain;
 
-
-
 import com.homeaid.domain.enumerate.GenderType;
 import com.homeaid.domain.enumerate.UserRole;
 import jakarta.persistence.CascadeType;
@@ -42,7 +40,7 @@ public class User {
   @Column(nullable = false)
   private String email;
 
-  @Column
+  @Column(nullable = false)
   private String password;
 
   @Column(nullable = false)
@@ -60,14 +58,17 @@ public class User {
   @Enumerated(EnumType.STRING)
   private UserRole role;
 
+  @Setter
   @Column(name = "profile_image_url")
   private String profileImageUrl;
 
   @Column(name = "profile_image_s3_key") // 삭제를 위한 S3 키
   private String profileImageS3Key;
 
+  @Setter
   private String provider; // ex: google
 
+  @Setter
   private String providerId; // 구글 로그인 유저의 고유 ID
 
   @Column(nullable = false)
@@ -139,13 +140,6 @@ public class User {
     this.profileImageS3Key = s3Key;
   }
 
-  public void additionalOAuthInfo(UserRole role, String phone, LocalDate birth, GenderType gender) {
-    this.role = role;
-    this.phone = phone;
-    this.birth = birth;
-    this.gender = gender;
-  }
-
   public void updateOAuthProfile(String name, String picture) {
     this.name = name;
     this.profileImageUrl = picture;
@@ -154,4 +148,5 @@ public class User {
   public boolean isProfileComplete() {
     return this.phone != null && this.birth != null;
   }
+
 }

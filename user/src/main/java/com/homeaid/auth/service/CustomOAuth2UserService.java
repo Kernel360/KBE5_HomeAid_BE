@@ -4,7 +4,6 @@ import com.homeaid.auth.user.CustomOAuth2User;
 import com.homeaid.auth.user.GoogleUserDetails;
 import com.homeaid.auth.user.OAuth2UserInfo;
 import com.homeaid.domain.User;
-import com.homeaid.domain.enumerate.UserRole;
 import com.homeaid.repository.UserRepository;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
@@ -50,36 +49,38 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
   }
 
   private User saveOrUpdateUser(OAuth2UserInfo userInfo, String provider) {
-    log.info("OAuth2 이메일로 사용자 검색: '{}'", userInfo.getEmail());
-    Optional<User> existingUser = userRepository.findByEmail(userInfo.getEmail());
-    log.info("사용자 검색 결과: {}", existingUser.isPresent() ? "존재함" : "존재하지 않음");
+    log.info("OAuth2 ID로 사용자 검색: '{}'", userInfo.getProviderId());
+
+    Optional<User> existingUser = userRepository.findByProviderAndProviderId(provider,
+        userInfo.getProviderId());
+    log.info("OAuth2 ID로 사용자 검색 결과: {}", existingUser.isPresent() ? "존재함" : "존재하지 않음");
 
     if (existingUser.isPresent()) {
       User user = existingUser.get();
-
-      if (!user.getProvider().equals(provider)) {
-        log.warn("기존 provider: {}, 현재 provider: {}", user.getProvider(), provider);
-        throw new OAuth2AuthenticationException(
-            "이미 " + user.getProvider() + " 계정으로 가입된 이메일입니다.");
-      }
-
+      // 기존 사용자 정보 업데이트
       user.updateOAuthProfile(userInfo.getName(), userInfo.getImageUrl());
       log.info("기존 사용자 정보 업데이트: {}", user.getEmail());
       return userRepository.save(user);
-
     } else {
-      // 새 사용자 생성 (추가 정보 입력 필요)
+      // 이메일로 기존 계정 확인 (다른 방식으로 가입한 계정이 있는지)
+      Optional<User> emailUser = userRepository.findByEmail(userInfo.getEmail());
+      if (emailUser.isPresent()) {
+        throw new OAuth2AuthenticationException(
+            "해당 이메일로 이미 가입된 계정이 있습니다. 일반 로그인을 이용해주세요.");
+      }
+
+      // 신규 사용자는 DB에 저장하지 않고 임시 객체만 생성
       User newUser = User.createOAuth2User(
           provider,
           userInfo.getProviderId(),
           userInfo.getEmail(),
           userInfo.getName(),
           userInfo.getImageUrl(),
-          UserRole.CUSTOMER
+          null // role은 나중에 설정
       );
 
-      log.info("새 OAuth2 사용자 생성: {} (추가 정보 입력 필요)", newUser.getEmail());
-      return userRepository.save(newUser);
+      log.info("새 OAuth2 사용자 생성 (임시): {} (추가 정보 입력 필요)", newUser.getEmail());
+      return newUser; // DB에 저장하지 않음
     }
   }
 }
