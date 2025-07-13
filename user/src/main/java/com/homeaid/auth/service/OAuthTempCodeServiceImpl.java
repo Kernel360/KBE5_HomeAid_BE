@@ -93,7 +93,16 @@ public class OAuthTempCodeServiceImpl implements OAuthTempCodeService {
         String key = RedisKeyFactory.buildOAuthCodeKey(oauthCode);
         Object userId = redisUtil.getObject(key);
 
-        return userService.getUserById((Long) userId);
+        Long longUserId;
+        if (userId instanceof Integer) {
+          longUserId = ((Integer) userId).longValue();
+        } else if (userId instanceof Long) {
+          longUserId = (Long) userId;
+        } else {
+          throw new IllegalStateException("Unexpected userId type in Redis: " + userId.getClass());
+        }
+
+        return userService.getUserById(longUserId);
       } catch (Exception e) {
         log.error("기존 사용자 ID 조회 실패 - Code: {}", oauthCode, e);
 

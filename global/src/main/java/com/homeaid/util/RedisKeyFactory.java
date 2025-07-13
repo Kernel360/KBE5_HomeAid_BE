@@ -21,11 +21,11 @@ public class RedisKeyFactory {
 
   // 신규 OAuth 사용자 임시 정보 키 생성
   public static String buildOAuthNewUserKey(String oauthCode) {
-    return "OAUTH_NEW_USER: " + oauthCode;
+    return "OAUTH_NEW_USER:" + oauthCode;
   }
 
    // 기존 OAuth 사용자 임시 코드 키 생성
   public static String buildOAuthCodeKey(String oauthCode) {
-    return "OAUTH_CODE: " + oauthCode;
+    return "OAUTH_CODE:" + oauthCode;
   }
 }

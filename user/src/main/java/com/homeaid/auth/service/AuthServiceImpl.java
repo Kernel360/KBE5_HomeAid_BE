@@ -19,6 +19,7 @@ import com.homeaid.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import java.util.Optional;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -138,7 +139,7 @@ public class AuthServiceImpl implements AuthService {
   // OAuth 사용자 추가 정보 저장
   @Override
   @Transactional
-  public void completeOAuthSignup(OAuthSignupRequestDto request) {
+  public String oAuthSignup(OAuthSignupRequestDto request) {
 
     // 임시 사용자 정보 조회 및 검증
     TempOAuthUserInfo tempUserInfo = validateAndGetTempUserInfo(request.getOauthCode());
@@ -155,6 +156,13 @@ public class AuthServiceImpl implements AuthService {
 
     // 5. 임시 코드 삭제
     oauthTempCodeService.deleteOAuthCode(request.getOauthCode());
+
+    // 로그인 요청 토큰 발급
+    String oauthCode = UUID.randomUUID().toString();
+    log.info(String.valueOf(savedUser.getId()));
+    oauthTempCodeService.storeExistingUserCode(oauthCode, savedUser.getId());
+
+    return oauthCode;
   }
 
   private TempOAuthUserInfo validateAndGetTempUserInfo(String oauthCode) {
@@ -250,6 +258,8 @@ public class AuthServiceImpl implements AuthService {
     String accessToken = jwtTokenProvider.createAccessToken(user.getId(), user.getRole().name());
     String refreshToken = jwtTokenProvider.createRefreshToken(user.getId());
     refreshTokenService.saveRefreshToken(user.getId(), refreshToken);
+
+    oauthTempCodeService.deleteOAuthCode(oauthCode);
 
     log.debug("[AuthService] AT & RT 생성 완료 - userId={}, accessToken={}, refreshToken={}", user.getId(), accessToken, refreshToken);
     return new SignInResponseDto(accessToken, refreshToken, user);

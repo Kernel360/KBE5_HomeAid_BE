@@ -24,7 +24,7 @@ public interface AuthService {
 
   SignInResponseDto issueToken(String oauthCode);
 
-  void completeOAuthSignup(OAuthSignupRequestDto request);
+  String oAuthSignup(OAuthSignupRequestDto request);
 
   OauthResponseDto oAuthSignInResponse(User user);
 }

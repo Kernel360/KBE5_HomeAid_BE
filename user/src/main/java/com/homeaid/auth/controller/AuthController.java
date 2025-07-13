@@ -21,7 +21,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.CookieValue;
-import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -71,11 +70,11 @@ public class AuthController {
 
   // oauth 회원가입
   @PostMapping("/signup/oauth/additional-profile")
-  public ResponseEntity<CommonApiResponse<Void>> completeOAuthSignup(
+  public ResponseEntity<CommonApiResponse<String>> completeOAuthSignup(
       @Valid @RequestBody OAuthSignupRequestDto request
   ) {
-    authService.completeOAuthSignup(request);
-    return ResponseEntity.ok(CommonApiResponse.success(null));
+    String signInToken = authService.oAuthSignup(request);
+    return ResponseEntity.ok(CommonApiResponse.success(signInToken));
   }
 
   // oauth 토큰 발급
@@ -84,7 +83,7 @@ public class AuthController {
       @RequestBody Map<String, String> request,
       HttpServletResponse response
   ) {
-    String oauthCode = request.get("OAUTH_CODE");
+    String oauthCode = request.get("oauthCode");
     SignInResponseDto signInResponseDto = authService.issueToken(oauthCode);
 
     // RT 쿠키 저장
