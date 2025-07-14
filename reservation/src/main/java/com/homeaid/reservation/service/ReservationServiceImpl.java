@@ -101,7 +101,7 @@ public class ReservationServiceImpl implements ReservationService {
   @Transactional(readOnly = true)
   public Page<ReservationResponseDto> getReservations(Pageable pageable, ReservationStatus status) {
 
-    Page<Reservation> reservations = reservationRepository.findByOptionalStatus(status, pageable);
+    Page<Reservation> reservations = reservationReader.getReservationByStatus(status, pageable);
 
     return reservations.map(reservation -> {
 

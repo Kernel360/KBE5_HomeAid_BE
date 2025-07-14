@@ -8,7 +8,6 @@ import com.homeaid.reservation.dto.response.ReservationInfo;
 import com.homeaid.reservation.domain.enumerate.ReservationStatus;
 import com.homeaid.reservation.dto.ReservationDtoMapper;
 import com.homeaid.reservation.dto.request.ReservationRequestDto;
-import com.homeaid.reservation.dto.request.UpdateReservationRequestDto;
 import com.homeaid.reservation.dto.response.ManagerReservationResponseDto;
 import com.homeaid.reservation.dto.response.ReservationResponseDto;
 import com.homeaid.auth.user.CustomUserDetails;
@@ -22,7 +21,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springdoc.core.models.GroupedOpenApi;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -49,7 +47,7 @@ public class ReservationController {
   private final ReservationService reservationService;
 
   private final ReservationDtoMapper reservationDtoMapper;
-  private final GroupedOpenApi managerAPI;
+
 
   @PostMapping
   @Operation(summary = "예약 생성", description = "고객이 예약 옵션을 선택하여 예약을 생성합니다.")
