@@ -27,9 +27,7 @@ public interface ReservationService {
 
   Page<ManagerReservationResponseDto> getReservationsByManager(Long userId, Pageable pageable);
 
-  Reservation validateReservation(Long reservationId);
+  Reservation validateReservation(Long reservationId, Long managerId);
 
-  void validateManagerAccess(Reservation reservation, Long managerId);
-
-  void validateUserAccess(Reservation reservation, Long managerId);
+  void validateReservationAndUserAccess(Long reservationId, Long userId);
 }

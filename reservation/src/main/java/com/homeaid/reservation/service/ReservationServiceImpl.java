@@ -142,25 +142,26 @@ public class ReservationServiceImpl implements ReservationService {
   }
 
   @Override
-  public Reservation validateReservation(Long reservationId) {
+  @Transactional(readOnly = true)
+  public Reservation validateReservation(Long reservationId, Long managerId) {
     Reservation reservation = reservationReader.getReservation(reservationId);
 
     if (reservation.getStatus() != ReservationStatus.COMPLETED) {
       throw new CustomException(ReservationErrorCode.RESERVATION_NOT_COMPLETED);
     }
 
+    if (!reservation.getManagerId().equals(managerId)) {
+      throw new CustomException(ReservationErrorCode.RESERVATION_MANAGER_MISMATCH);
+    }
+
     return reservation;
   }
 
   @Override
-  public void validateManagerAccess(Reservation reservation, Long managerId) {
-    if (!reservation.getManagerId().equals(managerId)) {
-      throw new CustomException(ReservationErrorCode.RESERVATION_MANAGER_MISMATCH);
-    }
-  }
+  @Transactional(readOnly = true)
+  public void validateReservationAndUserAccess(Long reservationId, Long userId) {
+    Reservation reservation = reservationReader.getReservation(reservationId);
 
-  @Override
-  public void validateUserAccess(Reservation reservation, Long userId) {
     boolean isManager = userId.equals(reservation.getManagerId());
     boolean isCustomer = userId.equals(reservation.getCustomer().getId());
 
