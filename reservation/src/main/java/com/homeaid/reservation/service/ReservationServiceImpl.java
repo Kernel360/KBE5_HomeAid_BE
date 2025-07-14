@@ -232,5 +232,4 @@ public class ReservationServiceImpl implements ReservationService {
   private Optional<Matching> getLatestMatching(Reservation reservation) {
     return reservation.getLatestMatching();
   }
-
 }

@@ -8,6 +8,7 @@ import com.homeaid.dto.response.WriterReviewResponseDto;
 import com.homeaid.paging.PagingResponseDto;
 import com.homeaid.paging.PagingResponseUtil;
 import com.homeaid.auth.user.CustomUserDetails;
+import com.homeaid.reservation.dto.response.ReviewTargetInfoResponse;
 import com.homeaid.service.ReviewService;
 import com.homeaid.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -123,5 +124,15 @@ public class ReviewController {
 
     return ResponseEntity.ok(
         CommonApiResponse.success(PagingResponseUtil.newInstance(targetResponseDtoPage)));
+  }
+
+  @GetMapping("/{reservationId}/review-target")
+  public ResponseEntity<CommonApiResponse<ReviewTargetInfoResponse>> getReviewTargetInfo(
+          @AuthenticationPrincipal CustomUserDetails user,
+          @PathVariable(name = "reservationId") long reservationId) {
+    Long targetId = reviewService.getReviewTargetInfo(reservationId, user.getUserId(), user.getUserRole());
+    ReviewTargetInfoResponse response = ReviewTargetInfoResponse.from(targetId, reservationId);
+
+    return ResponseEntity.ok(CommonApiResponse.success(response));
   }
 }
