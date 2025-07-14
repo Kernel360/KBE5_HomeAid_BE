@@ -18,9 +18,9 @@ public class RedisUtil {
   }
 
   // 데이터 저장
-  public void save(String key, Object val, Duration timeout) {
+  public void save(String key, Object value, Duration timeout) {
     try {
-      redisTemplate.opsForValue().set(key, val, timeout);
+      redisTemplate.opsForValue().set(key, value, timeout);
       log.info("Redis 저장 성공 - Key: {}", key);
     } catch (RedisConnectionFailureException | RedisConnectionException e) {
       throw new RuntimeException("Redis 연결 실패", e);

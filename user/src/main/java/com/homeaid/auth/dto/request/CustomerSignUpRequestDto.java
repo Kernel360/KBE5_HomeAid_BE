@@ -60,7 +60,7 @@ public class CustomerSignUpRequestDto {
 
   public static Customer toEntity(
       CustomerSignUpRequestDto customerSignUpRequestDto , String encodedPassword) {
-    return Customer.addSingleAddress()
+    return Customer.builder()
         .email(customerSignUpRequestDto.getEmail())
         .password(encodedPassword)
         .name(customerSignUpRequestDto.getName())

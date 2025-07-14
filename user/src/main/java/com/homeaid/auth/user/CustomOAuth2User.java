@@ -27,6 +27,9 @@ public class CustomOAuth2User implements UserDetails, OAuth2User { // Spring Sec
 
   @Override
   public Collection<? extends GrantedAuthority> getAuthorities() {
+    if (user.getRole() == null) {
+      return Collections.singleton(new SimpleGrantedAuthority("ROLE_CUSTOMER"));
+    }
     return Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + user.getRole().name()));
   }
 

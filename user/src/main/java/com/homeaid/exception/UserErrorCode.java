@@ -17,6 +17,7 @@ public enum UserErrorCode implements BaseErrorCode {
   INVALID_WORKTIME(HttpStatus.BAD_REQUEST, "INVALID_WORKTIME", "근무 가능 시간은 06:00 ~ 22:00 사이여야 합니다."),
   INVALID_WORKTIME_ORDER(HttpStatus.BAD_REQUEST, "INVALID_WORKTIME_ORDER", "시작 시간은 종료 시간보다 이전이어야 합니다."),
   ADDRESS_LIMIT_EXCEEDED(HttpStatus.BAD_REQUEST, "ADDRESS_LIMIT_EXCEEDED", "주소는 최대 10개까지만 등록할 수 있습니다."),
+  TEMP_TOKEN_EXPIRED(HttpStatus.BAD_REQUEST,"TEMP_TOKEN_EXPIRED", "임시 발급 토큰이 만료되었습니다."),
 
   // 401 UNAUTHORIZED
   UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "UNAUTHORIZED", "로그인이 필요합니다."),
@@ -34,9 +35,10 @@ public enum UserErrorCode implements BaseErrorCode {
   CUSTOMER_NOT_FOUND(HttpStatus.NOT_FOUND, "CUSTOMER_NOT_FOUND", "고객을 찾을 수 없습니다."),
   ADDRESS_NOT_FOUND(HttpStatus.NOT_FOUND, "ADDRESS_NOT_FOUND", "주소를 찾을 수 없습니다."),
   INVALID_MANAGER_REGION(HttpStatus.BAD_REQUEST, "INVALID_MANAGER_REGION", "존재하지 않는 시/군/구 지역입니다."),
-  PROFILE_IMAGE_NOT_FOUND(HttpStatus.BAD_REQUEST, "PROFILE_IMAGE_NOT_FOUND",
-      "프로필 이미지가 이미 삭제되었거나 프로필 이미지를 찾을 수 없습니다."),
+  PROFILE_IMAGE_NOT_FOUND(HttpStatus.BAD_REQUEST, "PROFILE_IMAGE_NOT_FOUND", "프로필 이미지가 이미 삭제되었거나 프로필 이미지를 찾을 수 없습니다."),
   INVALID_REVIEW_STATUS(HttpStatus.BAD_REQUEST, "INVALID_REVIEW_STATUS", "유효하지 않은 매니저 상태입니다."),
+  TEMP_TOKEN_NOT_FOUND(HttpStatus.BAD_REQUEST,"TEMP_TOKEN_EXPIRED", "임시 발급 토큰이 존재하지 않습니다."),
+
 
   // 409 CONFLICT
   USER_ALREADY_EXISTS(HttpStatus.CONFLICT, "USER_ALREADY_EXISTS", "이미 가입된 회원입니다."),

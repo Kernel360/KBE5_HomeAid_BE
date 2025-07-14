@@ -8,7 +8,7 @@ import com.homeaid.auth.dto.request.ManagerSignUpRequestDto;
 import com.homeaid.auth.dto.response.SignUpResponseDto;
 import com.homeaid.auth.dto.response.SignInResponseDto;
 import com.homeaid.auth.service.AuthService;
-import com.homeaid.dto.request.SignInRequestDto;
+import com.homeaid.auth.dto.request.SignInRequestDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;

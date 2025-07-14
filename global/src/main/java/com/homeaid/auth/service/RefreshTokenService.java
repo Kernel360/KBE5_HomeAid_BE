@@ -17,17 +17,17 @@ public class RefreshTokenService {
 
   // key: PREFIX + userId
   public void saveRefreshToken(Long userId, String refreshToken) {
-    String key = RedisKeyFactory.buildeRefreshTokenKey(userId);
+    String key = RedisKeyFactory.buildRefreshTokenKey(userId);
     redisUtil.save(key, refreshToken, DURATION);
   }
 
   public String getRefreshToken(Long userId) {
-    String key = RedisKeyFactory.buildeRefreshTokenKey(userId);
+    String key = RedisKeyFactory.buildRefreshTokenKey(userId);
     return redisUtil.getData(key);
   }
 
   public void deleteRefreshToken(Long userId) {
-    String key = RedisKeyFactory.buildeRefreshTokenKey(userId);
+    String key = RedisKeyFactory.buildRefreshTokenKey(userId);
     redisUtil.delete(key);
   }
 
