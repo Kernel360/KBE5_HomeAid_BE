@@ -156,8 +156,9 @@ public class ReservationController {
     Page<Reservation> reservations = reservationService.getReservationsByCustomer(user.getUserId(),
         pageable);
 
+
     PagedResponseDto<ReservationResponseDto> response =
-        PagedResponseDto.fromPage(reservations, ReservationResponseDto::toDto);
+        PagedResponseDto.fromPage(reservations, reservationDtoMapper::toDto);
 
     return ResponseEntity.ok(CommonApiResponse.success(response));
   }

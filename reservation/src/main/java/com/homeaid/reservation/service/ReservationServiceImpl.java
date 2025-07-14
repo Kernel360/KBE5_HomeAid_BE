@@ -11,6 +11,7 @@ import com.homeaid.reservation.domain.ReservationStore;
 import com.homeaid.reservation.domain.enumerate.ReservationStatus;
 import com.homeaid.domain.enumerate.UserRole;
 import com.homeaid.dto.RequestAlert;
+import com.homeaid.reservation.dto.ReservationDtoMapper;
 import com.homeaid.reservation.dto.request.ReservationCommand;
 import com.homeaid.reservation.dto.response.ManagerReservationResponseDto;
 import com.homeaid.reservation.dto.response.ReservationInfo;
@@ -37,6 +38,8 @@ public class ReservationServiceImpl implements ReservationService {
   private final ReservationStore reservationStore;
 
   private final ReservationReader reservationReader;
+
+  private final ReservationDtoMapper reservationDtoMapper;
 
   private final NotificationPublisher notificationPublisher;
 
@@ -100,7 +103,7 @@ public class ReservationServiceImpl implements ReservationService {
         managerName = latestMatching.getManager().getName();
       }
 
-      return ReservationResponseDto.toDto(reservation, reservation.getCustomer().getName(),
+      return reservationDtoMapper.toDto(reservation, reservation.getCustomer().getName(),
           managerName);
     });
   }
@@ -116,7 +119,8 @@ public class ReservationServiceImpl implements ReservationService {
   public Page<ManagerReservationResponseDto> getReservationsByManager(Long managerId,
       Pageable pageable) {
 
-    Page<Reservation> reservations = reservationReader.getReservationsByManagerId(managerId, pageable);
+    Page<Reservation> reservations = reservationReader.getReservationsByManagerId(managerId,
+        pageable);
 
     Map<Long, Customer> customerMap = getCustomersFromReservations(reservations);
 
@@ -132,7 +136,7 @@ public class ReservationServiceImpl implements ReservationService {
 
       Matching matching = getLatestMatching(reservation).get();
 
-      return ManagerReservationResponseDto.toDto(reservation, customer.getName(), matching);
+      return reservationDtoMapper.toDto(reservation, customer.getName(), matching);
     });
   }
 
