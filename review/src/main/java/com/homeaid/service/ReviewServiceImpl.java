@@ -1,5 +1,6 @@
 package com.homeaid.service;
 
+import com.homeaid.domain.enumerate.UserRole;
 import com.homeaid.reservation.domain.Reservation;
 import com.homeaid.domain.Review;
 import com.homeaid.reservation.domain.enumerate.ReservationStatus;
@@ -10,6 +11,7 @@ import com.homeaid.exception.ReviewErrorCode;
 import com.homeaid.matching.repository.MatchingRepository;
 import com.homeaid.reservation.repository.ReservationRepository;
 import com.homeaid.repository.ReviewRepository;
+import com.homeaid.reservation.service.ReservationService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -120,5 +122,31 @@ public class ReviewServiceImpl implements ReviewService {
     return matchingRepository.findById(finalMatchingId).orElseThrow(
         () -> new CustomException(MatchingErrorCode.MATCHING_NOT_FOUND)
     ).getManager().getId();
+  }
+
+  @Override
+  public Long getReviewTargetInfo(Long reservationId, Long userId, UserRole userRole) {
+    Reservation reservation = getReservationById(reservationId);
+
+    boolean unauthorized = switch (userRole) {
+      case CUSTOMER -> !reservation.getCustomer().getId().equals(userId);
+      case MANAGER -> !reservation.getManagerId().equals(userId);
+      default -> true;
+    };
+
+    if (unauthorized) {
+      throw new CustomException(ReservationErrorCode.VIEW_UNAUTHORIZED);
+    }
+    Long reviewTargetId = switch (userRole) {
+      case CUSTOMER -> reservation.getManagerId();
+      case MANAGER -> reservation.getCustomer().getId();
+      default -> -1L;
+    };
+    return reviewTargetId;
+  }
+
+  private Reservation getReservationById(Long reservationId) {
+    return reservationRepository.findById(reservationId).orElseThrow(() ->
+            new CustomException(ReservationErrorCode.RESERVATION_NOT_FOUND));
   }
 }

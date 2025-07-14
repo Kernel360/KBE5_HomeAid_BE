@@ -10,7 +10,6 @@ import com.homeaid.reservation.dto.request.UpdateReservationRequestDto;
 import com.homeaid.reservation.dto.response.ManagerReservationResponseDto;
 import com.homeaid.reservation.dto.response.ReservationResponseDto;
 import com.homeaid.auth.user.CustomUserDetails;
-import com.homeaid.reservation.dto.response.ReviewTargetInfoResponse;
 import com.homeaid.reservation.service.ReservationService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -179,14 +178,5 @@ public class ReservationController {
     return ResponseEntity.ok(CommonApiResponse.success(response));
   }
 
-  @GetMapping("/{reservationId}/review-target")
-  public ResponseEntity<CommonApiResponse<ReviewTargetInfoResponse>> getReviewTargetInfo(
-          @AuthenticationPrincipal CustomUserDetails user,
-          @PathVariable(name = "reservationId") long reservationId) {
-    Long targetId = reservationService.getReviewTargetInfo(reservationId, user.getUserId(), user.getUserRole());
-    ReviewTargetInfoResponse response = ReviewTargetInfoResponse.from(targetId, reservationId);
-
-    return ResponseEntity.ok(CommonApiResponse.success(response));
-  }
 
 }

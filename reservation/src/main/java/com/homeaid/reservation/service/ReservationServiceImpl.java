@@ -232,27 +232,4 @@ public class ReservationServiceImpl implements ReservationService {
   private Optional<Matching> getLatestMatching(Reservation reservation) {
     return reservation.getLatestMatching();
   }
-
-  @Override
-  public Long getReviewTargetInfo(Long reservationId, Long userId, UserRole userRole) {
-    Reservation reservation = reservationRepository.findById(reservationId).orElseThrow(() ->
-            new CustomException(ReservationErrorCode.RESERVATION_NOT_FOUND));
-
-    boolean unauthorized = switch (userRole) {
-      case CUSTOMER -> !reservation.getCustomer().getId().equals(userId);
-      case MANAGER -> !reservation.getManagerId().equals(userId);
-      default -> true;
-    };
-
-    if (unauthorized) {
-      throw new CustomException(ReservationErrorCode.VIEW_UNAUTHORIZED);
-    }
-    Long reviewTargetId = switch (userRole) {
-      case CUSTOMER -> reservation.getManagerId();
-      case MANAGER -> reservation.getCustomer().getId();
-      default -> -1L;
-    };
-    return reviewTargetId;
-  }
-
 }

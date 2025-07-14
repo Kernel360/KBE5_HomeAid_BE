@@ -1,7 +1,6 @@
 package com.homeaid.reservation.service;
 
 
-import com.homeaid.domain.enumerate.UserRole;
 import com.homeaid.reservation.domain.Reservation;
 import com.homeaid.reservation.domain.enumerate.ReservationStatus;
 import com.homeaid.reservation.dto.response.ManagerReservationResponseDto;
@@ -31,6 +30,4 @@ public interface ReservationService {
   void validateManagerAccess(Reservation reservation, Long managerId);
 
   void validateUserAccess(Reservation reservation, Long managerId);
-
-  Long getReviewTargetInfo(Long reservationId, Long userId, UserRole userRole);
 }
