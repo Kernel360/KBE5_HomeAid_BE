@@ -4,7 +4,6 @@ package com.homeaid.reservation.service;
 import com.homeaid.domain.Customer;
 import com.homeaid.matching.domain.Matching;
 import com.homeaid.reservation.domain.Reservation;
-import com.homeaid.reservation.domain.ReservationItem;
 import com.homeaid.matching.controller.enumerate.MatchingStatus;
 import com.homeaid.domain.enumerate.AlertType;
 import com.homeaid.reservation.domain.ReservationReader;
@@ -19,15 +18,9 @@ import com.homeaid.reservation.dto.response.ReservationResponseDto;
 import com.homeaid.exception.CustomException;
 import com.homeaid.reservation.exception.ReservationErrorCode;
 import com.homeaid.exception.UserErrorCode;
-import com.homeaid.repository.*;
-import com.homeaid.reservation.repository.ReservationRepository;
 import com.homeaid.service.NotificationPublisher;
-import com.homeaid.serviceoption.domain.ServiceOption;
-import com.homeaid.serviceoption.repository.ServiceOptionRepository;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -40,10 +33,6 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 @Slf4j
 public class ReservationServiceImpl implements ReservationService {
-
-  private final ReservationRepository reservationRepository;
-
-  private final CustomerRepository customerRepository;
 
   private final ReservationStore reservationStore;
 
@@ -119,19 +108,21 @@ public class ReservationServiceImpl implements ReservationService {
   @Override
   @Transactional(readOnly = true)
   public Page<Reservation> getReservationsByCustomer(Long userId, Pageable pageable) {
-    return reservationRepository.findAllByCustomerId(userId, pageable);
+    return reservationReader.getReservationsByCustomerId(userId, pageable);
   }
 
   @Override
   @Transactional(readOnly = true)
   public Page<ManagerReservationResponseDto> getReservationsByManager(Long managerId,
       Pageable pageable) {
-    Page<Reservation> reservations = reservationRepository.findAllByManagerId(managerId, pageable);
 
-    Map<Long, Customer> customerMap = batchGetCustomersFromReservations(reservations);
+    Page<Reservation> reservations = reservationReader.getReservationsByManagerId(managerId, pageable);
+
+    Map<Long, Customer> customerMap = getCustomersFromReservations(reservations);
 
     return reservations.map(reservation -> {
-      Customer customer = customerMap.get(reservation.getCustomer().getId());
+
+      Customer customer = customerMap.get(reservation.getId());
 
       if (customer == null) {
         log.error("[매니저 예약 조회 실패] 고객 정보 없음 - reservationId={}, customerId={}", reservation.getId(),
@@ -141,25 +132,18 @@ public class ReservationServiceImpl implements ReservationService {
 
       Matching matching = getLatestMatching(reservation).get();
 
-      return ManagerReservationResponseDto.toDto(reservation, customer, matching);
+      return ManagerReservationResponseDto.toDto(reservation, customer.getName(), matching);
     });
   }
 
-  private Map<Long, Customer> batchGetCustomersFromReservations(Page<Reservation> reservations) {
-    List<Long> customerIds = reservations.stream()
-        .map(reservation -> reservation.getCustomer().getId())
-        .distinct()
-        .toList();
-
-    return customerRepository.findByIdIn(customerIds).stream()
-        .collect(Collectors.toMap(Customer::getId, Function.identity()));
-
+  private Map<Long, Customer> getCustomersFromReservations(Page<Reservation> reservations) {
+    return reservations.stream().collect(Collectors.toMap(Reservation::getId,
+        Reservation::getCustomer));
   }
 
   @Override
   public Reservation validateReservation(Long reservationId) {
-    Reservation reservation = reservationRepository.findById(reservationId)
-        .orElseThrow(() -> new CustomException(ReservationErrorCode.RESERVATION_NOT_FOUND));
+    Reservation reservation = reservationReader.getReservation(reservationId);
 
     if (reservation.getStatus() != ReservationStatus.COMPLETED) {
       throw new CustomException(ReservationErrorCode.RESERVATION_NOT_COMPLETED);

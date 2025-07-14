@@ -27,6 +27,16 @@ public class ReservationReaderImpl implements ReservationReader {
     return reservationRepository.findByOptionalStatus(status, pageable);
   }
 
+  @Override
+  public Page<Reservation> getReservationsByCustomerId(Long userId, Pageable pageable) {
+    return reservationRepository.findAllByCustomerId(userId, pageable);
+  }
+
+  @Override
+  public Page<Reservation> getReservationsByManagerId(Long managerId, Pageable pageable) {
+    return reservationRepository.findAllByManagerId(managerId, pageable);
+  }
+
   private Reservation getReservationById(Long reservationId) {
     return reservationRepository.findById(reservationId)
         .orElseThrow(() -> new CustomException(ReservationErrorCode.RESERVATION_NOT_FOUND));

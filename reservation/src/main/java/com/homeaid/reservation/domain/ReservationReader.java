@@ -10,4 +10,9 @@ public interface ReservationReader {
   Reservation getReservation(Long reservationId);
 
   Page<Reservation> getReservationByStatus(ReservationStatus status, Pageable pageable);
+
+  Page<Reservation> getReservationsByCustomerId(Long userId, Pageable pageable);
+
+  Page<Reservation> getReservationsByManagerId(Long managerId, Pageable pageable);
+
 }
