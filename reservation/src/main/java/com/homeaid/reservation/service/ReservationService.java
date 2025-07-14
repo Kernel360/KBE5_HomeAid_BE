@@ -15,7 +15,7 @@ public interface ReservationService {
 
   ReservationInfo createReservation(ReservationCommand reservationCommand);
 
-  ReservationResponseDto getReservation(Long reservationId);
+  ReservationInfo getReservation(Long reservationId);
 
   ReservationInfo updateReservation(ReservationCommand reservationCommand);
 

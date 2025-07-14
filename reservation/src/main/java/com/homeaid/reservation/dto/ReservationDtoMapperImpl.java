@@ -64,6 +64,9 @@ public class ReservationDtoMapperImpl implements ReservationDtoMapper {
         .address(reservationInfo.getAddress())
         .addressDetail(reservationInfo.getAddressDetail())
         .customerMemo(reservationInfo.getCustomerMemo())
+        .matchingStatus(reservationInfo.getMatchingStatus())
+        .matchedManagerName(reservationInfo.getManagerName())
+        .matchingId(reservationInfo.getMatchingId())
         .build();
   }
 

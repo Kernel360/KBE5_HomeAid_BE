@@ -22,6 +22,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.core.models.GroupedOpenApi;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -48,6 +49,7 @@ public class ReservationController {
   private final ReservationService reservationService;
 
   private final ReservationDtoMapper reservationDtoMapper;
+  private final GroupedOpenApi managerAPI;
 
   @PostMapping
   @Operation(summary = "예약 생성", description = "고객이 예약 옵션을 선택하여 예약을 생성합니다.")
@@ -81,7 +83,7 @@ public class ReservationController {
   ) {
 
     return ResponseEntity.ok(
-        CommonApiResponse.success(reservationService.getReservation(reservationId)));
+        CommonApiResponse.success(reservationDtoMapper.toDto(reservationService.getReservation(reservationId))));
   }
 
   @PutMapping("/{reservationId}")

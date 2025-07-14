@@ -1,13 +1,17 @@
 package com.homeaid.reservation.dto.response;
 
+import com.homeaid.matching.controller.enumerate.MatchingStatus;
 import com.homeaid.reservation.domain.Reservation;
 import com.homeaid.reservation.domain.enumerate.ReservationStatus;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 
 @Getter
+@Builder(access = AccessLevel.PRIVATE)
 public class ReservationInfo {
 
   private final Long id;
@@ -28,26 +32,60 @@ public class ReservationInfo {
   private final LocalDateTime createdDate;
   private final LocalDateTime modifiedDate;
   private final LocalDateTime deletedDate;
+  private final MatchingStatus matchingStatus;
+  private final String managerName;
+  private final Long matchingId;
 
-  public ReservationInfo(Reservation reservation) {
-    this.id = reservation.getId();
-    this.requestedDate = reservation.getRequestedDate();
-    this.requestedTime = reservation.getRequestedTime();
-    this.totalPrice = reservation.getTotalPrice();
-    this.duration = reservation.getDuration();
-    this.status = reservation.getStatus();
-    this.address = reservation.getAddress();
-    this.addressDetail = reservation.getAddressDetail();
-    this.latitude = reservation.getLatitude();
-    this.longitude = reservation.getLongitude();
-    this.customerId = reservation.getCustomer().getId();
-    this.managerId = reservation.getManagerId();
-    this.itemBasePrice = reservation.getItem().getBasePrice();
-    this.itemServiceOptionName = reservation.getItem().getServiceOptionName();
-    this.customerMemo = reservation.getCustomerMemo();
-    this.createdDate = reservation.getCreatedDate();
-    this.modifiedDate = reservation.getModifiedDate();
-    this.deletedDate = reservation.getDeletedDate();
+  public static ReservationInfo toInfo(Reservation reservation) {
+    return ReservationInfo.builder()
+        .id(reservation.getId())
+        .requestedDate(reservation.getRequestedDate())
+        .requestedTime(reservation.getRequestedTime())
+        .totalPrice(reservation.getTotalPrice())
+        .duration(reservation.getDuration())
+        .status(reservation.getStatus())
+        .address(reservation.getAddress())
+        .addressDetail(reservation.getAddressDetail())
+        .latitude(reservation.getLatitude())
+        .longitude(reservation.getLongitude())
+        .customerId(reservation.getCustomer().getId())
+        .managerId(reservation.getManagerId())
+        .itemBasePrice(reservation.getItem().getBasePrice())
+        .itemServiceOptionName(reservation.getItem().getServiceOptionName())
+        .customerMemo(reservation.getCustomerMemo())
+        .createdDate(reservation.getCreatedDate())
+        .modifiedDate(reservation.getModifiedDate())
+        .deletedDate(reservation.getDeletedDate())
+        .matchingStatus(null)
+        .managerName(null)
+        .matchingId(null)
+        .build();
+  }
+
+  public static ReservationInfo toInfo(Reservation reservation, MatchingStatus matchingStatus, String managerName, Long matchingId) {
+    return ReservationInfo.builder()
+        .id(reservation.getId())
+        .requestedDate(reservation.getRequestedDate())
+        .requestedTime(reservation.getRequestedTime())
+        .totalPrice(reservation.getTotalPrice())
+        .duration(reservation.getDuration())
+        .status(reservation.getStatus())
+        .address(reservation.getAddress())
+        .addressDetail(reservation.getAddressDetail())
+        .latitude(reservation.getLatitude())
+        .longitude(reservation.getLongitude())
+        .customerId(reservation.getCustomer().getId())
+        .managerId(reservation.getManagerId())
+        .itemBasePrice(reservation.getItem().getBasePrice())
+        .itemServiceOptionName(reservation.getItem().getServiceOptionName())
+        .customerMemo(reservation.getCustomerMemo())
+        .createdDate(reservation.getCreatedDate())
+        .modifiedDate(reservation.getModifiedDate())
+        .deletedDate(reservation.getDeletedDate())
+        .matchingStatus(matchingStatus)
+        .managerName(managerName)
+        .matchingId(matchingId)
+        .build();
   }
 
 }

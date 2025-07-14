@@ -7,6 +7,7 @@ import com.homeaid.reservation.domain.Reservation;
 import com.homeaid.reservation.domain.ReservationItem;
 import com.homeaid.matching.controller.enumerate.MatchingStatus;
 import com.homeaid.domain.enumerate.AlertType;
+import com.homeaid.reservation.domain.ReservationReader;
 import com.homeaid.reservation.domain.ReservationStore;
 import com.homeaid.reservation.domain.enumerate.ReservationStatus;
 import com.homeaid.domain.enumerate.UserRole;
@@ -44,9 +45,9 @@ public class ReservationServiceImpl implements ReservationService {
 
   private final CustomerRepository customerRepository;
 
-  private final ServiceOptionRepository serviceOptionRepository;
-
   private final ReservationStore reservationStore;
+
+  private final ReservationReader reservationReader;
 
   private final NotificationPublisher notificationPublisher;
 
@@ -60,13 +61,13 @@ public class ReservationServiceImpl implements ReservationService {
         savedReservation.getId(), null);
     notificationPublisher.publishAdminNotification(createdAdminAlert);
 
-    return new ReservationInfo(savedReservation);
+    return ReservationInfo.toInfo(savedReservation);
   }
 
   @Override
   @Transactional(readOnly = true)
-  public ReservationResponseDto getReservation(Long id) {
-    Reservation reservation = getReservationById(id);
+  public ReservationInfo getReservation(Long reservationId) {
+    Reservation reservation = reservationReader.getReservation(reservationId);
 
     Matching latestMatching = getLatestMatching(reservation).orElse(null);
 
@@ -80,13 +81,13 @@ public class ReservationServiceImpl implements ReservationService {
       matchingId = latestMatching.getId();
     }
 
-    return ReservationResponseDto.toDto(reservation, status, managerName, matchingId);
+    return ReservationInfo.toInfo(reservation, status, managerName, matchingId);
   }
 
   @Override
   @Transactional
   public ReservationInfo updateReservation(ReservationCommand reservationCommand) {
-    return new ReservationInfo(reservationStore.update(reservationCommand));
+    return ReservationInfo.toInfo(reservationStore.update(reservationCommand));
   }
 
 
@@ -182,16 +183,6 @@ public class ReservationServiceImpl implements ReservationService {
     if (!isManager && !isCustomer) {
       throw new CustomException(ReservationErrorCode.USER_ACCESS_DENIED);
     }
-  }
-
-  private ServiceOption getServiceOptionById(Long serviceOptionId) {
-    return serviceOptionRepository.findById(serviceOptionId)
-        .orElseThrow(() -> new CustomException(ReservationErrorCode.RESERVATION_NOT_FOUND));
-  }
-
-  private Reservation getReservationById(Long reservationId) {
-    return reservationRepository.findById(reservationId)
-        .orElseThrow(() -> new CustomException(ReservationErrorCode.RESERVATION_NOT_FOUND));
   }
 
   private Optional<Matching> getLatestMatching(Reservation reservation) {
