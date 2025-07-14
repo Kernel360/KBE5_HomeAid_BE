@@ -53,8 +53,6 @@ public class ReservationServiceImpl implements ReservationService {
   @Override
   @Transactional
   public ReservationInfo createReservation(ReservationCommand reservationCommand) {
-    log.info("[예약 생성] customerId={}, serviceOptionId={}", reservationCommand.getUserId(),
-        reservationCommand.getOptionId());
     Reservation savedReservation = reservationStore.save(reservationCommand);
 
     RequestAlert createdAdminAlert = RequestAlert.createAlert(AlertType.RESERVATION_CREATED, null,

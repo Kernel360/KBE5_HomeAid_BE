@@ -39,6 +39,9 @@ public class ReservationStoreImpl implements ReservationStore {
     reservation.addItem(serviceOption);
     reservation.setCustomer(customer);
 
+    log.info("[예약 생성] customerId={}, serviceOptionId={}", reservationCommand.getUserId(),
+        reservationCommand.getOptionId());
+
     return reservationRepository.save(reservation);
   }
 
