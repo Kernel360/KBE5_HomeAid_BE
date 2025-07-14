@@ -27,7 +27,10 @@ public enum ReservationErrorCode implements BaseErrorCode {
   RESERVATION_CANNOT_UPDATE(HttpStatus.CONFLICT, "RESERVATION_CANNOT_UPDATE", "예약을 수정할 수 없습니다."),
   RESERVATION_ALREADY_MATCHED(HttpStatus.CONFLICT, "RESERVATION_ALREADY_MATCHED", "이미 매칭된 예약입니다."),
   RESERVATION_ALREADY_CANCELLED(HttpStatus.CONFLICT, "RESERVATION_ALREADY_CANCELLED", "이미 취소된 예약입니다."),
-  RESERVATION_NOT_COMPLETED(HttpStatus.CONFLICT, "RESERVATION_NOT_COMPLETED", "서비스가 완료된 예약이 아닙니다.");
+  RESERVATION_NOT_COMPLETED(HttpStatus.CONFLICT, "RESERVATION_NOT_COMPLETED", "서비스가 완료된 예약이 아닙니다."),
+
+  //401
+  VIEW_UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "REVIEW_TARGET_VIEW_UNAUTHORIZED", "리뷰대상자 조회 권한이 없습니다"),;
 
   private final HttpStatus status;
   private final String code;

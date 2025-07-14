@@ -2,8 +2,10 @@ package com.homeaid.settlement.service;
 
 import com.homeaid.settlement.domain.Settlement;
 import com.homeaid.settlement.dto.SettlementWithManagerResponseDto;
+import com.homeaid.settlement.dto.WeeklySettlementGroupDto;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 public interface AdminSettlementService {
 
@@ -30,4 +32,8 @@ public interface AdminSettlementService {
 
   // 관리자 매니저 정산 상세조회
   SettlementWithManagerResponseDto getSettlementWithManager(Long settlementId);
+
+  Map<String, WeeklySettlementGroupDto> getGroupedWeeklySettlementsByMonth(int year, int month);
+
+  List<Settlement> findByMonth(int year, int month);
 }
