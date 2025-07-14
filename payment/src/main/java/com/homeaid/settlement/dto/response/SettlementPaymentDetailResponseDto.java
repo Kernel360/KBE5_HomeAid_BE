@@ -17,15 +17,28 @@ public class SettlementPaymentDetailResponseDto {
   @Schema(description = "총 결제 금액")
   private Integer totalAmount;
 
+  @Schema(description = "총 환불 금액")
+  private Integer totalRefundedAmount;
+
+  @Schema(description = "총 실 결제 금액")
+  private Integer totalNetAmount;
+
   public static SettlementPaymentDetailResponseDto of(List<PaymentResponseDto> payments) {
-    int sum = payments.stream()
-        .mapToInt(PaymentResponseDto::getAmount)
-        .sum();
+    int total = 0;
+    int refunded = 0;
+    int net = 0;
+
+    for (PaymentResponseDto p : payments) {
+      total += p.getAmount() != null ? p.getAmount() : 0;
+      refunded += p.getRefundedAmount() != null ? p.getRefundedAmount() : 0;
+      net += p.getNetAmount() != null ? p.getNetAmount() : 0;
+    }
 
     return SettlementPaymentDetailResponseDto.builder()
         .payments(payments)
-        .totalAmount(sum)
+        .totalAmount(total)
+        .totalRefundedAmount(refunded)
+        .totalNetAmount(net)
         .build();
   }
-
 }

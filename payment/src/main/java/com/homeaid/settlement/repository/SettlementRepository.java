@@ -15,6 +15,9 @@ public interface SettlementRepository extends JpaRepository<Settlement, Long> {
   List<Settlement> findAllByManagerId(Long managerId);
   List<Settlement> findBySettlementWeekStart(LocalDate startDate);
   List<Settlement> findByManagerIdAndSettlementWeekStart(Long managerId, LocalDate settlementWeekStart);
+  List<Settlement> findByManagerIdAndSettlementWeekStartLessThanEqualAndSettlementWeekEndGreaterThanEqual(
+      Long managerId, LocalDate end, LocalDate start
+  );
 
   // 관리자
   List<Settlement> findBySettlementWeekStartBetween(LocalDate start, LocalDate end); //주간 정산 조회시 필요
