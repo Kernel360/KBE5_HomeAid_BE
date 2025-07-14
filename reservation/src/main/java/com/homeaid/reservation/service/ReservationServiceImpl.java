@@ -95,15 +95,7 @@ public class ReservationServiceImpl implements ReservationService {
   @Override
   @Transactional
   public void deleteReservation(Long reservationId, Long userId) {
-
-    Reservation reservation = getReservationById(reservationId);
-
-    if (!reservation.getCustomer().getId().equals(userId)) {
-      log.warn("[예약 삭제 실패] 권한 없음 - reservationId={}, userId={}", reservationId, userId);
-      throw new CustomException(ReservationErrorCode.UNAUTHORIZED_RESERVATION_ACCESS);
-    }
-
-    reservation.softDelete();
+    reservationStore.delete(reservationId, userId);
   }
 
   @Override

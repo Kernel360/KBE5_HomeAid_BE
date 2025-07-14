@@ -8,4 +8,5 @@ public interface ReservationStore {
 
   Reservation update(ReservationCommand reservationCommand);
 
+  void delete(Long reservationId, Long userId);
 }
