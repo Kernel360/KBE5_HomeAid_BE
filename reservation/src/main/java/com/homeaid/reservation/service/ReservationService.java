@@ -13,11 +13,11 @@ import org.springframework.data.domain.Pageable;
 public interface ReservationService {
 
 
-  ReservationInfo createReservation(ReservationCommand reservation);
+  ReservationInfo createReservation(ReservationCommand reservationCommand);
 
   ReservationResponseDto getReservation(Long reservationId);
 
-  Reservation updateReservation(Long reservationId, Long userId, Reservation reservation, Long serviceOptionId);
+  ReservationInfo updateReservation(ReservationCommand reservationCommand);
 
   Page<ReservationResponseDto> getReservations(Pageable pageable, ReservationStatus status);
 

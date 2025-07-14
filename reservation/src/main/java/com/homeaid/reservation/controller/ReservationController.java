@@ -98,13 +98,10 @@ public class ReservationController {
       @PathVariable(name = "reservationId") final Long reservationId,
       @RequestBody @Valid ReservationRequestDto reservationRequestDto) {
 
-    Reservation updated = reservationService.updateReservation(
-        user.getUserId(),
-        reservationId,
-        UpdateReservationRequestDto.toEntity(reservationRequestDto),
-        reservationRequestDto.getOptionId());
+    ReservationInfo reservationInfo = reservationService.updateReservation(
+        reservationDtoMapper.toCommand(reservationRequestDto, user.getUserId(), reservationId));
 
-    return ResponseEntity.ok(CommonApiResponse.success(ReservationResponseDto.toDto(updated)));
+    return ResponseEntity.ok(CommonApiResponse.success(reservationDtoMapper.toDto(reservationInfo)));
   }
 
   @DeleteMapping("/{reservationId}")

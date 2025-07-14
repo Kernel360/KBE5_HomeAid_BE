@@ -19,6 +19,7 @@ public class ReservationCommand {
   private final String addressDetail;
   private final Double latitude;
   private final Double longitude;
+  private final Long reservationId;
 
   public Reservation toEntity() {
     return Reservation.builder()

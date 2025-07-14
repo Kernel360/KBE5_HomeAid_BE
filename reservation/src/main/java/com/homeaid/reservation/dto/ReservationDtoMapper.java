@@ -10,5 +10,7 @@ public interface ReservationDtoMapper {
 
   ReservationCommand toCommand(ReservationRequestDto reservationRequestDto, Long userId);
 
+  ReservationCommand toCommand(ReservationRequestDto reservationRequestDto, Long userId, Long reservationId);
+
   ReservationResponseDto toDto(ReservationInfo reservationInfo);
 }

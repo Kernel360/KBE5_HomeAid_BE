@@ -87,30 +87,8 @@ public class ReservationServiceImpl implements ReservationService {
 
   @Override
   @Transactional
-  public Reservation updateReservation(Long reservationId, Long userId, Reservation newReservation,
-      Long serviceOptionId) {
-    Reservation originReservation = getReservationById(reservationId);
-
-    if (!originReservation.getCustomer().getId().equals(userId)) {
-      log.warn("[예약 수정 실패] 권한 없음 - reservationId={}, userId={}", reservationId, userId);
-      throw new CustomException(ReservationErrorCode.UNAUTHORIZED_RESERVATION_ACCESS);
-    }
-
-    if (originReservation.getStatus() != ReservationStatus.REQUESTED) {
-      log.warn("[예약 수정 실패] 예약 상태 불가 - reservationId={}, status={}", reservationId,
-          originReservation.getStatus());
-      throw new CustomException(ReservationErrorCode.RESERVATION_CANNOT_UPDATE);
-    }
-
-    ServiceOption serviceOption = getServiceOptionById(serviceOptionId);
-
-    originReservation.updateReservation(newReservation, serviceOption.getPrice(),
-        newReservation.getDuration());
-
-    ReservationItem item = originReservation.getItem();
-    item.updateItem(serviceOption);
-
-    return originReservation;
+  public ReservationInfo updateReservation(ReservationCommand reservationCommand) {
+    return new ReservationInfo(reservationStore.update(reservationCommand));
   }
 
 

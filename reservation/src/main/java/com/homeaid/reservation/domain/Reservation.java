@@ -6,6 +6,7 @@ import com.homeaid.domain.Customer;
 import com.homeaid.domain.Manager;
 import com.homeaid.matching.domain.Matching;
 import com.homeaid.reservation.domain.enumerate.ReservationStatus;
+import com.homeaid.reservation.dto.request.ReservationCommand;
 import com.homeaid.serviceoption.domain.ServiceOption;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -119,12 +120,13 @@ public class Reservation {
     this.totalPrice = serviceOption.getPrice() * this.duration;
   }
 
-  public void updateReservation(Reservation newReservation, int newTotalPrice,
-      int newDuration) {
+  public void updateReservation(ReservationCommand newReservation) {
     this.requestedDate = newReservation.getRequestedDate();
     this.requestedTime = newReservation.getRequestedTime();
-    this.totalPrice = newTotalPrice;
-    this.duration = newDuration;
+    this.latitude = newReservation.getLatitude();
+    this.longitude = newReservation.getLongitude();
+    this.address = newReservation.getAddress();
+    this.addressDetail = newReservation.getAddressDetail();
   }
 
   public void softDelete() {

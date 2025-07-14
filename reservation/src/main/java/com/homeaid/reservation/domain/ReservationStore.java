@@ -6,4 +6,6 @@ public interface ReservationStore {
 
   Reservation save(ReservationCommand reservationCommand);
 
+  Reservation update(ReservationCommand reservationCommand);
+
 }

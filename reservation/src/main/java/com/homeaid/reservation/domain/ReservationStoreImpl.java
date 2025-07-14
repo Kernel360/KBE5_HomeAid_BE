@@ -5,6 +5,7 @@ import com.homeaid.domain.Customer;
 import com.homeaid.exception.CustomException;
 import com.homeaid.exception.UserErrorCode;
 import com.homeaid.repository.CustomerRepository;
+import com.homeaid.reservation.domain.enumerate.ReservationStatus;
 import com.homeaid.reservation.dto.request.ReservationCommand;
 import com.homeaid.reservation.exception.ReservationErrorCode;
 import com.homeaid.reservation.repository.ReservationRepository;
@@ -40,5 +41,40 @@ public class ReservationStoreImpl implements ReservationStore {
 
     return reservationRepository.save(reservation);
   }
-  
+
+  @Override
+  public Reservation update(ReservationCommand reservationCommand) {
+    Reservation originReservation = getReservationById(reservationCommand.getReservationId());
+
+    if (!originReservation.getCustomer().getId().equals(reservationCommand.getUserId())) {
+      log.warn("[예약 수정 실패] 권한 없음 - reservationId={}, userId={}", reservationCommand.getReservationId(), reservationCommand.getUserId());
+      throw new CustomException(ReservationErrorCode.UNAUTHORIZED_RESERVATION_ACCESS);
+    }
+
+    if (originReservation.getStatus() != ReservationStatus.REQUESTED) {
+      log.warn("[예약 수정 실패] 예약 상태 불가 - reservationId={}, status={}", reservationCommand.getReservationId(),
+          originReservation.getStatus());
+      throw new CustomException(ReservationErrorCode.RESERVATION_CANNOT_UPDATE);
+    }
+
+    ServiceOption serviceOption = getServiceOptionById(reservationCommand.getOptionId());
+
+    originReservation.updateReservation(reservationCommand);
+
+    ReservationItem item = originReservation.getItem();
+    item.updateItem(serviceOption);
+
+    return originReservation;
+  }
+
+  private Reservation getReservationById(Long reservationId) {
+    return reservationRepository.findById(reservationId)
+        .orElseThrow(() -> new CustomException(ReservationErrorCode.RESERVATION_NOT_FOUND));
+  }
+
+  private ServiceOption getServiceOptionById(Long serviceOptionId) {
+    return serviceOptionRepository.findById(serviceOptionId)
+        .orElseThrow(() -> new CustomException(ReservationErrorCode.RESERVATION_NOT_FOUND));
+  }
+
 }

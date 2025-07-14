@@ -27,6 +27,25 @@ public class ReservationDtoMapperImpl implements ReservationDtoMapper {
   }
 
   @Override
+  public ReservationCommand toCommand(ReservationRequestDto reservationRequestDto, Long userId,
+      Long reservationId) {
+    if (reservationRequestDto == null) {
+      return null;
+    }
+    return ReservationCommand.builder()
+        .userId(userId)
+        .requestedDate(reservationRequestDto.getRequestedDate())
+        .requestedTime(reservationRequestDto.getRequestedTime())
+        .latitude(reservationRequestDto.getLatitude())
+        .longitude(reservationRequestDto.getLongitude())
+        .duration(reservationRequestDto.getTotalDuration())
+        .address(reservationRequestDto.getAddress())
+        .addressDetail(reservationRequestDto.getAddressDetail())
+        .reservationId(reservationId)
+        .build();
+  }
+
+  @Override
   public ReservationResponseDto toDto(ReservationInfo reservationInfo) {
     if (reservationInfo == null) {
       return null;
