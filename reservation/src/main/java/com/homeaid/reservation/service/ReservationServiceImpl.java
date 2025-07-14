@@ -7,10 +7,13 @@ import com.homeaid.reservation.domain.Reservation;
 import com.homeaid.reservation.domain.ReservationItem;
 import com.homeaid.matching.controller.enumerate.MatchingStatus;
 import com.homeaid.domain.enumerate.AlertType;
+import com.homeaid.reservation.domain.ReservationStore;
 import com.homeaid.reservation.domain.enumerate.ReservationStatus;
 import com.homeaid.domain.enumerate.UserRole;
 import com.homeaid.dto.RequestAlert;
+import com.homeaid.reservation.dto.request.ReservationCommand;
 import com.homeaid.reservation.dto.response.ManagerReservationResponseDto;
+import com.homeaid.reservation.dto.response.ReservationInfo;
 import com.homeaid.reservation.dto.response.ReservationResponseDto;
 import com.homeaid.exception.CustomException;
 import com.homeaid.reservation.exception.ReservationErrorCode;
@@ -43,29 +46,23 @@ public class ReservationServiceImpl implements ReservationService {
 
   private final ServiceOptionRepository serviceOptionRepository;
 
+  private final ReservationStore reservationStore;
+
   private final NotificationPublisher notificationPublisher;
 
   @Override
   @Transactional
-  public Reservation createReservation(Reservation reservation, Long userId, Long serviceOptionId) {
-    log.info("[예약 생성] customerId={}, serviceOptionId={}", userId, serviceOptionId);
-
-    Customer customer = customerRepository.findById(userId)
-        .orElseThrow(() -> new CustomException(UserErrorCode.CUSTOMER_NOT_FOUND));
-
-    ServiceOption serviceOption = getServiceOptionById(serviceOptionId);
-
-    reservation.addItem(serviceOption);
-    reservation.setCustomer(customer);
-
-    Reservation savedReservation = reservationRepository.save(reservation);
+  public ReservationInfo createReservation(ReservationCommand reservationCommand) {
+    log.info("[예약 생성] customerId={}, serviceOptionId={}", reservationCommand.getUserId(),
+        reservationCommand.getOptionId());
+    Reservation savedReservation = reservationStore.save(reservationCommand);
 
     RequestAlert createdAdminAlert = RequestAlert.createAlert(AlertType.RESERVATION_CREATED, null,
-            UserRole.ADMIN,
-            savedReservation.getId(), null);
+        UserRole.ADMIN,
+        savedReservation.getId(), null);
     notificationPublisher.publishAdminNotification(createdAdminAlert);
 
-    return savedReservation;
+    return new ReservationInfo(savedReservation);
   }
 
   @Override

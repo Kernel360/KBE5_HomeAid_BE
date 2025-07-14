@@ -123,7 +123,7 @@ public class WorkLogServiceImpl implements WorkLogService {
     return calculatedDistance < CHECK_RANGE_DISTANCE_METER;
   }
 
-  public void isValidManager(Long managerId, Long requestManagerId) {
+  private void isValidManager(Long managerId, Long requestManagerId) {
     if (!managerId.equals(requestManagerId)) {
       throw new CustomException(WorkLogErrorCode.CHECKOUT_MANAGER_MISMATCH);
     }

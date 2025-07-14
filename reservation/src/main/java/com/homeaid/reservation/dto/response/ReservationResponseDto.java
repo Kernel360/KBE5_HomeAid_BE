@@ -103,21 +103,5 @@ public class ReservationResponseDto {
         .build();
   }
 
-  public static ReservationResponseDto toDto(Reservation reservation) {
-    return ReservationResponseDto.builder()
-        .reservationId(reservation.getId())
-        .status(reservation.getStatus())
-        .totalPrice(reservation.getTotalPrice())
-        .totalDuration(reservation.getDuration())
-        .serviceOptionName(reservation.getItem().getServiceOptionName())
-        .customerId(reservation.getCustomer().getId())
-        .managerId(reservation.getManagerId())
-        .requestedDate(reservation.getRequestedDate())
-        .requestedTime(reservation.getRequestedTime())
-            .address(reservation.getAddress())
-            .addressDetail(reservation.getAddressDetail())
-            .customerMemo(reservation.getCustomerMemo())
-        .build();
-  }
 
 }

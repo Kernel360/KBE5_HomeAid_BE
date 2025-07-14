@@ -4,7 +4,9 @@ package com.homeaid.reservation.controller;
 import com.homeaid.common.response.CommonApiResponse;
 import com.homeaid.common.response.PagedResponseDto;
 import com.homeaid.reservation.domain.Reservation;
+import com.homeaid.reservation.dto.response.ReservationInfo;
 import com.homeaid.reservation.domain.enumerate.ReservationStatus;
+import com.homeaid.reservation.dto.ReservationDtoMapper;
 import com.homeaid.reservation.dto.request.ReservationRequestDto;
 import com.homeaid.reservation.dto.request.UpdateReservationRequestDto;
 import com.homeaid.reservation.dto.response.ManagerReservationResponseDto;
@@ -45,6 +47,8 @@ public class ReservationController {
 
   private final ReservationService reservationService;
 
+  private final ReservationDtoMapper reservationDtoMapper;
+
   @PostMapping
   @Operation(summary = "예약 생성", description = "고객이 예약 옵션을 선택하여 예약을 생성합니다.")
   @ApiResponse(responseCode = "201", description = "예약 생성 성공",
@@ -55,12 +59,12 @@ public class ReservationController {
       @AuthenticationPrincipal CustomUserDetails user,
       @RequestBody @Valid ReservationRequestDto reservationRequestDto
   ) {
-    Reservation reservation = reservationService.createReservation(
-        ReservationRequestDto.toEntity(reservationRequestDto), user.getUserId(),
-        reservationRequestDto.getOptionId());
+
+    ReservationInfo reservationInfo = reservationService.createReservation(
+        reservationDtoMapper.toCommand(reservationRequestDto, user.getUserId()));
 
     return ResponseEntity.status(HttpStatus.CREATED)
-        .body(CommonApiResponse.success(ReservationResponseDto.toDto(reservation)));
+        .body(CommonApiResponse.success(reservationDtoMapper.toDto(reservationInfo)));
   }
 
   @GetMapping("/{reservationId}")
