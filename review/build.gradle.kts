@@ -20,6 +20,7 @@ dependencies {
 
     implementation(project(":user"))
     implementation(project(":global"))
+    implementation(project(":notification"))
     implementation(project(":reservation"))
 
 

@@ -1,6 +1,8 @@
 package com.homeaid.service;
 
+import com.homeaid.domain.enumerate.AlertType;
 import com.homeaid.domain.enumerate.UserRole;
+import com.homeaid.dto.RequestAlert;
 import com.homeaid.reservation.domain.Reservation;
 import com.homeaid.domain.Review;
 import com.homeaid.reservation.domain.enumerate.ReservationStatus;
@@ -11,7 +13,6 @@ import com.homeaid.exception.ReviewErrorCode;
 import com.homeaid.matching.repository.MatchingRepository;
 import com.homeaid.reservation.repository.ReservationRepository;
 import com.homeaid.repository.ReviewRepository;
-import com.homeaid.reservation.service.ReservationService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -26,6 +27,7 @@ public class ReviewServiceImpl implements ReviewService {
   private final ReservationRepository reservationRepository;
   private final MatchingRepository matchingRepository;
   private final UserRatingUpdateService userRatingUpdateService;
+  private final NotificationPublisher notificationPublisher;
 
   @Transactional
   @Override
@@ -49,7 +51,9 @@ public class ReviewServiceImpl implements ReviewService {
     userRatingUpdateService.updateRating(savedReview.getTargetId(),
         savedReview.getWriterRole());
 
-    //Todo 매니저 찜 기능
+    RequestAlert requestAlert = RequestAlert.createAlert(AlertType.MANAGER_REVIEW_RECEIVED,
+            validatedReservation.getManagerId(), UserRole.MANAGER, savedReview.getId(), null);
+    notificationPublisher.publishNotification(requestAlert);
 
     return savedReview;
   }
