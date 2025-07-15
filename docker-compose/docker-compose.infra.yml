@@ -24,3 +24,11 @@ services:
     networks:
       - ci-network
     restart: always
+
+networks:
+  ci-network:
+    external: true
+
+volumes:
+  redis_data:
+  jenkins_home:

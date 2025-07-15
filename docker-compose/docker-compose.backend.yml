@@ -23,3 +23,7 @@ services:
     restart: always
     networks:
       - ci-network
+
+networks:
+  ci-network:
+    external: true
