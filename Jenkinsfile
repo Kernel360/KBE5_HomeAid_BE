@@ -81,6 +81,7 @@ pipeline {
                 else
                     echo "이미지 없음 → 삭제 생략"
                 fi
+
                 echo "🧽 Dangling 이미지 정리"
                 DANGLING_IDS=\$(docker images -f "dangling=true" -q)
                 if [ ! -z "\$DANGLING_IDS" ]; then
@@ -94,16 +95,15 @@ pipeline {
 
         stage('Build & Run via Docker Compose') {
             when {
-                    expression { env.BRANCH_NAME == 'dev' }
-                }
+                expression { env.BRANCH_NAME == 'dev' }
+            }
             steps {
                 sh """
-                docker-compose build backend
-                docker-compose up -d backend
+                docker-compose -f docker-compose/docker-compose.yml -f docker-compose/docker-compose.backend.yml build backend
+                docker-compose -f docker-compose/docker-compose.yml -f docker-compose/docker-compose.backend.yml up -d backend
                 """
             }
         }
-    }
 
     post {
         success {
