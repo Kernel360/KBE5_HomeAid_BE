@@ -9,7 +9,7 @@ services:
   promtail:
     image: grafana/promtail
     volumes:
-      - ./logs:/logs
+      - app-logs:/logs
       - ./promtail-config.yml:/etc/promtail/promtail-config.yml
     command: -config.file=/etc/promtail/promtail-config.yml
     networks:
@@ -25,3 +25,6 @@ services:
 networks:
   ci-network:
     external: true
+
+volumes:
+  app-logs:

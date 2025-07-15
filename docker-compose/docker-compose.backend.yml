@@ -1,6 +1,8 @@
 services:
   backend:
     container_name: backend-app
+    volumes:
+      - app-logs:/logs
     build:
       context: ../
       dockerfile: Dockerfile
@@ -27,3 +29,6 @@ services:
 networks:
   ci-network:
     external: true
+
+volumes:
+  app-logs:
