@@ -32,3 +32,4 @@ networks:
 
 volumes:
   app-logs:
+    external: true
