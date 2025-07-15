@@ -1,0 +1,24 @@
+services:
+  backend:
+    container_name: backend-app
+    build:
+      context: .
+    ports:
+      - "8081:8080"
+    env_file:
+      - dev.env
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT}
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET}
+      ACCESS_TOKEN_EXPIRE_TIME: ${ACCESS_TOKEN_EXPIRE_TIME}
+      REFRESH_TOKEN_EXPIRE_TIME: ${REFRESH_TOKEN_EXPIRE_TIME}
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: homeaidpassword
+    restart: always
+    networks:
+      - ci-network
