@@ -104,6 +104,7 @@ pipeline {
                 """
             }
         }
+    }
 
     post {
         success {
@@ -122,8 +123,8 @@ pipeline {
                      -d '${message}' \
                      ${DISCORD_WEBHOOK}
                 """
-                }
             }
+        }
 
         failure {
             script {
@@ -141,8 +142,8 @@ pipeline {
                      -d '${message}' \
                      ${DISCORD_WEBHOOK}
                 """
-                }
             }
         }
     }
 }
+
