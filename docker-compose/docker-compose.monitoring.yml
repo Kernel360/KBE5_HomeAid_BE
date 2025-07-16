@@ -4,8 +4,7 @@ services:
     container_name: loki
     ports:
       - "3100:3100"
-    command:
-      - config.file=/etc/loki/local-config.yaml
+    command: -config.file=/etc/loki/local-config.yaml
     volumes:
       - ./loki-local-config.yaml:/etc/loki/local-config.yaml
     networks:
@@ -17,8 +16,7 @@ services:
     volumes:
       - app-logs:/logs
       - ./promtail-config.yml:/etc/promtail/promtail-config.yml
-    command:
-      - config.file=/promtail-config.yml
+    command: -config.file=/etc/promtail/promtail-config.yml
     networks:
       - ci-network
 
