@@ -161,7 +161,7 @@ public class SseNotificationService {
                         .name("ping")
                         .data(System.currentTimeMillis()));
             } catch (IOException ignored) {
-                emitter.complete();
+                removeConnection(userId);
             }
         });
     }

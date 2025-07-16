@@ -34,13 +34,11 @@ public class NotificationService {
     //연결시 사용자의 읽지 않은 알림들
     @Transactional(readOnly = true)
     public List<Notification> getUnReadAlerts(Long userId, UserRole userRole) {
-        List<Notification> notifications = null;
         if (UserRole.ADMIN.equals(userRole)) {
-            notifications = notificationRepository.findByTargetRoleAndStatusOrderByCreatedAtDesc(userRole, NotificationStatus.UNREAD);
+            return notificationRepository.findByTargetRoleAndStatusOrderByCreatedAtDesc(userRole, NotificationStatus.UNREAD);
+        } else {
+            return notificationRepository.findByTargetIdAndStatusOrderByCreatedAtDesc(userId, NotificationStatus.UNREAD);
         }
-        notifications = notificationRepository.findByTargetIdAndStatusOrderByCreatedAtDesc(userId, NotificationStatus.UNREAD);
-
-        return Optional.ofNullable(notifications).orElse(Collections.emptyList());
     }
 
     @Transactional

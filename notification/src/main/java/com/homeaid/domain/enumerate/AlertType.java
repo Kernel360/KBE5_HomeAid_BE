@@ -26,6 +26,7 @@ public enum AlertType {
 
     // 시스템 관련
     PAYMENT_COMPLETED("결제가 완료되었습니다"),
+    MANAGER_REVIEW_RECEIVED("고객님으로부터 새로운 리뷰를 받았습니다"),
     REVIEW_REQUESTED("리뷰 작성 요청");
 
     private final String defaultMessage;
