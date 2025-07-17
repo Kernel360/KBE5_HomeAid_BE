@@ -7,6 +7,8 @@ import com.homeaid.domain.User;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -49,11 +51,11 @@ public class OAuth2AuthenticationSuccessHandler implements AuthenticationSuccess
         );
 
         oauthTempCodeService.storeNewUserInfo(oauthCode, tempUserInfo);
-
+        String encodedName = URLEncoder.encode(user.getName(), StandardCharsets.UTF_8);
         String redirectUrl = frontendRedirectUri
             + "?oauthCode=" + oauthCode
             + "&email=" + user.getEmail()
-            + "&name=" + user.getName()
+            + "&name=" + encodedName
             + "&profileComplete=false";
 
         response.sendRedirect(redirectUrl);
