@@ -39,9 +39,11 @@ www.homeaid-service.com
 - **ID**: `010-8989-8989`
 - **PW**: `Password1!`
 
-## 주요 기능
-### 수요자
-1. 서비스 시간/옵션 선택, 위치 입력
-<div align="center">
-    ![image](https://github.com/user-attachments/assets/c7e05c74-82a6-4472-aef8-136c09cf5e64)
-</div>
+## 🖥️ 화면 구성
+| 사용자 화면 #1 - 서비스 옵션/위치 입력 | 사용자 화면 #2 - 결제 방식 선택 |
+|:--------------------------------------:|:-------------------------------:|
+| ![옵션/위치 입력](https://github.com/user-attachments/assets/c7e05c74-82a6-4472-aef8-136c09cf5e64) | ![결제 방식](https://github.com/user-attachments/assets/3caf1ee4-8fe3-470f-a761-5bfe82de3c1d) |
+| 관리자 화면 #1 - 매칭 관리 | 매니저 화면 #1 - 매칭 수락 |
+| ![매칭 관리](https://github.com/user-attachments/assets/96f88ab1-1a9d-43c7-8a83-fd97e158015f) | ![매칭 수락](https://github.com/user-attachments/assets/a57ad94e-ca48-4df2-9d4e-4bc15bf139d1) |
+| 매니저 화면 #2 - 근무 진행 | 사용자 화면 #3 - 리뷰 작성 |
+| ![근무 진행](https://github.com/user-attachments/assets/de7da09f-8042-47c5-8536-7f0111d355bd) | ![리뷰 작성](https://github.com/user-attachments/assets/ba178314-6427-4234-b47c-58362abfbe1e) |
