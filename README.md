@@ -172,13 +172,13 @@ www.homeaid-service.com
 ![Notion](https://img.shields.io/badge/Notion-Documentation-000000?logo=notion)
 ![Discord](https://img.shields.io/badge/Discord-Communication-5865F2?logo=discord&logoColor=white)
 
-## ERD
+## 🗂ERD
 ![image](https://github.com/user-attachments/assets/97ea4163-2575-4c24-b2f2-45619ec5dc47)
 
-## 아키텍쳐
+## 📐아키텍쳐
 ![image](https://github.com/user-attachments/assets/647d90c0-1898-4dc0-b7a4-70d73a21faac)
 
-## 팀원 소개
+## 👨‍👩‍👧팀원 소개
 <table>
 <tr align="center">
    <th>상우진 [팀장](Backend)</th>
