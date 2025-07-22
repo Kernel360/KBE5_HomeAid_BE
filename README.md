@@ -1,5 +1,10 @@
 <div align="center">
   <img width="512" height="512" alt="HomeAid Logo" src="https://github.com/user-attachments/assets/a0a7e916-8bf1-43f5-ae6a-53f4e24573b0" />
+
+<h3> HomeAid  Readme ✅</h3>
+
+[<img src="https://img.shields.io/badge/-readme.md-important?style=flat&logo=google-chrome&logoColor=white" />]() [<img src="https://img.shields.io/badge/release-v1.0.0-yellow?style=flat&logo=google-chrome&logoColor=white" />]()
+<br/> [<img src="https://img.shields.io/badge/프로젝트 기간-2025.05.14~2025.07.18-green?style=flat&logo=&logoColor=white" />]()
 </div>
 
 ## 🏠 HomeAid - 생활 서비스 매칭 플랫폼
@@ -50,9 +55,6 @@ www.homeaid-service.com
 | <img src="https://github.com/user-attachments/assets/de7da09f-8042-47c5-8536-7f0111d355bd" width="400"/> | <img src="https://github.com/user-attachments/assets/ba178314-6427-4234-b47c-58362abfbe1e" width="400"/> |
 
 ## 🧩 주요 기능
-
----
-
 ### 👤 수요자 (고객)
 
 - **서비스 예약**
@@ -156,3 +158,28 @@ www.homeaid-service.com
 
 ## 아키텍쳐
 ![image](https://github.com/user-attachments/assets/647d90c0-1898-4dc0-b7a4-70d73a21faac)
+
+## 팀원 소개
+<table>
+<tr align="center">
+   <th>상우진 [팀장](Backend)</th>
+   <th>강희진(Backend)</th>
+   <th>김숙현(Backend)</th>
+   <th>안지현(Backend)</th>
+</tr>
+<tr align ="center">  
+   <td><a href="https://github.com/SangWJDev"><img src="https://avatars.githubusercontent.com/u/80154292?v=4" width="100"></a></td>
+   <td><a href="https://github.com/heeejinin"><img src="https://avatars.githubusercontent.com/u/150228975?v=4" width="100"></a></td>
+   <td><a href="https://github.com/soohoioa"><img src="https://avatars.githubusercontent.com/u/151589776?v=4" width="100"></a></td>
+   <td><a href="https://github.com/jhroom"><img src="https://avatars.githubusercontent.com/u/110217121?v=4" width="100"></a></td>
+</tr>
+<tr align ="center">
+    <td>
+       - 설계 총괄<br>
+       - 매칭, 예약, 작업기록 기능 개발<br>
+       - 인프라 및 CI/CD 파이프라인 구축
+    <td></td>
+    <td></td>
+    <td></td>
+</tr>
+</table>
