@@ -199,6 +199,10 @@ www.homeaid-service.com
        - 인프라 및 CI/CD 파이프라인 구축
     <td></td>
     <td></td>
-    <td></td>
+    <td>
+      - 설계 참여<br>
+      - 알림 구현<br>
+      - 리뷰,작업기록<br>초기 구현
+    </td>
 </tr>
 </table>
