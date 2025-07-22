@@ -1,5 +1,5 @@
 <div align="center">
-  <img width="512" height="512" alt="HomeAid Logo" src="https://github.com/user-attachments/assets/a0a7e916-8bf1-43f5-ae6a-53f4e24573b0" />
+  <img width="200" height="200" alt="HomeAid Logo" src="https://github.com/user-attachments/assets/a0a7e916-8bf1-43f5-ae6a-53f4e24573b0" />
 
 <h3> HomeAid  Readme ✅</h3>
 
@@ -7,6 +7,25 @@
 <br/> [<img src="https://img.shields.io/badge/프로젝트 기간-2025.05.14~2025.07.18-green?style=flat&logo=&logoColor=white" />]()
 </div>
 
+## 📚 목차
+
+1. [🏠 HomeAid 소개](#-homeaid---생활-서비스-매칭-플랫폼)
+2. [🚀 배포 주소](#-배포-주소)
+3. [📌 서비스 이용 방법](#-서비스-이용-방법)
+4. [🖥️ 화면 구성](#️-화면-구성)
+5. [🧩 주요 기능](#-주요-기능)
+    - [👤 수요자 기능](#-수요자-고객)
+    - [👷 매니저 기능](#-매니저-공급자)
+    - [🧑‍💼 관리자 기능](#-관리자)
+6. [🛠 기술 스택](#-기술-스택)
+    - [🧩 Backend](#-backend)
+    - [🗄️ Database & Cache](#-database--cache)
+    - [☁️ Infra / DevOps](#-infra--devops)
+    - [🤝 협업 도구](#-협업-도구)
+7. [🗂 ERD](#erd)
+8. [📐 아키텍쳐](#아키텍쳐)
+9. [👨‍👩‍👧‍👦 팀원 소개](#팀원-소개)
+---
 ## 🏠 HomeAid - 생활 서비스 매칭 플랫폼
 
 > 고객과 매니저를 연결하여 **청소, 세탁, 가사 등 다양한 생활 서비스를 손쉽게 예약**할 수 있는 플랫폼입니다.
