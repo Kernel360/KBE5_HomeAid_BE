@@ -125,3 +125,34 @@ www.homeaid-service.com
 - **문의글 관리**
     - 수요자 / 매니저 문의글 조회
     - 문의글에 대한 답변 작성
+
+## 🛠 기술 스택
+### 🧩 Backend
+![Java](https://img.shields.io/badge/Java-17-007396?logo=java&logoColor=white)
+![Spring Boot](https://img.shields.io/badge/Spring%20Boot-2.7+-6DB33F?logo=spring-boot)
+![Spring Security](https://img.shields.io/badge/Spring%20Security-JWT-6DB33F?logo=spring-security)
+![Spring Data JPA](https://img.shields.io/badge/Spring%20Data%20JPA-ORM-6DB33F)
+![OAuth2](https://img.shields.io/badge/OAuth2-Google-4285F4?logo=google)
+
+### 🗄️ Database & Cache
+![MySQL](https://img.shields.io/badge/AWS%20RDS-MySQL-4479A1?logo=mysql&logoColor=white)
+![Redis](https://img.shields.io/badge/Redis-InMemory-EF2D5E?logo=redis&logoColor=white)
+![S3](https://img.shields.io/badge/AWS-S3-569A31?logo=amazon-aws&logoColor=white)
+
+### ☁️ Infra / DevOps
+![AWS EC2](https://img.shields.io/badge/AWS-EC2-FF9900?logo=amazon-aws&logoColor=white)
+![Jenkins](https://img.shields.io/badge/Jenkins-CI/CD-D24939?logo=jenkins&logoColor=white)
+![Docker](https://img.shields.io/badge/Docker-Container-2496ED?logo=docker&logoColor=white)
+![Grafana Loki](https://img.shields.io/badge/Grafana-Loki-F46800?logo=grafana&logoColor=white)
+![Promtail](https://img.shields.io/badge/Promtail-Log%20Collector-000000)
+
+### 🤝 협업 도구
+![GitHub](https://img.shields.io/badge/GitHub-Version%20Control-181717?logo=github)
+![Notion](https://img.shields.io/badge/Notion-Documentation-000000?logo=notion)
+![Discord](https://img.shields.io/badge/Discord-Communication-5865F2?logo=discord&logoColor=white)
+
+## ERD
+![image](https://github.com/user-attachments/assets/97ea4163-2575-4c24-b2f2-45619ec5dc47)
+
+## 아키텍쳐
+![image](https://github.com/user-attachments/assets/647d90c0-1898-4dc0-b7a4-70d73a21faac)
