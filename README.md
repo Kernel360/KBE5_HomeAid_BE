@@ -192,12 +192,17 @@ www.homeaid-service.com
    <td><a href="https://github.com/soohoioa"><img src="https://avatars.githubusercontent.com/u/151589776?v=4" width="100"></a></td>
    <td><a href="https://github.com/jhroom"><img src="https://avatars.githubusercontent.com/u/110217121?v=4" width="100"></a></td>
 </tr>
-<tr align ="center">
+<tr>
     <td>
        - 설계 총괄<br>
        - 매칭, 예약, 작업기록 기능 개발<br>
        - 인프라 및 CI/CD 파이프라인 구축
-    <td></td>
+    <td> 
+       - 소셜로그인 및 로그인 인증 로직 구현 <br>
+       - 액세스 토큰/리프레시 토큰 발급 및 갱신 처리 <br>
+       - S3 기반 파일 업로드/다운로드 기능 개발 <br>
+       - 유저 프로필, 서비스 이슈, 문의글(+ 검색) 기능 개발
+    </td>
     <td></td>
     <td>
       - 설계 참여<br>
