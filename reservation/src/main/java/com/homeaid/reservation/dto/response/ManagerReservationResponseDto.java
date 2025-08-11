@@ -43,7 +43,7 @@ public class ManagerReservationResponseDto {
   private MatchingStatus matchingStatus;
 
 
-  public static ManagerReservationResponseDto toDto(Reservation reservation, Customer customer, Matching matching) {
+  public static ManagerReservationResponseDto toDto(Reservation reservation, String customerName, Matching matching) {
     return ManagerReservationResponseDto.builder()
         .reservationId(reservation.getId())
         .matchingId(matching.getId())
@@ -54,7 +54,7 @@ public class ManagerReservationResponseDto {
             reservation.getRequestedTime()
         ))
         .matchingStatus(matching.getStatus())
-        .customerName(customer.getName())
+        .customerName(customerName)
         .build();
   }
 

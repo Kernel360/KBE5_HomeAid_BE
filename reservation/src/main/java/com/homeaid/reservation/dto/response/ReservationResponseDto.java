@@ -1,7 +1,6 @@
 package com.homeaid.reservation.dto.response;
 
 
-import com.homeaid.reservation.domain.Reservation;
 import com.homeaid.matching.controller.enumerate.MatchingStatus;
 import com.homeaid.reservation.domain.enumerate.ReservationStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -66,58 +65,5 @@ public class ReservationResponseDto {
 
   @Schema(description = "매칭 ID", example = "99")
   private Long matchingId;
-
-  public static ReservationResponseDto toDto(Reservation reservation, String customerName, String managerName) {
-    return ReservationResponseDto.builder()
-        .reservationId(reservation.getId())
-        .status(reservation.getStatus())
-        .totalPrice(reservation.getTotalPrice())
-        .totalDuration(reservation.getDuration())
-        .serviceOptionName(reservation.getItem().getServiceOptionName())
-        .startTime(LocalDateTime.of(
-            reservation.getRequestedDate(),
-            reservation.getRequestedTime()
-        ))
-        .customerName(customerName)
-        .matchedManagerName(managerName)
-        .build();
-  }
-
-  public static ReservationResponseDto toDto(Reservation reservation, MatchingStatus matchingStatus, String managerName, Long matchingId) {
-    return ReservationResponseDto.builder()
-        .reservationId(reservation.getId())
-        .status(reservation.getStatus())
-        .totalPrice(reservation.getTotalPrice())
-        .totalDuration(reservation.getDuration())
-        .serviceOptionName(reservation.getItem().getServiceOptionName())
-        .customerId(reservation.getCustomer().getId())
-        .startTime(LocalDateTime.of(
-            reservation.getRequestedDate(),
-            reservation.getRequestedTime()
-        ))
-        .matchedManagerName(managerName)
-        .address(reservation.getAddress())
-        .addressDetail(reservation.getAddressDetail())
-        .matchingStatus(matchingStatus)
-        .matchingId(matchingId)
-        .build();
-  }
-
-  public static ReservationResponseDto toDto(Reservation reservation) {
-    return ReservationResponseDto.builder()
-        .reservationId(reservation.getId())
-        .status(reservation.getStatus())
-        .totalPrice(reservation.getTotalPrice())
-        .totalDuration(reservation.getDuration())
-        .serviceOptionName(reservation.getItem().getServiceOptionName())
-        .customerId(reservation.getCustomer().getId())
-        .managerId(reservation.getManagerId())
-        .requestedDate(reservation.getRequestedDate())
-        .requestedTime(reservation.getRequestedTime())
-            .address(reservation.getAddress())
-            .addressDetail(reservation.getAddressDetail())
-            .customerMemo(reservation.getCustomerMemo())
-        .build();
-  }
 
 }

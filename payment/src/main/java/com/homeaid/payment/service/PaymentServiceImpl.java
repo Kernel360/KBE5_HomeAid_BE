@@ -12,6 +12,7 @@ import com.homeaid.payment.dto.response.ReservationPaymentDetailResponseDto;
 import com.homeaid.payment.exception.PaymentErrorCode;
 import com.homeaid.payment.repository.PaymentRepository;
 import com.homeaid.payment.validator.PaymentValidator;
+import com.homeaid.reservation.dto.ReservationDtoMapper;
 import com.homeaid.reservation.dto.response.ReservationResponseDto;
 import com.homeaid.reservation.repository.ReservationRepository;
 import com.homeaid.repository.UserRepository;
@@ -30,6 +31,7 @@ public class PaymentServiceImpl implements PaymentService {
   private final ReservationRepository reservationRepository;
   private final UserRepository userRepository;
   private final PaymentValidator paymentValidator;
+  private final ReservationDtoMapper reservationDtoMapper;
 
   @Override
   @Transactional
@@ -80,7 +82,7 @@ public class PaymentServiceImpl implements PaymentService {
 
     String customerName = getCustomerName(reservation.getCustomer().getId());
 
-    ReservationResponseDto reservationDto = ReservationResponseDto.toDto(reservation);
+    ReservationResponseDto reservationDto = reservationDtoMapper.toDto(reservation);
     PaymentResponseDto paymentDto = PaymentResponseDto.toDto(payment, customerName);
 
     return ReservationPaymentDetailResponseDto.of(reservationDto, paymentDto);

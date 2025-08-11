@@ -41,7 +41,8 @@ public class WorkLogController {
       @AuthenticationPrincipal CustomUserDetails user,
       @Parameter(description = "매칭 ID", required = true)
       @PathVariable(name = "matchingId") Long matchingId,
-      @RequestBody @Valid WorkLogRequestDto workLogRequestDto) {
+      @RequestBody @Valid WorkLogRequestDto workLogRequestDto
+  ) {
 
     workLogService.updateWorkLogForCheckIn(user.getUserId(), matchingId, workLogRequestDto.getLat(),
         workLogRequestDto.getLng());
@@ -94,6 +95,7 @@ public class WorkLogController {
       @RequestParam(value = "page", defaultValue = "0") int page,
       @RequestParam(value = "size", defaultValue = "10") int size
   ) {
+
     Pageable pageable = PageRequest.of(page, size);
 
     Page<WorkLog> workLogs = workLogService.getAllWorkLogsByManager(user.getUserId(), pageable);

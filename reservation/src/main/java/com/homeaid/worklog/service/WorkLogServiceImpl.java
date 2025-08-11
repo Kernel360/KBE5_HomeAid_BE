@@ -14,11 +14,9 @@ import com.homeaid.matching.repository.MatchingRepository;
 import com.homeaid.worklog.exception.WorkLogErrorCode;
 import com.homeaid.worklog.util.GeoUtils;
 import java.time.LocalDateTime;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -102,11 +100,7 @@ public class WorkLogServiceImpl implements WorkLogService {
     Page<Matching> matchingPage =
         matchingRepository.findAllWithWorkLogByManager_IdAndStatus(userId, MatchingStatus.CONFIRMED, pageable);
 
-    List<WorkLog> workLogList = matchingPage.stream()
-        .map(Matching::getWorkLog)
-        .toList();
-
-    return new PageImpl<>(workLogList, pageable, matchingPage.getTotalElements());
+    return matchingPage.map(Matching::getWorkLog);
   }
 
   @Override
@@ -129,7 +123,7 @@ public class WorkLogServiceImpl implements WorkLogService {
     return calculatedDistance < CHECK_RANGE_DISTANCE_METER;
   }
 
-  public void isValidManager(Long managerId, Long requestManagerId) {
+  private void isValidManager(Long managerId, Long requestManagerId) {
     if (!managerId.equals(requestManagerId)) {
       throw new CustomException(WorkLogErrorCode.CHECKOUT_MANAGER_MISMATCH);
     }

@@ -9,12 +9,14 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Getter
+@Builder
 public class ReservationRequestDto {
 
   @NotNull
@@ -48,17 +50,5 @@ public class ReservationRequestDto {
   @NotNull
   @Schema(description = "경도", example = "127.02894600148066")
   private Double longitude;
-
-  public static Reservation toEntity(ReservationRequestDto reservationRequestDto) {
-    return Reservation.builder()
-        .requestedDate(reservationRequestDto.getRequestedDate())
-        .requestedTime(reservationRequestDto.getRequestedTime())
-        .latitude(reservationRequestDto.getLatitude())
-        .longitude(reservationRequestDto.getLongitude())
-        .duration(reservationRequestDto.getTotalDuration())
-        .address(reservationRequestDto.getAddress())
-        .addressDetail(reservationRequestDto.getAddressDetail())
-        .build();
-  }
 
 }

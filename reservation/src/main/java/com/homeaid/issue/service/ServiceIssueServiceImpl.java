@@ -27,8 +27,7 @@ public class ServiceIssueServiceImpl implements ServiceIssueService {
   public void createIssue(Long reservationId, Long managerId, String content,
       List<MultipartFile> files) {
 
-    Reservation reservation = reservationService.validateReservation(reservationId);
-    reservationService.validateManagerAccess(reservation, managerId);
+    Reservation reservation = reservationService.validateReservation(reservationId, managerId);
     existsByReservationId(reservation.getId());
 
     ServiceIssue issue = ServiceIssue.builder()
@@ -50,8 +49,7 @@ public class ServiceIssueServiceImpl implements ServiceIssueService {
   @Transactional(readOnly = true)
   public ServiceIssue getIssueByReservation(Long reservationId, Long userId) {
 
-    Reservation reservation = reservationService.validateReservation(reservationId);
-    reservationService.validateUserAccess(reservation, userId);
+    reservationService.validateReservationAndUserAccess(reservationId, userId);
 
     return findByReservationId(reservationId);
   }

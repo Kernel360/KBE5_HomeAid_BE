@@ -4,9 +4,10 @@ package com.homeaid.reservation.controller;
 import com.homeaid.common.response.CommonApiResponse;
 import com.homeaid.common.response.PagedResponseDto;
 import com.homeaid.reservation.domain.Reservation;
+import com.homeaid.reservation.dto.response.ReservationInfo;
 import com.homeaid.reservation.domain.enumerate.ReservationStatus;
+import com.homeaid.reservation.dto.ReservationDtoMapper;
 import com.homeaid.reservation.dto.request.ReservationRequestDto;
-import com.homeaid.reservation.dto.request.UpdateReservationRequestDto;
 import com.homeaid.reservation.dto.response.ManagerReservationResponseDto;
 import com.homeaid.reservation.dto.response.ReservationResponseDto;
 import com.homeaid.auth.user.CustomUserDetails;
@@ -45,22 +46,25 @@ public class ReservationController {
 
   private final ReservationService reservationService;
 
+  private final ReservationDtoMapper reservationDtoMapper;
+
+
   @PostMapping
   @Operation(summary = "예약 생성", description = "고객이 예약 옵션을 선택하여 예약을 생성합니다.")
   @ApiResponse(responseCode = "201", description = "예약 생성 성공",
       content = @Content(schema = @Schema(implementation = ReservationResponseDto.class)))
   @ApiResponse(responseCode = "400", description = "유효하지 않은 요청",
       content = @Content(schema = @Schema(implementation = CommonApiResponse.class)))
-  public ResponseEntity<CommonApiResponse<ReservationResponseDto>> createReservation(
+  public ResponseEntity<CommonApiResponse<ReservationResponseDto>> createReservation (
       @AuthenticationPrincipal CustomUserDetails user,
-      @RequestBody @Valid ReservationRequestDto reservationRequestDto) {
+      @RequestBody @Valid ReservationRequestDto reservationRequestDto
+  ) {
 
-    Reservation reservation = reservationService.createReservation(
-        ReservationRequestDto.toEntity(reservationRequestDto), user.getUserId(),
-        reservationRequestDto.getOptionId());
+    ReservationInfo reservationInfo = reservationService.createReservation(
+        reservationDtoMapper.toCommand(reservationRequestDto, user.getUserId()));
 
     return ResponseEntity.status(HttpStatus.CREATED)
-        .body(CommonApiResponse.success(ReservationResponseDto.toDto(reservation)));
+        .body(CommonApiResponse.success(reservationDtoMapper.toDto(reservationInfo)));
   }
 
   @GetMapping("/{reservationId}")
@@ -71,13 +75,13 @@ public class ReservationController {
       @ApiResponse(responseCode = "404", description = "해당 예약이 존재하지 않음",
           content = @Content(schema = @Schema(implementation = CommonApiResponse.class))),
   })
-  public ResponseEntity<CommonApiResponse<ReservationResponseDto>> getReservation(
+  public ResponseEntity<CommonApiResponse<ReservationResponseDto>> getReservation (
       @Parameter(description = "조회할 예약 ID", example = "1")
-      @PathVariable(name = "reservationId") Long reservationId
+      @PathVariable(name = "reservationId") final Long reservationId
   ) {
 
     return ResponseEntity.ok(
-        CommonApiResponse.success(reservationService.getReservation(reservationId)));
+        CommonApiResponse.success(reservationDtoMapper.toDto(reservationService.getReservation(reservationId))));
   }
 
   @PutMapping("/{reservationId}")
@@ -88,19 +92,16 @@ public class ReservationController {
       @ApiResponse(responseCode = "400", description = "유효하지 않은 요청 또는 수정 불가 상태",
           content = @Content(schema = @Schema(implementation = CommonApiResponse.class))),
   })
-  public ResponseEntity<CommonApiResponse<ReservationResponseDto>> updateReservation(
+  public ResponseEntity<CommonApiResponse<ReservationResponseDto>> updateReservation (
       @AuthenticationPrincipal CustomUserDetails user,
       @Parameter(description = "수정할 예약 ID", example = "1")
-      @PathVariable(name = "reservationId") Long reservationId,
+      @PathVariable(name = "reservationId") final Long reservationId,
       @RequestBody @Valid ReservationRequestDto reservationRequestDto) {
 
-    Reservation updated = reservationService.updateReservation(
-        user.getUserId(),
-        reservationId,
-        UpdateReservationRequestDto.toEntity(reservationRequestDto),
-        reservationRequestDto.getOptionId());
+    ReservationInfo reservationInfo = reservationService.updateReservation(
+        reservationDtoMapper.toCommand(reservationRequestDto, user.getUserId(), reservationId));
 
-    return ResponseEntity.ok(CommonApiResponse.success(ReservationResponseDto.toDto(updated)));
+    return ResponseEntity.ok(CommonApiResponse.success(reservationDtoMapper.toDto(reservationInfo)));
   }
 
   @DeleteMapping("/{reservationId}")
@@ -114,7 +115,7 @@ public class ReservationController {
   public ResponseEntity<CommonApiResponse<Void>> deleteReservation(
       @AuthenticationPrincipal CustomUserDetails user,
       @Parameter(description = "삭제할 예약 ID", example = "1")
-      @PathVariable(name = "reservationId") Long reservationId
+      @PathVariable(name = "reservationId") final Long reservationId
   ) {
     reservationService.deleteReservation(reservationId, user.getUserId());
     return ResponseEntity.ok(CommonApiResponse.success(null));
@@ -125,7 +126,7 @@ public class ReservationController {
    */
   @GetMapping
   @Operation(summary = "예약 전체 조회", description = "페이지네이션 기반으로 예약 목록을 조회합니다.")
-  public ResponseEntity<CommonApiResponse<PagedResponseDto<ReservationResponseDto>>> getReservationsList(
+  public ResponseEntity<CommonApiResponse<PagedResponseDto<ReservationResponseDto>>> getReservationsList (
       @RequestParam(value = "page", defaultValue = "0") int page,
       @RequestParam(value = "size", defaultValue = "10") int size,
       @RequestParam(value = "status", required = false) ReservationStatus status
@@ -144,17 +145,21 @@ public class ReservationController {
    */
   @GetMapping("/customer")
   @Operation(summary = "특정 유저의 예약 전체 조회", description = "고객의 모든 예약을 페이지네이션으로 조회합니다.")
-  public ResponseEntity<CommonApiResponse<PagedResponseDto<ReservationResponseDto>>> getReservationsByCustomer(
+  public ResponseEntity<CommonApiResponse<PagedResponseDto<ReservationResponseDto>>> getReservationsByCustomer (
       @AuthenticationPrincipal CustomUserDetails user,
       @RequestParam(value = "page", defaultValue = "0") int page,
       @RequestParam(value = "size", defaultValue = "10") int size
   ) {
+
     Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdDate"));
+
     Page<Reservation> reservations = reservationService.getReservationsByCustomer(user.getUserId(),
         pageable);
 
+
     PagedResponseDto<ReservationResponseDto> response =
-        PagedResponseDto.fromPage(reservations, ReservationResponseDto::toDto);
+        PagedResponseDto.fromPage(reservations, reservationDtoMapper::toDto);
+
     return ResponseEntity.ok(CommonApiResponse.success(response));
   }
 
@@ -163,17 +168,19 @@ public class ReservationController {
    */
   @GetMapping("/manager")
   @Operation(summary = "매니저 담당 예약 전체 조회", description = "매니저가 담당 중인 예약을 페이지네이션으로 조회합니다.")
-  public ResponseEntity<CommonApiResponse<PagedResponseDto<ManagerReservationResponseDto>>> getReservationsByManager(
+  public ResponseEntity<CommonApiResponse<PagedResponseDto<ManagerReservationResponseDto>>> getReservationsByManager (
       @AuthenticationPrincipal CustomUserDetails userDetails,
       @RequestParam(value = "page", defaultValue = "0") int page,
       @RequestParam(value = "size", defaultValue = "10") int size
   ) {
 
     Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.DESC, "createdDate"));
+
     Page<ManagerReservationResponseDto> reservations = reservationService.getReservationsByManager(
         userDetails.getUserId(), pageable);
 
-    PagedResponseDto<ManagerReservationResponseDto> response = PagedResponseDto.fromPage(reservations);
+    PagedResponseDto<ManagerReservationResponseDto> response = PagedResponseDto.fromPage(
+        reservations);
 
     return ResponseEntity.ok(CommonApiResponse.success(response));
   }
